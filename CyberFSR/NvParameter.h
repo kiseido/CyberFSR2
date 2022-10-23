@@ -1,6 +1,7 @@
 #pragma once
 #include "pch.h"
 
+
 enum NvParameterType {
 	NvInt,
 	NvFloat,
@@ -12,29 +13,20 @@ enum NvParameterType {
 	NvVoidPtr
 };
 
-struct NvParameter : NVSDK_NGX_Parameter
+
+struct NvParameter : public NVSDK_NGX_Parameter
 {
-	unsigned int Width{}, Height{}, OutWidth{}, OutHeight{};
-	NVSDK_NGX_PerfQuality_Value PerfQualityValue = NVSDK_NGX_PerfQuality_Value_Balanced;
+	CyberStorage::Cyber_Resource_Pointer NGX_Feature_Create_Params;
+	CyberStorage::Cyber_Resource_Pointer NGX_XX_DLSS_Eval_Params;
+	CyberStorage::Cyber_Resource_Pointer NGX_XX_Feature_Eval_Params;
+	CyberStorage::Cyber_Resource_Pointer NGX_DLDenoise_Create_Params;
+	
 	bool RTXValue{}, FreeMemOnReleaseFeature{};
 	int CreationNodeMask{}, VisibilityNodeMask{}, OptLevel{}, IsDevSnippetBranch{};
-	float Sharpness = 1.0f;
-	bool ResetRender{};
-	float MVScaleX = 1.0, MVScaleY = 1.0;
-	float JitterOffsetX{}, JitterOffsetY{};
 
-	long long SizeInBytes{};
+	unsigned long long SizeInBytes{};
 
 	bool DepthInverted{}, AutoExposure{}, Hdr{}, EnableSharpening{}, JitterMotion{}, LowRes{};
-
-	//external Resources
-	void* InputBiasCurrentColorMask{};
-	void* Color{};
-	void* Depth{};
-	void* MotionVectors{};
-	void* Output{};
-	void* TransparencyMask{};
-	void* ExposureTexture{};
 
 	virtual void Set(const char* InName, unsigned long long InValue) override;
 	virtual void Set(const char* InName, float InValue) override;
@@ -58,5 +50,7 @@ struct NvParameter : NVSDK_NGX_Parameter
 	NVSDK_NGX_Result Get_Internal(const char* InName, unsigned long long* OutValue, NvParameterType ParameterType) const;
 
 	void EvaluateRenderScale();
+
+
 };
 

@@ -69,7 +69,40 @@ namespace Util
 		//Dev Stuff
 		SizeInBytes,
 		OptLevel,
-		IsDevSnippetBranch
+		IsDevSnippetBranch,
+
+		Feature,
+		pInDepth,
+		pInMotionVectors,
+		InJitterOffsetX,
+		InJitterOffsetY,
+		InRenderSubrectDimensions,
+		InReset,
+		InMVScaleX,
+		InMVScaleY,
+		pInTransparencyMask,
+		pInExposureTexture,
+		pInBiasCurrentColorMask,
+		InColorSubrectBase,
+		InDepthSubrectBase,
+		InMVSubrectBase,
+		InTranslucencySubrectBase,
+		InBiasCurrentColorSubrectBase,
+		InOutputSubrectBase,
+		InPreExposure,
+		InExposureScale,
+		InIndicatorInvertXAxis,
+		InIndicatorInvertYAxis,
+		GBufferSurface,
+		InToneMapperType,
+		pInMotionVectors3D,
+		pInIsParticleMask,
+		pInAnimatedTextureMask,
+		pInDepthHighRes,
+		pInPositionViewSpace,
+		InFrameTimeDeltaInMsec,
+		pInRayTracingHitDistance,
+		pInMotionVectorsReflections
 	};
 
 	NvParameter NvParameterToEnum(const char* name);

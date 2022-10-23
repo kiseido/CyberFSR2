@@ -148,59 +148,64 @@ NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_VULKAN_ReleaseFeature(NVSDK_
 	return NVSDK_NGX_Result_Success;
 }
 
+inline FfxResource Cyber_ffxGTextureResourceVK(FfxFsr2Context* fsrContext, NVSDK_NGX_Resource_VK* texture, const wchar_t* name)
+{
+	return ffxGetTextureResourceVK(fsrContext, texture->Resource.ImageViewInfo.Image, texture->Resource.ImageViewInfo.ImageView, texture->Resource.ImageViewInfo.Width, texture->Resource.ImageViewInfo.Height, texture->Resource.ImageViewInfo.Format, name);
+}
+
+inline FfxResource Cyber_ffxGTextureResourceVK(FfxFsr2Context* fsrContext, NVSDK_NGX_Resource_VK* texture, const wchar_t* name, const FfxResourceStates state)
+{
+	return ffxGetTextureResourceVK(fsrContext, texture->Resource.ImageViewInfo.Image, texture->Resource.ImageViewInfo.ImageView, texture->Resource.ImageViewInfo.Width, texture->Resource.ImageViewInfo.Height, texture->Resource.ImageViewInfo.Format, name, state);
+}
+
 NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_VULKAN_EvaluateFeature(VkCommandBuffer InCmdList, const NVSDK_NGX_Handle* InFeatureHandle, const NVSDK_NGX_Parameter* InParameters, PFN_NVSDK_NGX_ProgressCallback InCallback)
 {
 	auto instance = CyberFsrContext::instance();
-	auto& config = instance->MyConfig;
+	const auto& config = instance->MyConfig;
 	auto deviceContext = CyberFsrContext::instance()->Contexts[InFeatureHandle->Id].get();
-	const auto inParams = dynamic_cast<const NvParameter*>(InParameters);
+	const auto& inParams = *dynamic_cast<const NvParameter*>(InParameters);
 
-	auto color = (NVSDK_NGX_Resource_VK*)inParams->Color;
-	auto depth = (NVSDK_NGX_Resource_VK*)inParams->Depth;
-	auto motionVectors = (NVSDK_NGX_Resource_VK*)inParams->MotionVectors;
-	auto exposureTexture = (NVSDK_NGX_Resource_VK*)inParams->ExposureTexture;
-	auto inputBiasColorMask = (NVSDK_NGX_Resource_VK*)inParams->InputBiasCurrentColorMask;
-	auto transparencyMask = (NVSDK_NGX_Resource_VK*)inParams->TransparencyMask;
-	auto output = (NVSDK_NGX_Resource_VK*)inParams->Output;
+	auto color = (NVSDK_NGX_Resource_VK*)inParams.Feature.pInColor;
+	auto depth = (NVSDK_NGX_Resource_VK*)inParams.pInDepth;
+	auto motionVectors = (NVSDK_NGX_Resource_VK*)inParams.pInMotionVectors;
+	auto exposureTexture = (NVSDK_NGX_Resource_VK*)inParams.pInExposureTexture;
+	auto inputBiasColorMask = (NVSDK_NGX_Resource_VK*)inParams.pInBiasCurrentColorMask;
+	auto transparencyMask = (NVSDK_NGX_Resource_VK*)inParams.pInTransparencyMask;
+	auto output = (NVSDK_NGX_Resource_VK*)inParams.Feature.pInOutput;
 
 	auto* fsrContext = &deviceContext->FsrContext;
 	FfxFsr2DispatchDescription dispatchParameters = {};
 	dispatchParameters.commandList = ffxGetCommandListVK(InCmdList);
 	if (color)
-		dispatchParameters.color = ffxGetTextureResourceVK(fsrContext, color->Resource.ImageViewInfo.Image, color->Resource.ImageViewInfo.ImageView, color->Resource.ImageViewInfo.Width, color->Resource.ImageViewInfo.Height, color->Resource.ImageViewInfo.Format, (wchar_t*)L"FSR2_InputColor");
+		dispatchParameters.color = Cyber_ffxGTextureResourceVK(fsrContext, color, (wchar_t*)L"FSR2_InputColor");
 	if (depth)
-		dispatchParameters.depth = ffxGetTextureResourceVK(fsrContext, depth->Resource.ImageViewInfo.Image, depth->Resource.ImageViewInfo.ImageView, depth->Resource.ImageViewInfo.Width, depth->Resource.ImageViewInfo.Height, depth->Resource.ImageViewInfo.Format, (wchar_t*)L"FSR2_InputDepth");
+		dispatchParameters.depth = Cyber_ffxGTextureResourceVK(fsrContext, depth, (wchar_t*)L"FSR2_InputDepth");
 	if (motionVectors)
-		dispatchParameters.motionVectors = ffxGetTextureResourceVK(fsrContext, motionVectors->Resource.ImageViewInfo.Image, motionVectors->Resource.ImageViewInfo.ImageView, motionVectors->Resource.ImageViewInfo.Width, motionVectors->Resource.ImageViewInfo.Height, motionVectors->Resource.ImageViewInfo.Format, (wchar_t*)L"FSR2_InputMotionVectors");
+		dispatchParameters.motionVectors = Cyber_ffxGTextureResourceVK(fsrContext, motionVectors, (wchar_t*)L"FSR2_InputMotionVectors");
 	if (exposureTexture)
-		dispatchParameters.exposure = ffxGetTextureResourceVK(fsrContext, exposureTexture->Resource.ImageViewInfo.Image, exposureTexture->Resource.ImageViewInfo.ImageView, exposureTexture->Resource.ImageViewInfo.Width, exposureTexture->Resource.ImageViewInfo.Height, exposureTexture->Resource.ImageViewInfo.Format, (wchar_t*)L"FSR2_InputExposure");
+		dispatchParameters.exposure = Cyber_ffxGTextureResourceVK(fsrContext, exposureTexture, (wchar_t*)L"FSR2_InputExposure");
 	if (inputBiasColorMask)
-		dispatchParameters.reactive = ffxGetTextureResourceVK(fsrContext, inputBiasColorMask->Resource.ImageViewInfo.Image, inputBiasColorMask->Resource.ImageViewInfo.ImageView, inputBiasColorMask->Resource.ImageViewInfo.Width, inputBiasColorMask->Resource.ImageViewInfo.Height, inputBiasColorMask->Resource.ImageViewInfo.Format, (wchar_t*)L"FSR2_InputReactiveMap");
+		dispatchParameters.reactive = Cyber_ffxGTextureResourceVK(fsrContext, inputBiasColorMask, (wchar_t*)L"FSR2_InputReactiveMap");
 	if (transparencyMask)
-		dispatchParameters.transparencyAndComposition = ffxGetTextureResourceVK(fsrContext, transparencyMask->Resource.ImageViewInfo.Image, transparencyMask->Resource.ImageViewInfo.ImageView, transparencyMask->Resource.ImageViewInfo.Width, transparencyMask->Resource.ImageViewInfo.Height, transparencyMask->Resource.ImageViewInfo.Format, (wchar_t*)L"FSR2_TransparencyAndCompositionMap");
+		dispatchParameters.transparencyAndComposition = Cyber_ffxGTextureResourceVK(fsrContext, transparencyMask, (wchar_t*)L"FSR2_TransparencyAndCompositionMap");
 	if (output)
-		dispatchParameters.output = ffxGetTextureResourceVK(fsrContext, output->Resource.ImageViewInfo.Image, output->Resource.ImageViewInfo.ImageView, output->Resource.ImageViewInfo.Width, output->Resource.ImageViewInfo.Height, output->Resource.ImageViewInfo.Format, (wchar_t*)L"FSR2_OutputUpscaledColor", FFX_RESOURCE_STATE_UNORDERED_ACCESS);
+		dispatchParameters.output = Cyber_ffxGTextureResourceVK(fsrContext, output, (wchar_t*)L"FSR2_OutputUpscaledColor", FFX_RESOURCE_STATE_UNORDERED_ACCESS);
 
-	dispatchParameters.jitterOffset.x = inParams->JitterOffsetX;
-	dispatchParameters.jitterOffset.y = inParams->JitterOffsetY;
-	dispatchParameters.motionVectorScale.x = (float)inParams->MVScaleX;
-	dispatchParameters.motionVectorScale.y = (float)inParams->MVScaleY;
+	dispatchParameters.jitterOffset.x = inParams.InJitterOffsetX;
+	dispatchParameters.jitterOffset.y = inParams.InJitterOffsetY;
+	dispatchParameters.motionVectorScale.x = (float)inParams.InMVScaleX;
+	dispatchParameters.motionVectorScale.y = (float)inParams.InMVScaleY;
 
-	dispatchParameters.reset = inParams->ResetRender;
+	dispatchParameters.reset = inParams.InReset;
 
-	float sharpness = Util::ConvertSharpness(inParams->Sharpness, config->SharpnessRange);
-	dispatchParameters.enableSharpening = config->EnableSharpening.value_or(inParams->EnableSharpening);
+	float sharpness = Util::ConvertSharpness(inParams.Feature.InSharpness, config->SharpnessRange);
+	dispatchParameters.enableSharpening = config->EnableSharpening.value_or(inParams.EnableSharpening);
 	dispatchParameters.sharpness = config->Sharpness.value_or(sharpness);
 
-	static double lastFrameTime = 0.0;
-	double currentTime = Util::MillisecondsNow();
-	double deltaTime = (currentTime - lastFrameTime);
-	lastFrameTime = currentTime;
-
-	dispatchParameters.frameTimeDelta = (float)deltaTime;
+	dispatchParameters.frameTimeDelta = inParams.InFrameTimeDeltaInMsec;
 	dispatchParameters.preExposure = 1.0f;
-	dispatchParameters.renderSize.width = inParams->Width;
-	dispatchParameters.renderSize.height = inParams->Height;
+	dispatchParameters.renderSize.width = inParams.InRenderSubrectDimensions.Width;
+	dispatchParameters.renderSize.height = inParams.InRenderSubrectDimensions.Height;
 
 	dispatchParameters.cameraFar = deviceContext->ViewMatrix->GetFarPlane();
 	dispatchParameters.cameraNear = deviceContext->ViewMatrix->GetNearPlane();
