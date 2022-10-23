@@ -33,7 +33,6 @@ void Config::Reload()
 		UpscaleRatioOverrideEnabled = readBool("UpscaleRatio", "UpscaleRatioOverrideEnabled");
 		UpscaleRatioOverrideValue = readFloat("UpscaleRatio", "UpscaleRatioOverrideValue");
 
-
 		// Quality Overrides
 		QualityRatioOverrideEnabled = readBool("QualityOverrides", "QualityRatioOverrideEnabled");
 		if (QualityRatioOverrideEnabled) {
