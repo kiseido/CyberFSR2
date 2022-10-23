@@ -47,22 +47,6 @@ public:
 	std::optional<float> QualityRatio_Performance;
 	std::optional<float> QualityRatio_UltraPerformance;
 
-	// Dynamic Scaler
-	std::optional<bool> DynamicScalerEnabled;
-	std::optional<float> FPSTarget;
-	std::optional<float> FPSTargetMin;
-	std::optional<float> FPSTargetMax;
-	std::optional<float> FPSTargetResolutionMin;
-	std::optional<float> FPSTargetResolutionMax;
-	
-	// Quality Overrides
-	std::optional<bool> QualityRatioOverrideEnabled;
-	std::optional<float> QualityRatio_UltraQuality;
-	std::optional<float> QualityRatio_Quality;
-	std::optional<float> QualityRatio_Balanced;
-	std::optional<float> QualityRatio_Performance;
-	std::optional<float> QualityRatio_UltraPerformance;
-
 	// View
 	std::optional<ViewMethod> Method;
 	std::optional<float> VerticalFOV;
