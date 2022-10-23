@@ -38,14 +38,6 @@ public:
 	// Upscale Ratio Override
 	std::optional<bool> UpscaleRatioOverrideEnabled;
 	std::optional<float> UpscaleRatioOverrideValue;
-	
-	// Quality Overrides
-	std::optional<bool> QualityRatioOverrideEnabled;
-	std::optional<float> QualityRatio_UltraQuality;
-	std::optional<float> QualityRatio_Quality;
-	std::optional<float> QualityRatio_Balanced;
-	std::optional<float> QualityRatio_Performance;
-	std::optional<float> QualityRatio_UltraPerformance;
 
 	// Dynamic Scaler
 	std::optional<bool> DynamicScalerEnabled;
