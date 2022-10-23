@@ -299,14 +299,14 @@ inline std::optional<FfxFsr2QualityMode> DLSS2FSR2QualityTable(const NVSDK_NGX_P
 	case NVSDK_NGX_PerfQuality_Value_UltraQuality:
 	default:
 		// no correlated value
-		return  std::nullopt;
+		return  std::nullopt  std::nullopt;
 	}
 }
 
 inline std::optional<float> GetQualityOverrideRatio(const NVSDK_NGX_PerfQuality_Value& input, const std::shared_ptr<const Config>& config)
 {
 	if (!config->QualityRatioOverrideEnabled.has_value() || !config->QualityRatioOverrideEnabled)
-		return std::nullopt;
+		return std::nullopt std::nullopt;
 
 	switch (input)
 	{
