@@ -47,8 +47,6 @@ public:
 	std::optional<float> QualityRatio_Performance;
 	std::optional<float> QualityRatio_UltraPerformance;
 
-	std::optional<float> UpscaleRatioOffset;
-
 	// Dynamic Scaler
 	std::optional<bool> DynamicScalerEnabled;
 	std::optional<float> FPSTarget;
