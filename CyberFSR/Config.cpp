@@ -33,6 +33,15 @@ void Config::Reload()
 		UpscaleRatioOverrideEnabled = readBool("UpscaleRatio", "UpscaleRatioOverrideEnabled");
 		UpscaleRatioOverrideValue = readFloat("UpscaleRatio", "UpscaleRatioOverrideValue");
 
+		// Dynamic Scaler
+		DynamicScalerEnabled = readBool("DynamicResolution", "DynamicScalerEnabled");
+		if (DynamicScalerEnabled) {
+			FPSTarget = readFloat("DynamicResolution", "FPSTarget");
+			FPSTargetMin = readFloat("DynamicResolution", "FPSTargetMin");
+			FPSTargetMax = readFloat("DynamicResolution", "FPSTargetMax");
+			FPSTargetResolutionMin = readFloat("DynamicResolution", "FPSTargetResolutionMin");
+			FPSTargetResolutionMax = readFloat("DynamicResolution", "FPSTargetResolutionMax");
+		}
 
 		// Quality Overrides
 		QualityRatioOverrideEnabled = readBool("QualityOverrides", "QualityRatioOverrideEnabled");

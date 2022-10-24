@@ -206,13 +206,9 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCm
 		dispatchParameters.enableSharpening = config->EnableSharpening.value_or(inParams->EnableSharpening);
 		dispatchParameters.sharpness = config->Sharpness.value_or(sharpness);
 
-		//deltatime hax
-		static double lastFrameTime;
-		double currentTime = Util::MillisecondsNow();
-		double deltaTime = (currentTime - lastFrameTime);
-		lastFrameTime = currentTime;
+		const float FrameTimeDeltaInMsec = inParams->InFrameTimeDeltaInMsec;
 
-		dispatchParameters.frameTimeDelta = (float)deltaTime;
+		dispatchParameters.frameTimeDelta = FrameTimeDeltaInMsec;
 		dispatchParameters.preExposure = 1.0f;
 		dispatchParameters.renderSize.width = inParams->Width;
 		dispatchParameters.renderSize.height = inParams->Height;
