@@ -5,7 +5,7 @@
 #include "CyberFsr.h"
 
 // NvParameter::Set helper
-inline void Set_Member(NvParameter const* setee, const char const*& memberName, const auto& setValue, const NvParameterType& type)
+inline void Set_Member(NvParameter* setee, const char const*& memberName, const auto& setValue, const NvParameterType& type)
 {
 	setee->Set_Internal(memberName, *((unsigned long long*) & setValue), type);
 }
@@ -51,9 +51,9 @@ void NvParameter::Set(const char* InName, void* InValue)
 }
 
 // NvParameter::Get helper
-inline auto Get_Member(const NvParameter const* object, const char const*& name, const auto& value, const NvParameterType& type)
+inline auto Get_Member(const NvParameter const* getee, const char const*& memberName, const auto& value, const NvParameterType& type)
 {
-	return object->Get_Internal(name, (unsigned long long*) value, type);
+	return getee->Get_Internal(memberName, (unsigned long long*) value, type);
 }
 
 NVSDK_NGX_Result NvParameter::Get(const char* InName, unsigned long long* OutValue) const
