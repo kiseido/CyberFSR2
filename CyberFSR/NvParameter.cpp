@@ -4,8 +4,10 @@
 #include "NvParameter.h"
 #include "CyberFsr.h"
 
+
+
 // NvParameter::Set helper
-inline void Set_Member(NvParameter* setee, const char const*& memberName, const auto& setValue, const NvParameterType& type)
+inline void Set_Member(NvParameter* setee, const char*& memberName, const auto& setValue, const NvParameterType& type)
 {
 	setee->Set_Internal(memberName, *((unsigned long long*) & setValue), type);
 }
@@ -51,7 +53,7 @@ void NvParameter::Set(const char* InName, void* InValue)
 }
 
 // NvParameter::Get helper
-inline auto Get_Member(const NvParameter const* getee, const char const*& memberName, const auto& value, const NvParameterType& type)
+inline auto Get_Member(const NvParameter* getee, const char*& memberName, const auto& value, const NvParameterType& type)
 {
 	return getee->Get_Internal(memberName, (unsigned long long*) value, type);
 }
