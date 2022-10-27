@@ -29,4 +29,6 @@
 #include <nvsdk_ngx_vk.h>
 #include <nvsdk_ngx_helpers_vk.h>
 
+#include "Cyber_Storage.h"
+
 #include "SimpleIni.h"

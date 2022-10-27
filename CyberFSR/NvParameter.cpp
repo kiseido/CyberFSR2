@@ -125,19 +125,19 @@ void NvParameter::Set_Internal(const char* InName, unsigned long long InValue, N
 	switch (Util::NvParameterToEnum(InName))
 	{
 	case Util::NvParameter::MV_Scale_X:
-		MVScaleX = CastTo<float>(InValue);
+		InMVScaleX = CastTo<float>(InValue);
 		break;
 	case Util::NvParameter::MV_Scale_Y:
-		MVScaleY = CastTo<float>(InValue);
+		InMVScaleY = CastTo<float>(InValue);
 		break;
 	case Util::NvParameter::Jitter_Offset_X:
-		JitterOffsetX = CastTo<float>(InValue);
+		InJitterOffsetX = CastTo<float>(InValue);
 		break;
 	case Util::NvParameter::Jitter_Offset_Y:
-		JitterOffsetY = CastTo<float>(InValue);
+		InJitterOffsetY = CastTo<float>(InValue);
 		break;
 	case Util::NvParameter::Sharpness:
-		Sharpness = CastTo<float>(InValue);
+		Feature.InSharpness = CastTo<float>(InValue);
 		break;
 	case Util::NvParameter::Width:
 		Width = CastTo<int>(InValue);

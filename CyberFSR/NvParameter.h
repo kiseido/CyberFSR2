@@ -1,6 +1,7 @@
 #pragma once
 #include "pch.h"
 
+
 enum NvParameterType {
 	NvInt,
 	NvFloat,
@@ -12,14 +13,13 @@ enum NvParameterType {
 	NvVoidPtr
 };
 
-typedef void* CyberResource;
 
 struct NvParameter : public NVSDK_NGX_Parameter
 {
-	NVSDK_NGX_Feature_Create_Params top_params;
-	NVSDK_NGX_DLSS_Eval_Params detail_params;
-	FSR_Params fsr_params;
-
+	CyberStorage::Cyber_Resource_Pointer NGX_Feature_Create_Params;
+	CyberStorage::Cyber_Resource_Pointer NGX_XX_DLSS_Eval_Params;
+	CyberStorage::Cyber_Resource_Pointer NGX_XX_Feature_Eval_Params;
+	CyberStorage::Cyber_Resource_Pointer NGX_DLDenoise_Create_Params;
 	
 	bool RTXValue{}, FreeMemOnReleaseFeature{};
 	int CreationNodeMask{}, VisibilityNodeMask{}, OptLevel{}, IsDevSnippetBranch{};
@@ -50,5 +50,7 @@ struct NvParameter : public NVSDK_NGX_Parameter
 	NVSDK_NGX_Result Get_Internal(const char* InName, unsigned long long* OutValue, NvParameterType ParameterType) const;
 
 	void EvaluateRenderScale();
+
+
 };
 
