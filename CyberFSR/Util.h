@@ -73,7 +73,7 @@ namespace Util
 	};
 
 	NvParameter NvParameterToEnum(const char* name);
-};
+}
 
 inline void ThrowIfFailed(HRESULT hr)
 {
@@ -82,4 +82,12 @@ inline void ThrowIfFailed(HRESULT hr)
 		// Set a breakpoint on this line to catch DirectX API errors
 		throw std::exception();
 	}
+}
+
+inline FfxFsr2InitializationFlagBits operator&(const FfxFsr2InitializationFlagBits& a, const bool& b) {
+	return b ? a : (FfxFsr2InitializationFlagBits)0;
+}
+
+inline FfxFsr2InitializationFlagBits operator&(const bool& b, const FfxFsr2InitializationFlagBits& a) {
+	return b ? a : (FfxFsr2InitializationFlagBits)0;
 }

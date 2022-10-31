@@ -2,6 +2,13 @@
 #include "Config.h"
 #include "Util.h"
 
+#ifdef _DEBUG
+#include <chrono>
+// nanosecond precision
+#define GetHighPrecisionTimeNow() std::chrono::steady_clock::now()
+#define NanoSecondsBetween(a,b) std::chrono::duration_cast<std::chrono::nanoseconds>(b - a).count()
+#endif
+
 namespace fs = std::filesystem;
 
 extern HMODULE dllModule;
@@ -44,7 +51,7 @@ double Util::MillisecondsNow()
 	}
 	else
 	{
-		milliseconds = double(GetTickCount());
+		milliseconds = double(GetTickCount64()); //32bit overflows after 49days... unlikely to hit but still
 	}
 
 	return milliseconds;

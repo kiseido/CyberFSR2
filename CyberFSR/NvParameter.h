@@ -1,7 +1,8 @@
 #pragma once
 #include "pch.h"
 
-enum NvParameterType {
+enum NvParameterType 
+{
 	NvInt,
 	NvFloat,
 	NvDouble,
@@ -59,4 +60,3 @@ struct NvParameter : NVSDK_NGX_Parameter
 
 	void EvaluateRenderScale();
 };
-

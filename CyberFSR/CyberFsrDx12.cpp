@@ -108,31 +108,13 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_CreateFeature(ID3D12GraphicsCommandList* InCmdL
 	initParams.displaySize.width = inParams->OutWidth;
 	initParams.displaySize.height = inParams->OutHeight;
 
-	initParams.flags = 0;
-	if (config->DepthInverted.value_or(inParams->DepthInverted))
-	{
-		initParams.flags |= FFX_FSR2_ENABLE_DEPTH_INVERTED;
-	}
-	if (config->AutoExposure.value_or(inParams->AutoExposure))
-	{
-		initParams.flags |= FFX_FSR2_ENABLE_AUTO_EXPOSURE;
-	}
-	if (config->HDR.value_or(inParams->Hdr))
-	{
-		initParams.flags |= FFX_FSR2_ENABLE_HIGH_DYNAMIC_RANGE;
-	}
-	if (config->JitterCancellation.value_or(inParams->JitterMotion))
-	{
-		initParams.flags |= FFX_FSR2_ENABLE_MOTION_VECTORS_JITTER_CANCELLATION;
-	}
-	if (config->DisplayResolution.value_or(!inParams->LowRes))
-	{
-		initParams.flags |= FFX_FSR2_ENABLE_DISPLAY_RESOLUTION_MOTION_VECTORS;
-	}
-	if (config->InfiniteFarPlane.value_or(false))
-	{
-		initParams.flags |= FFX_FSR2_ENABLE_DEPTH_INFINITE;
-	}
+	initParams.flags = 0 |
+		(config->DepthInverted		.value_or(inParams->DepthInverted)	& FFX_FSR2_ENABLE_DEPTH_INVERTED ) |
+		(config->AutoExposure		.value_or(inParams->AutoExposure)	& FFX_FSR2_ENABLE_AUTO_EXPOSURE ) |
+		(config->HDR				.value_or(inParams->Hdr)			& FFX_FSR2_ENABLE_HIGH_DYNAMIC_RANGE) |
+		(config->JitterCancellation	.value_or(inParams->JitterMotion)	& FFX_FSR2_ENABLE_MOTION_VECTORS_JITTER_CANCELLATION) |
+		(config->DisplayResolution	.value_or(!inParams->LowRes)		& FFX_FSR2_ENABLE_DISPLAY_RESOLUTION_MOTION_VECTORS) |
+		(config->InfiniteFarPlane	.value_or(false)					& FFX_FSR2_ENABLE_DEPTH_INFINITE);
 
 	errorCode = ffxFsr2ContextCreate(&deviceContext->FsrContext, &initParams);
 	FFX_ASSERT(errorCode == FFX_OK);

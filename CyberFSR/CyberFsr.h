@@ -4,6 +4,23 @@
 #include "NvParameter.h"
 #include "DebugOverlay.h"
 
+#include <variant>
+
+using Cyber_Var_Ptr = std::variant<
+	void*,
+	std::unique_ptr<ID3D11Resource>,
+	std::unique_ptr<ID3D12Resource>,
+	std::unique_ptr<NVSDK_NGX_Resource_VK>,
+	std::unique_ptr<NVSDK_NGX_ImageViewInfo_VK>,
+	std::unique_ptr<NVSDK_NGX_BufferInfo_VK>,
+	std::unique_ptr<NVSDK_NGX_Resource_VK>,
+	std::unique_ptr<NVSDK_NGX_Feature>,
+	std::unique_ptr<NVSDK_NGX_Parameter>
+>;
+using Cyber_Key = void*;
+using Cyber_Locker = std::optional<Cyber_Var_Ptr>;
+using Cyber_Garage = std::map<Cyber_Key, Cyber_Locker>;
+
 class FeatureContext;
 
 //Global Context

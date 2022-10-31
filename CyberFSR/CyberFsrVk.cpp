@@ -80,7 +80,7 @@ NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_VULKAN_CreateFeature(VkComma
 
 NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_VULKAN_CreateFeature1(VkDevice InDevice, VkCommandBuffer InCmdList, NVSDK_NGX_Feature InFeatureID, const NVSDK_NGX_Parameter* InParameters, NVSDK_NGX_Handle** OutHandle)
 {
- 	const auto inParams = dynamic_cast<const NvParameter*>(InParameters);
+	const auto inParams = dynamic_cast<const NvParameter*>(InParameters);
 
 	auto instance = CyberFsrContext::instance();
 	auto& config = instance->MyConfig;
@@ -90,7 +90,7 @@ NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_VULKAN_CreateFeature1(VkDevi
 	deviceContext->DebugLayer = std::make_unique<DebugOverlay>(InDevice, InCmdList);
 #endif
 
-	*OutHandle = &deviceContext->Handle;
+	* OutHandle = &deviceContext->Handle;
 
 	auto initParams = deviceContext->FsrContextDescription;
 
@@ -106,34 +106,14 @@ NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_VULKAN_CreateFeature1(VkDevi
 	initParams.maxRenderSize.height = inParams->Height;
 	initParams.displaySize.width = inParams->OutWidth;
 	initParams.displaySize.height = inParams->OutHeight;
-	initParams.flags = (inParams->DepthInverted) ? FFX_FSR2_ENABLE_DEPTH_INVERTED : 0
-		| (inParams->AutoExposure) ? FFX_FSR2_ENABLE_AUTO_EXPOSURE : 0
-		| (inParams->Hdr) ? FFX_FSR2_ENABLE_HIGH_DYNAMIC_RANGE : 0
-		| (inParams->JitterMotion) ? FFX_FSR2_ENABLE_MOTION_VECTORS_JITTER_CANCELLATION : 0
-		| (!inParams->LowRes) ? FFX_FSR2_ENABLE_DISPLAY_RESOLUTION_MOTION_VECTORS : 0;
 
-	initParams.flags = 0;
-	if (config->DepthInverted.value_or(inParams->DepthInverted))
-	{
-		initParams.flags |= FFX_FSR2_ENABLE_DEPTH_INVERTED;
-	}
-	if (config->AutoExposure.value_or(inParams->AutoExposure))
-	{
-		initParams.flags |= FFX_FSR2_ENABLE_AUTO_EXPOSURE;
-	}
-	if (config->HDR.value_or(inParams->Hdr))
-	{
-		initParams.flags |= FFX_FSR2_ENABLE_HIGH_DYNAMIC_RANGE;
-	}
-	if (config->JitterCancellation.value_or(inParams->JitterMotion))
-	{
-		initParams.flags |= FFX_FSR2_ENABLE_MOTION_VECTORS_JITTER_CANCELLATION;
-	}
-	if (config->DisplayResolution.value_or(!inParams->LowRes))
-	{
-		initParams.flags |= FFX_FSR2_ENABLE_DISPLAY_RESOLUTION_MOTION_VECTORS;
-	}
-	
+	initParams.flags = 0 |
+		(config->DepthInverted		.value_or(inParams->DepthInverted)	& FFX_FSR2_ENABLE_DEPTH_INVERTED ) |
+		(config->AutoExposure		.value_or(inParams->AutoExposure)	& FFX_FSR2_ENABLE_AUTO_EXPOSURE ) |
+		(config->HDR				.value_or(inParams->Hdr)			& FFX_FSR2_ENABLE_HIGH_DYNAMIC_RANGE) |
+		(config->JitterCancellation	.value_or(inParams->JitterMotion)	& FFX_FSR2_ENABLE_MOTION_VECTORS_JITTER_CANCELLATION) |
+		(config->DisplayResolution	.value_or(!inParams->LowRes)		& FFX_FSR2_ENABLE_DISPLAY_RESOLUTION_MOTION_VECTORS);
+
 	errorCode = ffxFsr2ContextCreate(&deviceContext->FsrContext, &initParams);
 	FFX_ASSERT(errorCode == FFX_OK);
 	return NVSDK_NGX_Result_Success;

@@ -27,5 +27,7 @@
 #define NGX_ENABLE_DEPRECATED_GET_PARAMETERS
 #include <nvsdk_ngx.h>
 #include <nvsdk_ngx_vk.h>
+#include <nvsdk_ngx_helpers.h>
+#include <nvsdk_ngx_helpers_vk.h>
 
 #include "SimpleIni.h"

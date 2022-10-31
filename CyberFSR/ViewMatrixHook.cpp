@@ -3,22 +3,26 @@
 #include "scanner.h"
 std::unique_ptr<ViewMatrixHook> ViewMatrixHook::Create(const Config& config)
 {
-	switch (config.Method.value_or(ViewMethod::Config))
-	{
-		case ViewMethod::Cyberpunk2077:
-			return std::make_unique<ViewMatrixHook::Cyberpunk2077>();
-			
-		case ViewMethod::RDR2:
-			return std::make_unique<ViewMatrixHook::RDR2>();
+	std::unique_ptr<ViewMatrixHook> output;
 
-		case ViewMethod::Config:
-		default:
-			return std::make_unique<ViewMatrixHook::Configured>(
-				config.VerticalFOV.value_or(60.0f),
-				config.FarPlane.value_or(std::numeric_limits<float>::infinity()),
-				config.NearPlane.value_or(0.0f)
+	switch (config.ViewHookMethod.value_or(ViewMethod::Config))
+	{
+	case ViewMethod::Cyberpunk2077:
+		output = std::make_unique<ViewMatrixHook::Cyberpunk2077>();
+		break;
+	case ViewMethod::RDR2:
+		output = std::make_unique<ViewMatrixHook::RDR2>();
+		break;
+	case ViewMethod::Config:
+	default:
+		output = std::make_unique<ViewMatrixHook::Configured>(
+			config.VerticalFOV.value_or(60.0f),
+			config.FarPlane.value_or(std::numeric_limits<float>::infinity()),
+			config.NearPlane.value_or(0.0f)
 			);
+		break;
 	}
+	return output;
 }
 
 #pragma region Configured

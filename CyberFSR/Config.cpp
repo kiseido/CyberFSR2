@@ -53,20 +53,39 @@ void Config::Reload()
 
 
 		// View
-		Method = readViewMethod("View", "Method");
+		ViewHookMethod = readViewMethod("View", "Method");
 		VerticalFOV = readFloat("View", "VerticalFOV");
 		NearPlane = readFloat("View", "NearPlane");
 		FarPlane = readFloat("View", "FarPlane");
 		InfiniteFarPlane = readBool("View", "InfiniteFarPlane");
 
 		DisableReactiveMask = readBool("Hotfix", "DisableReactiveMask");
+
+		// Upscale type
+		//UpscalerProfile = readUpscalingProfile("Upscaling", "UpscalerProfile").value_or(UpscalingProfile::DLSS2);
+
+		StaticRatioOverride = readFloat("Upscaling", "Static_Ratio");
+
+		// Quality Overrides
+		QualityRatio_UltraQuality = readFloat("Upscaling", "Divisor_UltraQuality");
+		QualityRatio_Quality = readFloat("Upscaling", "Divisor_Quality");
+		QualityRatio_Balanced = readFloat("Upscaling", "Divisor_Balanced");
+		QualityRatio_Performance = readFloat("Upscaling", "Divisor_Performance");
+		QualityRatio_UltraPerformance = readFloat("Upscaling", "Divisor_UltraPerformance");
+
+		// Quality Overrides
+		QualityRatio_UltraQuality = readFloat("Upscaling", "Resolution_UltraQuality");
+		QualityRatio_Quality = readFloat("Upscaling", "Resolution_Quality");
+		QualityRatio_Balanced = readFloat("Upscaling", "Resolution_Balanced");
+		QualityRatio_Performance = readFloat("Upscaling", "Resolution_Performance");
+		QualityRatio_UltraPerformance = readFloat("Upscaling", "Resolution_UltraPerformance");
 	}
 
 	auto exeName = Util::ExePath().filename();
 
 	if (exeName == "Cyberpunk2077.exe")
 	{
-		Method = Method.value_or(ViewMethod::Cyberpunk2077);
+		ViewHookMethod = ViewHookMethod.value_or(ViewMethod::Cyberpunk2077);
 	}
 	else if (exeName == "DyingLightGame_x64_rwdi.exe")
 	{
@@ -74,7 +93,7 @@ void Config::Reload()
 	}
 	else if (exeName == "RDR2.exe")
 	{
-		Method = Method.value_or(ViewMethod::RDR2);
+		ViewHookMethod = ViewHookMethod.value_or(ViewMethod::RDR2);
 	}
 }
 
