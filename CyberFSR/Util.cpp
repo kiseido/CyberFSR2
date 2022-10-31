@@ -46,16 +46,16 @@ namespace CyberFSR
 		static BOOL s_use_qpc = QueryPerformanceFrequency(&s_frequency);
 		double milliseconds = 0;
 
-		if (s_use_qpc)
-		{
-			LARGE_INTEGER now;
-			QueryPerformanceCounter(&now);
-			milliseconds = double(1000.0 * now.QuadPart) / s_frequency.QuadPart;
-		}
-		else
-		{
-			milliseconds = double(GetTickCount64()); //32bit overflows after 49days... unlikely to hit but still
-		}
+	if (s_use_qpc)
+	{
+		LARGE_INTEGER now;
+		QueryPerformanceCounter(&now);
+		milliseconds = double(1000.0 * now.QuadPart) / s_frequency.QuadPart;
+	}
+	else
+	{
+		milliseconds = double(GetTickCount()); //32bit overflows after 49days... unlikely to hit but still
+	}
 
 		return milliseconds;
 	}
