@@ -80,6 +80,9 @@
     <ClCompile Include="DebugOverlay.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CyberMacros.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="scanner.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

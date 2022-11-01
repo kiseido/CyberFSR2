@@ -1,86 +1,92 @@
 #pragma once
 #include "Config.h"
 
-namespace Util
+namespace CyberFSR
 {
-	std::filesystem::path ExePath();
+	using ULongLong = unsigned long long;
+	using ULongLongPtr = ULongLong*;
 
-	std::filesystem::path DllPath();
-
-	double MillisecondsNow();
-
-	float ConvertSharpness(float sharpness, std::optional<SharpnessRangeModifier> range);
-
-	enum class NvParameter
+	namespace Util
 	{
-		Invalid,
+		std::filesystem::path ExePath();
 
-		//SuperSampling
-		SuperSampling_ScaleFactor,
-		SuperSampling_Available,
-		SuperSampling_MinDriverVersionMajor,
-		SuperSampling_MinDriverVersionMinor,
-		SuperSampling_FeatureInitResult,
-		SuperSampling_NeedsUpdatedDriver,
-		//User settings stuff
-		Width,
-		Height,
-		PerfQualityValue,
-		RTXValue,
-		FreeMemOnReleaseFeature,
-		//Resolution stuff
-		OutWidth,
-		OutHeight,
+		std::filesystem::path DllPath();
 
-		DLSS_Render_Subrect_Dimensions_Width,
-		DLSS_Render_Subrect_Dimensions_Height,
-		DLSS_Get_Dynamic_Max_Render_Width,
-		DLSS_Get_Dynamic_Max_Render_Height,
-		DLSS_Get_Dynamic_Min_Render_Width,
-		DLSS_Get_Dynamic_Min_Render_Height,
-		Sharpness,
-		//Callbacks
-		DLSSGetStatsCallback,
-		DLSSOptimalSettingsCallback,
+		double MillisecondsNow();
 
-		//Render stuff
-		CreationNodeMask,
-		VisibilityNodeMask,
-		DLSS_Feature_Create_Flags,
-		DLSS_Enable_Output_Subrects,
+		float ConvertSharpness(float sharpness, std::optional<SharpnessRangeModifier> range);
 
-		//D3D12 Buffers
-		Color,
-		MotionVectors,
-		Depth,
-		Output,
-		TransparencyMask,
-		ExposureTexture,
-		DLSS_Input_Bias_Current_Color_Mask,
-		Pre_Exposure,
-		Exposure_Scale,
+		enum class NvParameter
+		{
+			Invalid,
 
-		Reset,
-		MV_Scale_X,
-		MV_Scale_Y,
-		Jitter_Offset_X,
-		Jitter_Offset_Y,
+			//SuperSampling
+			SuperSampling_ScaleFactor,
+			SuperSampling_Available,
+			SuperSampling_MinDriverVersionMajor,
+			SuperSampling_MinDriverVersionMinor,
+			SuperSampling_FeatureInitResult,
+			SuperSampling_NeedsUpdatedDriver,
+			//User settings stuff
+			Width,
+			Height,
+			PerfQualityValue,
+			RTXValue,
+			FreeMemOnReleaseFeature,
+			//Resolution stuff
+			OutWidth,
+			OutHeight,
 
-		//Dev Stuff
-		SizeInBytes,
-		OptLevel,
-		IsDevSnippetBranch
-	};
+			DLSS_Render_Subrect_Dimensions_Width,
+			DLSS_Render_Subrect_Dimensions_Height,
+			DLSS_Get_Dynamic_Max_Render_Width,
+			DLSS_Get_Dynamic_Max_Render_Height,
+			DLSS_Get_Dynamic_Min_Render_Width,
+			DLSS_Get_Dynamic_Min_Render_Height,
+			Sharpness,
+			//Callbacks
+			DLSSGetStatsCallback,
+			DLSSOptimalSettingsCallback,
 
-	NvParameter NvParameterToEnum(const char* name);
-}
+			//Render stuff
+			CreationNodeMask,
+			VisibilityNodeMask,
+			DLSS_Feature_Create_Flags,
+			DLSS_Enable_Output_Subrects,
 
-inline void ThrowIfFailed(HRESULT hr)
-{
-	if (FAILED(hr))
+			//D3D12 Buffers
+			Color,
+			MotionVectors,
+			Depth,
+			Output,
+			TransparencyMask,
+			ExposureTexture,
+			DLSS_Input_Bias_Current_Color_Mask,
+			Pre_Exposure,
+			Exposure_Scale,
+
+			Reset,
+			MV_Scale_X,
+			MV_Scale_Y,
+			Jitter_Offset_X,
+			Jitter_Offset_Y,
+
+			//Dev Stuff
+			SizeInBytes,
+			OptLevel,
+			IsDevSnippetBranch
+		};
+
+		NvParameter NvParameterToEnum(const char* name);
+	}
+
+	inline void ThrowIfFailed(HRESULT hr)
 	{
-		// Set a breakpoint on this line to catch DirectX API errors
-		throw std::exception();
+		if (FAILED(hr))
+		{
+			// Set a breakpoint on this line to catch DirectX API errors
+			throw std::exception();
+		}
 	}
 }
 

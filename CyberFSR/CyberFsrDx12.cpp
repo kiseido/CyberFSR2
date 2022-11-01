@@ -4,6 +4,8 @@
 #include "DirectXHooks.h"
 #include "Util.h"
 
+#include "CyberMacros.cpp"
+
 NVSDK_NGX_API NVSDK_NGX_Result NVSDK_NGX_D3D12_Init_Ext(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath,
 	ID3D12Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion,
 	unsigned long long unknown0)
@@ -28,36 +30,36 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_Init_with_ProjectID(const char* InProjectId, NV
 
 NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D12_Shutdown(void)
 {
-	CyberFsrContext::instance()->Parameters.clear();
-	CyberFsrContext::instance()->Contexts.clear();
+	CyberContext::instance()->Parameters.clear();
+	CyberContext::instance()->Contexts.clear();
 	return NVSDK_NGX_Result_Success;
 }
 
 NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D12_Shutdown1(ID3D12Device* InDevice)
 {
-	CyberFsrContext::instance()->Parameters.clear();
-	CyberFsrContext::instance()->Contexts.clear();
+	CyberContext::instance()->Parameters.clear();
+	CyberContext::instance()->Contexts.clear();
 	return NVSDK_NGX_Result_Success;
 }
 
 //Deprecated Parameter Function - Internal Memory Tracking
 NVSDK_NGX_Result NVSDK_NGX_D3D12_GetParameters(NVSDK_NGX_Parameter** OutParameters)
 {
-	*OutParameters = CyberFsrContext::instance()->AllocateParameter();
+	*OutParameters = CyberContext::instance()->AllocateParameter();
 	return NVSDK_NGX_Result_Success;
 }
 
 //TODO External Memory Tracking
 NVSDK_NGX_Result NVSDK_NGX_D3D12_GetCapabilityParameters(NVSDK_NGX_Parameter** OutParameters)
 {
-	*OutParameters = new NvParameter();
+	*OutParameters = new CyberNvParameter();
 	return NVSDK_NGX_Result_Success;
 }
 
 //TODO
 NVSDK_NGX_Result NVSDK_NGX_D3D12_AllocateParameters(NVSDK_NGX_Parameter** OutParameters)
 {
-	*OutParameters = new NvParameter();
+	*OutParameters = new CyberNvParameter();
 	return NVSDK_NGX_Result_Success;
 }
 
@@ -78,15 +80,15 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_GetScratchBufferSize(NVSDK_NGX_Feature InFeatur
 NVSDK_NGX_Result NVSDK_NGX_D3D12_CreateFeature(ID3D12GraphicsCommandList* InCmdList, NVSDK_NGX_Feature InFeatureID,
 	const NVSDK_NGX_Parameter* InParameters, NVSDK_NGX_Handle** OutHandle)
 {
-	const auto inParams = dynamic_cast<const NvParameter*>(InParameters);
+	const auto inParams = dynamic_cast<const CyberNvParameter*>(InParameters);
 
 	ID3D12Device* device;
 	InCmdList->GetDevice(IID_PPV_ARGS(&device));
 
-	auto instance = CyberFsrContext::instance();
+	auto instance = CyberContext::instance();
 	auto config = instance->MyConfig;
-	auto deviceContext = CyberFsrContext::instance()->CreateContext();
-	deviceContext->ViewMatrix = ViewMatrixHook::Create(*config);
+	auto deviceContext = CyberContext::instance()->CreateContext();
+	deviceContext->ViewMatrix = CyberHooker::Create(*config);
 #ifdef DEBUG_FEATURES
 	deviceContext->DebugLayer = std::make_unique<DebugOverlay>(device, InCmdList);
 #endif
@@ -126,10 +128,10 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_CreateFeature(ID3D12GraphicsCommandList* InCmdL
 
 NVSDK_NGX_Result NVSDK_NGX_D3D12_ReleaseFeature(NVSDK_NGX_Handle* InHandle)
 {
-	auto deviceContext = CyberFsrContext::instance()->Contexts[InHandle->Id].get();
+	auto deviceContext = CyberContext::instance()->Contexts[InHandle->Id].get();
 	FfxErrorCode errorCode = ffxFsr2ContextDestroy(&deviceContext->FsrContext);
 	FFX_ASSERT(errorCode == FFX_OK);
-	CyberFsrContext::instance()->DeleteContext(InHandle);
+	CyberContext::instance()->DeleteContext(InHandle);
 	return NVSDK_NGX_Result_Success;
 }
 
@@ -150,13 +152,13 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCm
 
 	ID3D12Device* device;
 	InCmdList->GetDevice(IID_PPV_ARGS(&device));
-	auto instance = CyberFsrContext::instance();
+	auto instance = CyberContext::instance();
 	auto config = instance->MyConfig;
-	auto deviceContext = CyberFsrContext::instance()->Contexts[InFeatureHandle->Id].get();
+	auto deviceContext = CyberContext::instance()->Contexts[InFeatureHandle->Id].get();
 
 	if (orgRootSig)
 	{
-		const auto inParams = dynamic_cast<const NvParameter*>(InParameters);
+		const auto inParams = dynamic_cast<const CyberNvParameter*>(InParameters);
 
 		auto* fsrContext = &deviceContext->FsrContext;
 
@@ -184,13 +186,13 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCm
 
 		dispatchParameters.reset = inParams->ResetRender;
 
-		float sharpness = Util::ConvertSharpness(inParams->Sharpness, config->SharpnessRange);
+		float sharpness = CyberUtil::ConvertSharpness(inParams->Sharpness, config->SharpnessRange);
 		dispatchParameters.enableSharpening = config->EnableSharpening.value_or(inParams->EnableSharpening);
 		dispatchParameters.sharpness = config->Sharpness.value_or(sharpness);
 
 		//deltatime hax
 		static double lastFrameTime;
-		double currentTime = Util::MillisecondsNow();
+		double currentTime = CyberUtil::MillisecondsNow();
 		double deltaTime = (currentTime - lastFrameTime);
 		lastFrameTime = currentTime;
 
