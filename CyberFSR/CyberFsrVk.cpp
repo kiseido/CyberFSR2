@@ -96,7 +96,7 @@ NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_VULKAN_CreateFeature1(VkDevi
 	auto deviceContext = instance->CreateContext();
 	deviceContext->ViewMatrix = CyberHooker::Create(*config);
 #ifdef _DEBUG
-	deviceContext->DebugLayer = std::make_unique<DebugOverlay>(InDevice, InCmdList);
+	deviceContext->DebugLayer = std::make_unique<CyberFSR::DebugOverlay>(InDevice, InCmdList);
 #endif
 
 	* OutHandle = &deviceContext->Handle;

@@ -23,6 +23,7 @@ namespace CyberFSR
 			//SuperSampling
 			SuperSampling_ScaleFactor,
 			SuperSampling_Available,
+			SuperSampling_Available_E,
 			SuperSampling_MinDriverVersionMajor,
 			SuperSampling_MinDriverVersionMinor,
 			SuperSampling_FeatureInitResult,
@@ -74,7 +75,9 @@ namespace CyberFSR
 			//Dev Stuff
 			SizeInBytes,
 			OptLevel,
-			IsDevSnippetBranch
+			OptLevel_E,
+			IsDevSnippetBranch,
+			IsDevSnippetBranch_E
 		};
 
 		NvParameter NvParameterToEnum(const char* name);

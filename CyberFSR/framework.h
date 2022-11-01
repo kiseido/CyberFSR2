@@ -25,6 +25,7 @@
 #define NV_WINDOWS
 #define NVSDK_NGX
 #define NGX_ENABLE_DEPRECATED_GET_PARAMETERS
+#include <nvsdk_ngx_defs.h>
 #include <nvsdk_ngx.h>
 #include <nvsdk_ngx_vk.h>
 #include <nvsdk_ngx_helpers.h>

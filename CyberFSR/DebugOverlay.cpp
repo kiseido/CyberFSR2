@@ -22,4 +22,18 @@ namespace CyberFSR
 	void DebugOverlay::Render(VkCommandBuffer cmdList)
 	{
 	}
+
+	constexpr ModuleCode GetPrimaryId(ModuleCode InValue) 
+	{
+		// magic number int size, 32bit
+		constexpr unsigned int MAX_INT = 1 << 31;
+		unsigned int i = MAX_INT;
+		do 
+		{
+			i = i >> 1;
+		} 
+		while ((i & InValue) == 0 || i != 0);
+
+		return (ModuleCode)i;
+	}
 }

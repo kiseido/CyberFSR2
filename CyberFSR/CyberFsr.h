@@ -6,6 +6,8 @@
 
 #include <variant>
 
+class FeatureContext;
+
 namespace CyberFSR
 {
 	using Cyber_Var_Ptr = std::variant<
@@ -20,7 +22,7 @@ namespace CyberFSR
 		std::unique_ptr<NVSDK_NGX_Parameter>
 	>;
 	using Cyber_Key = void*;
-	using Cyber_Locker = std::optional<Cyber_Var_Ptr>;
+	using Cyber_Locker = Cyber_Var_Ptr;
 	using Cyber_Garage = std::map<Cyber_Key, Cyber_Locker>;
 
 	class FeatureContext;

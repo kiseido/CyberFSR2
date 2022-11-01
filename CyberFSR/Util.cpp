@@ -2,6 +2,7 @@
 #include "Config.h"
 #include "Util.h"
 #include <algorithm>
+//#include <ffx_fsr2_interface.h>
 
 #ifdef _DEBUG
 #include <chrono>
@@ -81,61 +82,61 @@ namespace CyberFSR
 	Util::NvParameter Util::NvParameterToEnum(const char* name)
 	{
 		static std::unordered_map<std::string, NvParameter> NvParamTranslation = {
-			{"SuperSampling.ScaleFactor", NvParameter::SuperSampling_ScaleFactor},
-			{"SuperSampling.Available", NvParameter::SuperSampling_Available},
-			{"SuperSampling.MinDriverVersionMajor", NvParameter::SuperSampling_MinDriverVersionMajor},
-			{"SuperSampling.MinDriverVersionMinor", NvParameter::SuperSampling_MinDriverVersionMinor},
-			{"SuperSampling.FeatureInitResult", NvParameter::SuperSampling_FeatureInitResult},
-			{"SuperSampling.NeedsUpdatedDriver", NvParameter::SuperSampling_NeedsUpdatedDriver},
-			{"#\x01", NvParameter::SuperSampling_Available},
+			{NVSDK_NGX_Parameter_SuperSampling_ScaleFactor, NvParameter::SuperSampling_ScaleFactor},
+			{NVSDK_NGX_Parameter_SuperSampling_Available, NvParameter::SuperSampling_Available},
+			{NVSDK_NGX_Parameter_SuperSampling_MinDriverVersionMajor, NvParameter::SuperSampling_MinDriverVersionMajor},
+			{NVSDK_NGX_Parameter_SuperSampling_MinDriverVersionMinor, NvParameter::SuperSampling_MinDriverVersionMinor},
+			{NVSDK_NGX_Parameter_SuperSampling_FeatureInitResult, NvParameter::SuperSampling_FeatureInitResult},
+			{NVSDK_NGX_Parameter_SuperSampling_NeedsUpdatedDriver, NvParameter::SuperSampling_NeedsUpdatedDriver},
+			{NVSDK_NGX_EParameter_SuperSampling_Available, NvParameter::SuperSampling_Available_E},
 
-			{"Width", NvParameter::Width},
-			{"Height", NvParameter::Height},
-			{"PerfQualityValue", NvParameter::PerfQualityValue},
-			{"RTXValue", NvParameter::RTXValue},
-			{"NVSDK_NGX_Parameter_FreeMemOnReleaseFeature", NvParameter::FreeMemOnReleaseFeature},
+			{NVSDK_NGX_Parameter_Width, NvParameter::Width},
+			{NVSDK_NGX_Parameter_Height, NvParameter::Height},
+			{NVSDK_NGX_Parameter_PerfQualityValue, NvParameter::PerfQualityValue},
+			{NVSDK_NGX_Parameter_RTXValue, NvParameter::RTXValue},
+			{NVSDK_NGX_Parameter_FreeMemOnReleaseFeature, NvParameter::FreeMemOnReleaseFeature},
 
-			{"OutWidth", NvParameter::OutWidth},
-			{"OutHeight", NvParameter::OutHeight},
+			{NVSDK_NGX_Parameter_OutWidth, NvParameter::OutWidth},
+			{NVSDK_NGX_Parameter_OutHeight, NvParameter::OutHeight},
 
-			{"DLSS.Render.Subrect.Dimensions.Width", NvParameter::DLSS_Render_Subrect_Dimensions_Width},
-			{"DLSS.Render.Subrect.Dimensions.Height", NvParameter::DLSS_Render_Subrect_Dimensions_Height},
-			{"DLSS.Get.Dynamic.Max.Render.Width", NvParameter::DLSS_Get_Dynamic_Max_Render_Width},
-			{"DLSS.Get.Dynamic.Max.Render.Height", NvParameter::DLSS_Get_Dynamic_Max_Render_Height},
-			{"DLSS.Get.Dynamic.Min.Render.Width", NvParameter::DLSS_Get_Dynamic_Min_Render_Width},
-			{"DLSS.Get.Dynamic.Min.Render.Height", NvParameter::DLSS_Get_Dynamic_Min_Render_Height},
-			{"Sharpness", NvParameter::Sharpness},
+			{NVSDK_NGX_Parameter_DLSS_Render_Subrect_Dimensions_Width, NvParameter::DLSS_Render_Subrect_Dimensions_Width},
+			{NVSDK_NGX_Parameter_DLSS_Render_Subrect_Dimensions_Height, NvParameter::DLSS_Render_Subrect_Dimensions_Height},
+			{NVSDK_NGX_Parameter_DLSS_Get_Dynamic_Max_Render_Width, NvParameter::DLSS_Get_Dynamic_Max_Render_Width},
+			{NVSDK_NGX_Parameter_DLSS_Get_Dynamic_Max_Render_Height, NvParameter::DLSS_Get_Dynamic_Max_Render_Height},
+			{NVSDK_NGX_Parameter_DLSS_Get_Dynamic_Min_Render_Width, NvParameter::DLSS_Get_Dynamic_Min_Render_Width},
+			{NVSDK_NGX_Parameter_DLSS_Get_Dynamic_Min_Render_Height, NvParameter::DLSS_Get_Dynamic_Min_Render_Height},
+			{NVSDK_NGX_Parameter_Sharpness, NvParameter::Sharpness},
 
-			{"DLSSOptimalSettingsCallback", NvParameter::DLSSOptimalSettingsCallback},
-			{"DLSSGetStatsCallback", NvParameter::DLSSGetStatsCallback},
+			{NVSDK_NGX_Parameter_DLSSOptimalSettingsCallback, NvParameter::DLSSOptimalSettingsCallback},
+			{NVSDK_NGX_Parameter_DLSSGetStatsCallback, NvParameter::DLSSGetStatsCallback},
 
-			{"CreationNodeMask", NvParameter::CreationNodeMask},
-			{"VisibilityNodeMask", NvParameter::VisibilityNodeMask},
-			{"DLSS.Feature.Create.Flags", NvParameter::DLSS_Feature_Create_Flags},
-			{"DLSS.Enable.Output.Subrects", NvParameter::DLSS_Enable_Output_Subrects},
+			{NVSDK_NGX_Parameter_CreationNodeMask, NvParameter::CreationNodeMask},
+			{NVSDK_NGX_Parameter_VisibilityNodeMask, NvParameter::VisibilityNodeMask},
+			{NVSDK_NGX_Parameter_DLSS_Feature_Create_Flags, NvParameter::DLSS_Feature_Create_Flags},
+			{NVSDK_NGX_Parameter_DLSS_Enable_Output_Subrects, NvParameter::DLSS_Enable_Output_Subrects},
 
-			{"Color", NvParameter::Color},
-			{"MotionVectors", NvParameter::MotionVectors},
-			{"Depth", NvParameter::Depth},
-			{"Output", NvParameter::Output},
-			{"TransparencyMask", NvParameter::TransparencyMask},
-			{"ExposureTexture", NvParameter::ExposureTexture},
-			{"DLSS.Input.Bias.Current.Color.Mask", NvParameter::DLSS_Input_Bias_Current_Color_Mask},
+			{NVSDK_NGX_Parameter_Color, NvParameter::Color},
+			{NVSDK_NGX_Parameter_MotionVectors, NvParameter::MotionVectors},
+			{NVSDK_NGX_Parameter_Depth, NvParameter::Depth},
+			{NVSDK_NGX_Parameter_Output, NvParameter::Output},
+			{NVSDK_NGX_Parameter_TransparencyMask, NvParameter::TransparencyMask},
+			{NVSDK_NGX_Parameter_ExposureTexture, NvParameter::ExposureTexture},
+			{NVSDK_NGX_Parameter_DLSS_Input_Bias_Current_Color_Mask, NvParameter::DLSS_Input_Bias_Current_Color_Mask},
 
-			{"DLSS.Pre.Exposure", NvParameter::Pre_Exposure},
-			{"DLSS.Exposure.Scale", NvParameter::Exposure_Scale},
+			{NVSDK_NGX_Parameter_DLSS_Pre_Exposure, NvParameter::Pre_Exposure},
+			{NVSDK_NGX_Parameter_DLSS_Exposure_Scale, NvParameter::Exposure_Scale},
 
-			{"Reset", NvParameter::Reset},
-			{"MV.Scale.X", NvParameter::MV_Scale_X},
-			{"MV.Scale.Y", NvParameter::MV_Scale_Y},
-			{"Jitter.Offset.X", NvParameter::Jitter_Offset_X},
-			{"Jitter.Offset.Y", NvParameter::Jitter_Offset_Y},
+			{NVSDK_NGX_Parameter_Reset, NvParameter::Reset},
+			{NVSDK_NGX_Parameter_MV_Scale_X, NvParameter::MV_Scale_X},
+			{NVSDK_NGX_Parameter_MV_Scale_Y, NvParameter::MV_Scale_Y},
+			{NVSDK_NGX_Parameter_Jitter_Offset_X, NvParameter::Jitter_Offset_X},
+			{NVSDK_NGX_Parameter_Jitter_Offset_Y, NvParameter::Jitter_Offset_Y},
 
-			{"SizeInBytes", NvParameter::SizeInBytes},
-			{"Snippet.OptLevel", NvParameter::OptLevel},
-			{"#\x44", NvParameter::OptLevel},
-			{"Snippet.IsDevBranch", NvParameter::IsDevSnippetBranch},
-			{"#\x45", NvParameter::IsDevSnippetBranch}
+			{NVSDK_NGX_Parameter_SizeInBytes, NvParameter::SizeInBytes},
+			{NVSDK_NGX_Parameter_OptLevel, NvParameter::OptLevel},
+			{NVSDK_NGX_EParameter_OptLevel, NvParameter::OptLevel_E},
+			{NVSDK_NGX_Parameter_IsDevSnippetBranch, NvParameter::IsDevSnippetBranch},
+			{NVSDK_NGX_EParameter_IsDevSnippetBranch, NvParameter::IsDevSnippetBranch_E}
 		};
 
 		return NvParamTranslation[std::string(name)];

@@ -6,6 +6,10 @@
 
 #include "CyberMacros.cpp"
 
+// external\FidelityFX-FSR2\src\ffx-fsr2-api\ffx_fsr2_interface.h
+// external\nvngx_dlss_sdk\include\nvsdk_ngx_defs.h
+// external\nvngx_dlss_sdk\include\nvsdk_ngx_helpers.h
+
 NVSDK_NGX_API NVSDK_NGX_Result NVSDK_NGX_D3D12_Init_Ext(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath,
 	ID3D12Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion,
 	unsigned long long unknown0)
@@ -20,11 +24,27 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_Init(unsigned long long InApplicationId, const 
 
 NVSDK_NGX_API NVSDK_NGX_Result NVSDK_NGX_D3D12_Init_ProjectID(const char* InProjectId, NVSDK_NGX_EngineType InEngineType, const char* InEngineVersion, const wchar_t* InApplicationDataPath, ID3D12Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion)
 {
+//typedef enum NVSDK_NGX_EngineType
+//{
+//	NVSDK_NGX_ENGINE_TYPE_CUSTOM = 0,
+//		NVSDK_NGX_ENGINE_TYPE_UNREAL,<<<< the game tells us it is unreal!
+//		NVSDK_NGX_ENGINE_TYPE_UNITY,
+//		NVSDK_NGX_ENGINE_TYPE_OMNIVERSE,
+//		NVSDK_NGX_ENGINE_COUNT
+//} NVSDK_NGX_EngineType;
 	return NVSDK_NGX_D3D12_Init_Ext(0x1337, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion, 0);
 }
 
 NVSDK_NGX_Result NVSDK_NGX_D3D12_Init_with_ProjectID(const char* InProjectId, NVSDK_NGX_EngineType InEngineType, const char* InEngineVersion, const wchar_t* InApplicationDataPath, ID3D12Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion)
 {
+//typedef enum NVSDK_NGX_EngineType
+//{
+//	NVSDK_NGX_ENGINE_TYPE_CUSTOM = 0,
+//		NVSDK_NGX_ENGINE_TYPE_UNREAL,<<<< the game tells us it is unreal!
+//		NVSDK_NGX_ENGINE_TYPE_UNITY,
+//		NVSDK_NGX_ENGINE_TYPE_OMNIVERSE,
+//		NVSDK_NGX_ENGINE_COUNT
+//} NVSDK_NGX_EngineType;
 	return NVSDK_NGX_D3D12_Init_Ext(0x1337, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion, 0);
 }
 
