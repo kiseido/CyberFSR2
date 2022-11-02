@@ -2,21 +2,15 @@
 #include "pch.h"
 #include "NvParameter.h"
 
-#include <typeindex>
-#include <typeinfo>
 #include <variant>
-
-#include <iostream>
-#include <map>
-#include <string>
-#include <typeinfo>
 
 namespace CyberFSR 
 {
+	class CyberStorage;
+
 	class CyberStorage
 	{
-	public:
-		using Cyber_Resource_Pointer = std::variant<
+		typedef std::variant<
 			void*,
 			std::shared_ptr<ID3D11Resource>,
 			std::shared_ptr<ID3D12Resource>,
@@ -26,7 +20,31 @@ namespace CyberFSR
 			std::shared_ptr<NVSDK_NGX_Resource_VK>,
 			std::shared_ptr<NVSDK_NGX_Feature>,
 			std::shared_ptr<NVSDK_NGX_Parameter>
-		>;
+		> Cyber_Resource_Pointer;
+
+		template <typename type>
+		using Cyber_Garage = std::map<void*, std::shared_ptr<type>>;
+	private:
+		static Cyber_Garage<CyberStorage> SuperStorage;
+
+		// DLSS related stuff
+		static Cyber_Garage<NvParameter> NvParameters;
+		static Cyber_Garage<NVSDK_NGX_Feature_Create_Params> Feature_Create_Params;
+		static Cyber_Garage<NVSDK_NGX_DLSS_Create_Params> DLSS_Create_Params;
+		static Cyber_Garage<NVSDK_NGX_DLDenoise_Create_Params> DLDenoise_Create_Params;
+
+		// D3D related stuff
+		static Cyber_Garage<ID3D11Resource> ID3D11Resources;
+		static Cyber_Garage<ID3D12Resource> ID3D12Resources;
+
+		// Vulkan related stuff
+
+
+		// FSR related stuff
+
+	public:
+		//static ModuleCode Interal_Logs[5000];
+		//static NvLogStruct Nv_Logs[5000];
 
 		//	using Cyber_Resource_Pointer = union {
 		//		void* Raw;
@@ -46,26 +64,6 @@ namespace CyberFSR
 		//	};
 
 			//typedef std::pair<std::type_index, Cyber_Resource_P> Cyber_Resource;
-
-		template <typename type>
-		using Cyber_Garage = std::map<void*, std::shared_ptr<type>>;
-
-	private:
-		// DLSS related stuff
-		static Cyber_Garage<NvParameter> Allocated_Parameters;
-		static Cyber_Garage<NVSDK_NGX_Feature_Create_Params> Allocated_Feature_Create_Params;
-		static Cyber_Garage<NVSDK_NGX_DLSS_Create_Params> Allocated_DLSS_Create_Params;
-		static Cyber_Garage<NVSDK_NGX_DLDenoise_Create_Params> Allocated_DLDenoise_Create_Params;
-
-		// D3D related stuff
-		static Cyber_Garage<ID3D11Resource> Allocated_ID3D11Resource;
-		static Cyber_Garage<ID3D12Resource> Allocated_ID3D12Resource;
-
-		// Vulkan related stuff
-
-
-		// FSR related stuff
-
 	};
 
 	// add sub-module names between the defined numbers for automated incrementing and sub-division
@@ -93,7 +91,7 @@ namespace CyberFSR
 		// can go up to 0b1 << 30 with this pattern
 		Highest = 0xffffffff & ~(0b1<<31),
 
-	};
+	};	
 
 	constexpr ModuleCode GetPrimaryId(ModuleCode);
 
@@ -102,4 +100,3 @@ namespace CyberFSR
 
 	};
 }
-
