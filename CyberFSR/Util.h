@@ -81,6 +81,9 @@ namespace CyberFSR
 		};
 
 		NvParameter NvParameterToEnum(const char* name);
+		UpscalingProfile UpscalingProfileMap(const char* name);
+		ViewMethod ViewMethodMap(const char* name);
+		SharpnessRangeModifier SharpnessRangeModifierMap(const char* name);
 	}
 
 	inline void ThrowIfFailed(HRESULT hr)

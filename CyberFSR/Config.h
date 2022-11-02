@@ -24,41 +24,6 @@ namespace CyberFSR
 		Fixed
 	};
 
-	// String switch paridgam
-
-	struct SharpnessRangeModifierMap : public std::map<std::string, SharpnessRangeModifier>
-	{
-		SharpnessRangeModifierMap()
-		{
-			this->operator[]("Normal") = SharpnessRangeModifier::Normal;
-			this->operator[]("Extended") = SharpnessRangeModifier::Extended;
-		};
-		~SharpnessRangeModifierMap() {}
-	};
-
-	struct ViewMethodMap : public std::map<std::string, ViewMethod>
-	{
-		ViewMethodMap()
-		{
-			this->operator[]("Config") = ViewMethod::Config;
-			this->operator[]("Cyberpunk2077") = ViewMethod::Cyberpunk2077;
-			this->operator[]("RDR2") = ViewMethod::RDR2;
-		};
-		~ViewMethodMap() {}
-	};
-
-	struct UpscalingProfileMap : public std::map<std::string, UpscalingProfile>
-	{
-		UpscalingProfileMap()
-		{
-			this->operator[]("FSR2") = UpscalingProfile::FSR2;
-			this->operator[]("DLSS2") = UpscalingProfile::DLSS2;
-			this->operator[]("DynaRes") = UpscalingProfile::DynaRes;
-			this->operator[]("Fixed") = UpscalingProfile::Fixed;
-		};
-		~UpscalingProfileMap() {}
-	};
-
 	class Config
 	{
 	public:

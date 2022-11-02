@@ -144,11 +144,12 @@ namespace CyberFSR
 	std::optional<bool> Config::readBool(std::string section, std::string key)
 	{
 		auto value = readString(section, key, true);
-		if (value == "true")
+
+		if (value.value().compare("true") == 0)
 		{
 			return true;
 		}
-		else if (value == "false")
+		else if (value.value().compare("false") == 0)
 		{
 			return false;
 		}
@@ -159,34 +160,20 @@ namespace CyberFSR
 	std::optional<SharpnessRangeModifier> Config::readSharpnessRange(std::string section, std::string key)
 	{
 		auto value = readString(section, key, true);
-		if (value == "normal")
-		{
-			return SharpnessRangeModifier::Normal;
-		}
-		else if (value == "extended")
-		{
-			return SharpnessRangeModifier::Extended;
-		}
 
-		return std::nullopt;
+		if (value)
+			return Util::SharpnessRangeModifierMap(value.value().c_str());
+		else
+			return std::nullopt;
 	}
 
 	std::optional<ViewMethod> Config::readViewMethod(std::string section, std::string key)
 	{
 		auto value = readString(section, key, true);
-		if (value == "config")
-		{
-			return ViewMethod::Config;
-		}
-		else if (value == "cyberpunk2077")
-		{
-			return ViewMethod::Cyberpunk2077;
-		}
-		else if (value == "rdr2")
-		{
-			return ViewMethod::RDR2;
-		}
 
-		return std::nullopt;
+		if (value)
+			return Util::ViewMethodMap(value.value().c_str());
+		else
+			return std::nullopt;
 	}
 }

@@ -4,12 +4,17 @@
 #include <algorithm>
 //#include <ffx_fsr2_interface.h>
 
-#ifdef _DEBUG
+
 #include <chrono>
 // nanosecond precision
 #define GetHighPrecisionTimeNow() std::chrono::steady_clock::now()
+
 #define NanoSecondsBetween(a,b) std::chrono::duration_cast<std::chrono::nanoseconds>(b - a).count()
-#endif
+#define MilliSecondsBetween(a,b) std::chrono::duration_cast<std::chrono::milliseconds>(b - a).count()
+
+#define NanoSecondsNow() std::chrono::duration_cast<std::chrono::nanoseconds>(GetHighPrecisionTimeNow().time_since_epoch()).count()
+#define MilliSecondsNow() std::chrono::duration_cast<std::chrono::milliseconds>(GetHighPrecisionTimeNow().time_since_epoch()).count()
+
 
 namespace fs = std::filesystem;
 
@@ -43,20 +48,27 @@ namespace CyberFSR
 
 	double Util::MillisecondsNow()
 	{
+		constexpr double MsinSec = (double)1 / (double)1000;
+
 		static LARGE_INTEGER s_frequency;
-		static BOOL s_use_qpc = QueryPerformanceFrequency(&s_frequency);
+		static int s_use_qpc = QueryPerformanceFrequency(&s_frequency);
 		double milliseconds = 0;
 
-	if (s_use_qpc)
-	{
-		LARGE_INTEGER now;
-		QueryPerformanceCounter(&now);
-		milliseconds = double(1000.0 * now.QuadPart) / s_frequency.QuadPart;
-	}
-	else
-	{
-		milliseconds = double(GetTickCount()); //32bit overflows after 49days... unlikely to hit but still
-	}
+		switch(s_use_qpc)
+		{
+		case 0:
+			LARGE_INTEGER now;
+			QueryPerformanceCounter(&now);
+			milliseconds = double(1000.0 * now.QuadPart) / s_frequency.QuadPart;
+			break;
+		case 1:
+			milliseconds = double(GetTickCount64()); //32bit overflows after 49days... unlikely to hit but still
+			break;
+		case 2:
+		default:
+			milliseconds = MilliSecondsNow() * MsinSec; //really fast chrono, use mult to keep it fast
+			break;
+		}
 
 		return milliseconds;
 	}
@@ -69,15 +81,45 @@ namespace CyberFSR
 		{
 			// normalize sharpness value to [0, 1] range
 			// originally in range [-0.99, 1]
-			output = (sharpness + 0.99f) / 2.0f;
-			output = std::clamp(output, 0.0f, 1.0f); 
+			output = ((sharpness * 2.0f ) + 1.98f) * 0.25f;
+			output = std::clamp(output, 0.0f, 1.0f);
 		}
 		else
 		{
 			output = sharpness;
 		}
-		return output;
+		return 0;
 	}
+
+	SharpnessRangeModifier Util::SharpnessRangeModifierMap(const char* in)
+	{
+		static std::unordered_map<std::string, SharpnessRangeModifier> Translation = {
+			{"Normal", SharpnessRangeModifier::Normal},
+			{"Extended", SharpnessRangeModifier::Extended}
+		};
+		return Translation[std::string(in)];
+	};
+
+	ViewMethod Util::ViewMethodMap(const char* in)
+	{
+		static std::unordered_map<std::string, ViewMethod> Translation = {
+			{"Config", ViewMethod::Config},
+			{"Cyberpunk2077", ViewMethod::Cyberpunk2077},
+			{"RDR2", ViewMethod::RDR2}
+		};
+		return Translation[std::string(in)];
+	};
+
+	UpscalingProfile Util::UpscalingProfileMap(const char* in)
+	{
+		static std::unordered_map<std::string, UpscalingProfile> Translation = {
+			{"FSR2", UpscalingProfile::FSR2},
+			{"DLSS2", UpscalingProfile::DLSS2},
+			{"DynaRes", UpscalingProfile::DynaRes},
+			{"Fixed", UpscalingProfile::Fixed}
+		};
+		return Translation[std::string(in)];
+	};
 
 	Util::NvParameter Util::NvParameterToEnum(const char* name)
 	{
