@@ -44,13 +44,13 @@ namespace CyberFSR
 
 	struct Log_Buffer {
 	private:
-		static constexpr int ValueArrSize = 0b1 << 12;
-		int head = 0;
-		int tail = 0;
+		static constexpr unsigned int ValueArrSize = 0b1 << 12;
+		unsigned int head = 0;
+		unsigned int tail = 0;
 		Log_Small values[ValueArrSize];
 	public:
 		Log_Small get();
-		Log_Small put();
+		bool put();
 	};
 	//class CyberStorage;
 
@@ -95,7 +95,6 @@ namespace CyberFSR
 		// FSR related stuff
 
 	public:
-
 		static Log_Buffer Interal_Logs;
 	};
 

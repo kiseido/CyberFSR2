@@ -65,7 +65,7 @@ namespace CyberFSR
 		std::optional<SharpnessRangeModifier> SharpnessRange;
 
 		// Upscale type
-		std::optional<UpscalingProfile> UpscalerProfile;
+		UpscalingProfile UpscalerProfile;
 
 		// Upscale Ratio Override
 		std::optional<float> StaticRatioOverride;

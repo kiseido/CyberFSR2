@@ -309,6 +309,57 @@ NVSDK_NGX_Result NvParameter::Get_Internal(const char* InName, unsigned long lon
 	}
 
 	// EvaluateRenderScale helper
+	inline float FSR2QualityTable(const NVSDK_NGX_PerfQuality_Value& input)
+	{
+		float output = NO_VALUEf;
+
+		switch (input)
+		{
+		case NVSDK_NGX_PerfQuality_Value_UltraPerformance:
+			output = 3.0f;
+			break;
+		case NVSDK_NGX_PerfQuality_Value_MaxPerf:
+			output = 2.0f;
+			break;
+		case NVSDK_NGX_PerfQuality_Value_Balanced:
+			output = 1.7f;
+			break;
+		case NVSDK_NGX_PerfQuality_Value_MaxQuality:
+			output = 1.5f;
+			break;
+		case NVSDK_NGX_PerfQuality_Value_UltraQuality:
+			break;
+		}
+		return output;
+	}
+
+	// EvaluateRenderScale helper
+	inline float DLSS2QualityTable(const NVSDK_NGX_PerfQuality_Value& input)
+	{
+		float output = NO_VALUEf;
+
+		switch (input)
+		{
+		case NVSDK_NGX_PerfQuality_Value_UltraPerformance:
+			output = 3.0f;
+			break;
+		case NVSDK_NGX_PerfQuality_Value_MaxPerf:
+			output = 2.0f;
+			break;
+		case NVSDK_NGX_PerfQuality_Value_Balanced:
+			output = 1.7f;
+			break;
+		case NVSDK_NGX_PerfQuality_Value_MaxQuality:
+			output = 1.5f;
+			break;
+		case NVSDK_NGX_PerfQuality_Value_UltraQuality:
+			output = 1.3f;
+			break;
+		}
+		return output;
+	}
+
+	// EvaluateRenderScale helper
 	inline FfxFsr2QualityMode DLSS2FSR2QualityTable(const NVSDK_NGX_PerfQuality_Value& input)
 	{
 		int output = NO_VALUEi;
@@ -328,10 +379,7 @@ NVSDK_NGX_Result NvParameter::Get_Internal(const char* InName, unsigned long lon
 			output = FFX_FSR2_QUALITY_MODE_QUALITY;
 			break;
 		case NVSDK_NGX_PerfQuality_Value_UltraQuality:
-		default:
-			// no correlated value, add some logging?
 			break;
-
 		}
 		return (FfxFsr2QualityMode)output;
 	}
@@ -365,77 +413,126 @@ NVSDK_NGX_Result NvParameter::Get_Internal(const char* InName, unsigned long lon
 		return output;
 	}
 
-	void NvParameter::EvaluateRenderScale()
+	typedef std::pair<unsigned int, unsigned int> ScreenDimensions;
+
+
+	inline ScreenDimensions CalcSame(const auto& Width, const auto& Height, const auto& Division_Ratio) {
+		// do a single division now to save on calc time later
+		const auto resolution_Ratio = 1.0f / Division_Ratio;
+
+		ScreenDimensions output = { 0,0 };
+
+		// Multiply is faster than divide
+		const unsigned int computedHeight = std::lround(Height * resolution_Ratio);
+		// Multiply is faster than divide
+		const unsigned int computedWidth = std::lround(Width * resolution_Ratio);
+
+		output.first = computedHeight;
+		output.second = computedWidth;
+		return output;
+	}
+
+	inline ScreenDimensions CalcDifferent(const auto& Width, const auto& Height, const auto& Width_Division_Ratio, const auto& Height_Division_Ratio) {
+		ScreenDimensions output = { 0,0 };
+		const unsigned int computedHeight = std::lround(Height / Height_Division_Ratio);
+		const unsigned int computedWidth = std::lround(Width / Width_Division_Ratio);
+
+		output.first = computedHeight;
+		output.second = computedWidth;
+		return output;
+	}
+
+	inline ScreenDimensions Switcher(const std::shared_ptr<Config>& InConfig, const NvParameter* InNvParameter, const UpscalingProfile& InProfile)
 	{
 		// multiply is generally significantly faster than divide, so store ratio as a multiple
 		// constexpr should occur at compile-time, saving on division later
 		// double is vastly more accurate than float, use it curing compute when useful and cheap
 
+		ScreenDimensions output = {0,0};
+
+		switch (InProfile)
+		{
+			case UpscalingProfile::DLSS2:
+			{
+				float QualityRatio = GetQualityOverrideRatio(InNvParameter->PerfQualityValue, InConfig);
+
+				if (QualityRatio == NO_VALUEf)
+					QualityRatio = DLSS2QualityTable(InNvParameter->PerfQualityValue);
+
+				output = CalcSame(InNvParameter->Width, InNvParameter->Height, QualityRatio);
+			}
+				break;
+			case UpscalingProfile::FSR2:
+			{
+				float QualityRatio = GetQualityOverrideRatio(InNvParameter->PerfQualityValue, InConfig);
+				if (QualityRatio != NO_VALUEf)
+				{
+					output = CalcSame(InNvParameter->Width, InNvParameter->Height, QualityRatio);
+				} 
+				else
+				{
+					FfxFsr2QualityMode fsrQualityMode = DLSS2FSR2QualityTable(InNvParameter->PerfQualityValue);
+
+					if (fsrQualityMode != NO_VALUEi)
+					{
+						const FfxErrorCode err = ffxFsr2GetRenderResolutionFromQualityMode(&output.second, &output.first, InNvParameter->Width, InNvParameter->Height, fsrQualityMode);
+#ifdef _DEBUG
+					switch (err)
+					{
+					case FFX_OK:
+						// all good!
+						break;
+					case FFX_ERROR_INVALID_POINTER:
+						printf("EvaluateRenderScale error: FFX_ERROR_INVALID_POINTER");
+						break;
+					case FFX_ERROR_INVALID_ENUM:
+						printf("EvaluateRenderScale error: FFX_ERROR_INVALID_ENUM");
+						break;
+					default:
+						printf("EvaluateRenderScale error: default");
+						// bad crap!
+						break;
+					}
+#endif
+					}
+				}
+			}
+				break;
+			case UpscalingProfile::DynaRes:
+				break;
+			case UpscalingProfile::Fixed:
+				break;
+			default:
+				// no correlated value, add some logging?
+				break;
+		}
+		return output;
+	}
+
+	void NvParameter::EvaluateRenderScale()
+	{
 		// percentage of the screen size to use as render size, in decimal. 
 		// 1.0 : 100%
 		// 0.8 :   80%
 		//
-		constexpr double defaultRatioVertical = 1.0f;
+		constexpr auto defaultRatioVertical = 1.0f;
 		// percentage of the screen size to use as render size, in decimal. 
 		// 1.0 : 100%
 		// 0.8 :   80%
 		//
-		constexpr double defaultRatioHorizontal = 1.0f;
+		constexpr auto defaultRatioHorizontal = 1.0f;
 
 	std::shared_ptr<Config> config = CyberFsrContext::instance()->MyConfig;
 
-		const float QualityRatio = GetQualityOverrideRatio(PerfQualityValue, config);
+		auto dimensions = Switcher(config, this, config->UpscalerProfile);
 
-		if (QualityRatio != NO_VALUEf) {
-			// shift to doubles
-			const double resDivision_Ratio = QualityRatio;
-
-			// do a single division now to save on calc time later
-			const double resolution_Ratio = 1.0f / resDivision_Ratio;
-
-			// calc and apply non-square pixel size here
-			const double resolution_Ratio_Vertical = resolution_Ratio;
-			const double resolution_Ratio_Horizontal = resolution_Ratio;
-
-			const unsigned int computedHeight = std::round(Height * resolution_Ratio_Vertical);
-			const unsigned int computedWidth = std::round(Width * resolution_Ratio_Horizontal);
-
-			// Multiply is faster than divide
-			OutHeight = computedHeight;
-			OutWidth = computedWidth;
+		if (dimensions.second == 0 || dimensions.first == 0) {
+			OutHeight = std::lround(Height * defaultRatioVertical);
+			OutWidth = std::lround(Width * defaultRatioHorizontal);
 		}
-		else 
-		{
-			FfxFsr2QualityMode fsrQualityMode = DLSS2FSR2QualityTable(PerfQualityValue);
-
-			if (fsrQualityMode != NO_VALUEi) 
-			{
-				const FfxErrorCode err = ffxFsr2GetRenderResolutionFromQualityMode(&OutWidth, &OutHeight, Width, Height, fsrQualityMode);
-#ifdef _DEBUG
-				switch (err)
-				{
-				case FFX_OK:
-					// all good!
-					break;
-				case FFX_ERROR_INVALID_POINTER:
-					printf("EvaluateRenderScale error: FFX_ERROR_INVALID_POINTER");
-					break;
-				case FFX_ERROR_INVALID_ENUM:
-					printf("EvaluateRenderScale error: FFX_ERROR_INVALID_ENUM");
-					break;
-				default:
-					printf("EvaluateRenderScale error: default");
-					// bad crap!
-					break;
-				}
-#endif
-			}
-			else 
-			{
-				// have to have some sort of default unless we want to crash?
-				OutHeight = unsigned int(std::round(Height * defaultRatioVertical));
-				OutWidth = unsigned int(std::round(Width * defaultRatioHorizontal));
-			}
+		else {
+			OutHeight = dimensions.first;
+			OutWidth = dimensions.second;
 		}
 	}
 

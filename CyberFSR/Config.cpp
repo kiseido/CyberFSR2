@@ -64,7 +64,7 @@ namespace CyberFSR
 			DisableReactiveMask = readBool("Hotfix", "DisableReactiveMask");
 
 			// Upscale type
-			//UpscalerProfile = readUpscalingProfile("Upscaling", "UpscalerProfile").value_or(UpscalingProfile::DLSS2);
+			UpscalerProfile = UpscalingProfile::DLSS2;//readUpscalingProfile("Upscaling", "UpscalerProfile").value_or(UpscalingProfile::DLSS2);
 
 			StaticRatioOverride = readFloat("Upscaling", "Static_Ratio");
 
