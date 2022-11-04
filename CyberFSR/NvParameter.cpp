@@ -270,10 +270,12 @@ NVSDK_NGX_Result NvParameter::Get_Internal(const char* InName, unsigned long lon
 			outValueInt = Height;
 			break;
 		case Util::NvParameter::DLSS_Get_Dynamic_Min_Render_Width:
-			outValueInt = OutWidth;
+			outValueInt = Width / 10;
+			//outValueInt = OutWidth;
 			break;
 		case Util::NvParameter::DLSS_Get_Dynamic_Min_Render_Height:
-			outValueInt = OutHeight;
+			outValueInt = Height / 10;
+			//outValueInt = OutHeight;
 			break;
 		case Util::NvParameter::DLSSOptimalSettingsCallback:
 			outValuePtr = NVSDK_NGX_DLSS_GetOptimalSettingsCallback;
@@ -306,31 +308,6 @@ NVSDK_NGX_Result NvParameter::Get_Internal(const char* InName, unsigned long lon
 #undef outValueULL
 #undef outValuePtr
 		return NVSDK_NGX_Result_Success;
-	}
-
-	// EvaluateRenderScale helper
-	inline float FSR2QualityTable(const NVSDK_NGX_PerfQuality_Value& input)
-	{
-		float output = NO_VALUEf;
-
-		switch (input)
-		{
-		case NVSDK_NGX_PerfQuality_Value_UltraPerformance:
-			output = 3.0f;
-			break;
-		case NVSDK_NGX_PerfQuality_Value_MaxPerf:
-			output = 2.0f;
-			break;
-		case NVSDK_NGX_PerfQuality_Value_Balanced:
-			output = 1.7f;
-			break;
-		case NVSDK_NGX_PerfQuality_Value_MaxQuality:
-			output = 1.5f;
-			break;
-		case NVSDK_NGX_PerfQuality_Value_UltraQuality:
-			break;
-		}
-		return output;
 	}
 
 	// EvaluateRenderScale helper
@@ -413,32 +390,25 @@ NVSDK_NGX_Result NvParameter::Get_Internal(const char* InName, unsigned long lon
 		return output;
 	}
 
-	typedef std::pair<unsigned int, unsigned int> ScreenDimensions;
-
+	struct ScreenDimensions {
+		unsigned int Width = 0;
+		unsigned int Height = 0;
+	};
 
 	inline ScreenDimensions CalcSame(const auto& Width, const auto& Height, const auto& Division_Ratio) {
 		// do a single division now to save on calc time later
+		ScreenDimensions output;
 		const auto resolution_Ratio = 1.0f / Division_Ratio;
-
-		ScreenDimensions output = { 0,0 };
-
 		// Multiply is faster than divide
-		const unsigned int computedHeight = std::lround(Height * resolution_Ratio);
-		// Multiply is faster than divide
-		const unsigned int computedWidth = std::lround(Width * resolution_Ratio);
-
-		output.first = computedHeight;
-		output.second = computedWidth;
+		output.Height = std::lround(Height * resolution_Ratio);
+		output.Width = std::lround(Width * resolution_Ratio);
 		return output;
 	}
 
 	inline ScreenDimensions CalcDifferent(const auto& Width, const auto& Height, const auto& Width_Division_Ratio, const auto& Height_Division_Ratio) {
 		ScreenDimensions output = { 0,0 };
-		const unsigned int computedHeight = std::lround(Height / Height_Division_Ratio);
-		const unsigned int computedWidth = std::lround(Width / Width_Division_Ratio);
-
-		output.first = computedHeight;
-		output.second = computedWidth;
+		output.Height = std::lround(Height / Height_Division_Ratio);
+		output.Width = std::lround(Width / Width_Division_Ratio);
 		return output;
 	}
 
@@ -448,7 +418,7 @@ NVSDK_NGX_Result NvParameter::Get_Internal(const char* InName, unsigned long lon
 		// constexpr should occur at compile-time, saving on division later
 		// double is vastly more accurate than float, use it curing compute when useful and cheap
 
-		ScreenDimensions output = {0,0};
+		ScreenDimensions output;
 
 		switch (InProfile)
 		{
@@ -465,6 +435,7 @@ NVSDK_NGX_Result NvParameter::Get_Internal(const char* InName, unsigned long lon
 			case UpscalingProfile::FSR2:
 			{
 				float QualityRatio = GetQualityOverrideRatio(InNvParameter->PerfQualityValue, InConfig);
+
 				if (QualityRatio != NO_VALUEf)
 				{
 					output = CalcSame(InNvParameter->Width, InNvParameter->Height, QualityRatio);
@@ -475,7 +446,7 @@ NVSDK_NGX_Result NvParameter::Get_Internal(const char* InName, unsigned long lon
 
 					if (fsrQualityMode != NO_VALUEi)
 					{
-						const FfxErrorCode err = ffxFsr2GetRenderResolutionFromQualityMode(&output.second, &output.first, InNvParameter->Width, InNvParameter->Height, fsrQualityMode);
+						const FfxErrorCode err = ffxFsr2GetRenderResolutionFromQualityMode(&output.Width, &output.Height, InNvParameter->Width, InNvParameter->Height, fsrQualityMode);
 #ifdef _DEBUG
 					switch (err)
 					{
@@ -483,13 +454,13 @@ NVSDK_NGX_Result NvParameter::Get_Internal(const char* InName, unsigned long lon
 						// all good!
 						break;
 					case FFX_ERROR_INVALID_POINTER:
-						printf("EvaluateRenderScale error: FFX_ERROR_INVALID_POINTER");
+						//printf("EvaluateRenderScale error: FFX_ERROR_INVALID_POINTER");
 						break;
 					case FFX_ERROR_INVALID_ENUM:
-						printf("EvaluateRenderScale error: FFX_ERROR_INVALID_ENUM");
+						//printf("EvaluateRenderScale error: FFX_ERROR_INVALID_ENUM");
 						break;
 					default:
-						printf("EvaluateRenderScale error: default");
+						//printf("EvaluateRenderScale error: default");
 						// bad crap!
 						break;
 					}
@@ -499,10 +470,19 @@ NVSDK_NGX_Result NvParameter::Get_Internal(const char* InName, unsigned long lon
 			}
 				break;
 			case UpscalingProfile::DynaRes:
+			{
+
+			}
 				break;
 			case UpscalingProfile::Fixed:
+			{
+
+			}
 				break;
 			default:
+			{
+
+			}
 				// no correlated value, add some logging?
 				break;
 		}
@@ -511,29 +491,20 @@ NVSDK_NGX_Result NvParameter::Get_Internal(const char* InName, unsigned long lon
 
 	void NvParameter::EvaluateRenderScale()
 	{
-		// percentage of the screen size to use as render size, in decimal. 
-		// 1.0 : 100%
-		// 0.8 :   80%
-		//
-		constexpr auto defaultRatioVertical = 1.0f;
-		// percentage of the screen size to use as render size, in decimal. 
-		// 1.0 : 100%
-		// 0.8 :   80%
-		//
-		constexpr auto defaultRatioHorizontal = 1.0f;
+		constexpr auto defaultRatioVertical = 2.0f;
+		constexpr auto defaultRatioHorizontal = 2.0f;
 
-	std::shared_ptr<Config> config = CyberFsrContext::instance()->MyConfig;
+		const std::shared_ptr<Config> config = CyberFsrContext::instance()->MyConfig;
 
 		auto dimensions = Switcher(config, this, config->UpscalerProfile);
 
-		if (dimensions.second == 0 || dimensions.first == 0) {
-			OutHeight = std::lround(Height * defaultRatioVertical);
-			OutWidth = std::lround(Width * defaultRatioHorizontal);
+		if (dimensions.Width == 0 || dimensions.Height == 0) {
+			dimensions = CalcSame(dimensions.Width, dimensions.Height, defaultRatioVertical);
+			//CalcDifferent(dimensions.Width, dimensions.Height, defaultRatioVertical, defaultRatioHorizontal);
 		}
-		else {
-			OutHeight = dimensions.first;
-			OutWidth = dimensions.second;
-		}
+
+		OutWidth = dimensions.Width;
+		OutHeight = dimensions.Height;
 	}
 
 	NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_DLSS_GetOptimalSettingsCallback(NVSDK_NGX_Parameter* InParams)
