@@ -101,6 +101,7 @@ namespace CyberFSR
 
 	std::optional<std::string> Config::readString(std::string section, std::string key, bool lowercase)
 	{
+		std::optional<std::string> output = std::nullopt;
 		std::string value = ini.GetValue(section.c_str(), key.c_str(), "auto");
 
 		std::string lower = value;
@@ -113,67 +114,76 @@ namespace CyberFSR
 			}
 		);
 
-		if (lower == "auto")
-		{
-			return std::nullopt;
-		}
-		return lowercase ? lower : value;
+		if (lower != "auto")
+			output = lowercase ? lower : value;
+
+		return output;
 	}
 
 	std::optional<float> Config::readFloat(std::string section, std::string key)
 	{
+		std::optional<float> output = std::nullopt;
 		auto value = readString(section, key);
 		try
 		{
-			return std::stof(value.value());
+			output = std::stof(value.value());
 		}
 		catch (const std::bad_optional_access&) // missing or auto value
 		{
-			return std::nullopt;
+			output = std::nullopt;
 		}
 		catch (const std::invalid_argument&) // invalid float string for std::stof
 		{
-			return std::nullopt;
+			output = std::nullopt;
 		}
 		catch (const std::out_of_range&) // out of range for 32 bit float
 		{
-			return std::nullopt;
+			output = std::nullopt;
 		}
+
+		return output;
 	}
 
 	std::optional<bool> Config::readBool(std::string section, std::string key)
 	{
-		auto value = readString(section, key, true);
+		std::optional<bool> output = std::nullopt;
+		auto valueOpt = readString(section, key, true);
 
-		if (value.value().compare("true") == 0)
-		{
-			return true;
-		}
-		else if (value.value().compare("false") == 0)
-		{
-			return false;
+		if (valueOpt.has_value()) {
+			const std::string& value = valueOpt.value();
+
+			if (value.compare("true") == 0)
+			{
+				output = true;
+			}
+			else if (value.compare("false") == 0)
+			{
+				output = false;
+			}
 		}
 
-		return std::nullopt;
+		return output;
 	}
 
 	std::optional<SharpnessRangeModifier> Config::readSharpnessRange(std::string section, std::string key)
 	{
+		std::optional<SharpnessRangeModifier> output = std::nullopt;
 		auto value = readString(section, key, true);
 
 		if (value)
-			return Util::SharpnessRangeModifierMap(value.value().c_str());
-		else
-			return std::nullopt;
+			output = Util::SharpnessRangeModifierMap(value.value().c_str());
+
+		return output;
 	}
 
 	std::optional<ViewMethod> Config::readViewMethod(std::string section, std::string key)
 	{
+		std::optional<ViewMethod> output = std::nullopt;
 		auto value = readString(section, key, true);
 
 		if (value)
-			return Util::ViewMethodMap(value.value().c_str());
-		else
-			return std::nullopt;
+			output = Util::ViewMethodMap(value.value().c_str());
+
+		return output;
 	}
 }

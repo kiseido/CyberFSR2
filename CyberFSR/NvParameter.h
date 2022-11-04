@@ -20,7 +20,7 @@ namespace CyberFSR
 		unsigned int Width{}, Height{}, OutWidth{}, OutHeight{};
 		NVSDK_NGX_PerfQuality_Value PerfQualityValue = NVSDK_NGX_PerfQuality_Value_Balanced;
 		bool RTXValue{}, FreeMemOnReleaseFeature{};
-		int CreationNodeMask{}, VisibilityNodeMask{}, OptLevel{}, IsDevSnippetBranch{};
+		int CreationNodeMask{}, VisibilityNodeMask{}, OptLevel = 0, IsDevSnippetBranch = 0;
 		float Sharpness = 1.0f;
 		bool ResetRender{};
 		float MVScaleX = 1.0, MVScaleY = 1.0;
