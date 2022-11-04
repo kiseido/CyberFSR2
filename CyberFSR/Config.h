@@ -21,7 +21,7 @@ namespace CyberFSR
 		FSR2,
 		DLSS2,
 		DynaRes,
-		Fixed
+		FixedRes
 	};
 
 	class Config

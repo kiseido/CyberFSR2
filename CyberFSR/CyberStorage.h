@@ -13,21 +13,21 @@ namespace CyberFSR
 		Undefined = -1,
 		Unset = 0,
 		Sys_Util = 0b1 << 15,
-
+		Sys_Util_Unknown,
 		Sys_Config = 0b1 << 16,
-
+		Sys_Config_Unknown,
 		Sys_CyberFsr = 0b1 << 17,
-
+		Sys_CyberFsr_Unknown,
 		Sys_DebugOverlay = 0b1 << 18,
-
+		Sys_DebugOverlay_Unknown,
 		Sys_DirectXHooks = 0b1 << 19,
-
+		Sys_DirectXHooks_Unknown,
 		Sys_ViewMatrixHook = 0b1 << 20,
-
+		Sys_ViewMatrixHook_Unknown,
 		Sys_NvParameter = 0b1 << 21,
-
+		Sys_NvParameter_Unknown,
 		Sys_CyberStorage = 0b1 << 22,
-
+		Sys_CyberStorage_Unknown,
 		// can go up to 0b1 << 30 with this pattern
 		Highest = 0xffffffff & ~(0b1 << 31),
 

@@ -12,302 +12,400 @@ namespace CyberFSR
 	void NvParameter::Set(const char* InName, unsigned long long InValue)
 	{
 		constexpr NvParameterType nvType = NvULL;
-		Set_Internal(InName, (ULongLong)InValue, nvType);
+
+		const Util::NvParameter inParameter = Util::NvParameterToEnum(InName);
+
+		switch (inParameter)
+		{
+		default:
+			break;
+		}
 	}
 
 	void NvParameter::Set(const char* InName, float InValue)
 	{
 		constexpr NvParameterType nvType = NvFloat;
-		Set_Internal(InName, (ULongLong)InValue, nvType);
+
+		const Util::NvParameter inParameter = Util::NvParameterToEnum(InName);
+
+		switch (inParameter)
+		{
+		case Util::NvParameter::MV_Scale_X:
+			MVScaleX = InValue;
+			break;
+		case Util::NvParameter::MV_Scale_Y:
+			MVScaleY = InValue;
+			break;
+		case Util::NvParameter::Jitter_Offset_X:
+			JitterOffsetX = InValue;
+			break;
+		case Util::NvParameter::Jitter_Offset_Y:
+			JitterOffsetY = InValue;
+			break;
+		case Util::NvParameter::Sharpness:
+			Sharpness = InValue;
+			break;
+		default:
+			break;
+		}
 	}
 
 	void NvParameter::Set(const char* InName, double InValue)
 	{
 		constexpr NvParameterType nvType = NvDouble;
-		Set_Internal(InName, (ULongLong)InValue, nvType);
+
+		const Util::NvParameter inParameter = Util::NvParameterToEnum(InName);
+
+		switch (inParameter)
+		{
+		default:
+			break;
+		}
 	}
 
 	void NvParameter::Set(const char* InName, unsigned int InValue)
 	{
 		constexpr NvParameterType nvType = NvUInt;
-		Set_Internal(InName, (ULongLong)InValue, nvType);
+
+		const Util::NvParameter inParameter = Util::NvParameterToEnum(InName);
+
+		switch (inParameter)
+		{
+		default:
+			break;
+		}
 	}
 
 	void NvParameter::Set(const char* InName, int InValue)
 	{
 		constexpr NvParameterType nvType = NvInt;
-		Set_Internal(InName, (ULongLong)InValue, nvType);
+
+	const Util::NvParameter inParameter = Util::NvParameterToEnum(InName);
+
+		switch (inParameter)
+		{
+		case Util::NvParameter::Width:
+			Width = InValue;
+			break;
+		case Util::NvParameter::Height:
+			Height = InValue;
+			break;
+		case Util::NvParameter::DLSS_Render_Subrect_Dimensions_Width:
+			Width = InValue;
+			break;
+		case Util::NvParameter::DLSS_Render_Subrect_Dimensions_Height:
+			Height = InValue;
+			break;
+		case Util::NvParameter::PerfQualityValue:
+			PerfQualityValue = static_cast<NVSDK_NGX_PerfQuality_Value>(InValue);
+			break;
+		case Util::NvParameter::RTXValue:
+			RTXValue = InValue;
+			break;
+		case Util::NvParameter::FreeMemOnReleaseFeature:
+			FreeMemOnReleaseFeature = InValue;
+			break;
+		case Util::NvParameter::CreationNodeMask:
+			CreationNodeMask = InValue;
+			break;
+		case Util::NvParameter::VisibilityNodeMask:
+			VisibilityNodeMask = InValue;
+			break;
+		case Util::NvParameter::Reset:
+			ResetRender = InValue;
+			break;
+		case Util::NvParameter::OutWidth:
+			OutWidth = InValue;
+			break;
+		case Util::NvParameter::OutHeight:
+			OutHeight = InValue;
+			break;
+		case Util::NvParameter::DLSS_Feature_Create_Flags:
+			Hdr = InValue & NVSDK_NGX_DLSS_Feature_Flags_IsHDR;
+			LowRes = InValue & NVSDK_NGX_DLSS_Feature_Flags_MVLowRes;
+			JitterMotion = InValue & NVSDK_NGX_DLSS_Feature_Flags_MVJittered;
+			DepthInverted = InValue & NVSDK_NGX_DLSS_Feature_Flags_DepthInverted;
+			EnableSharpening = InValue & NVSDK_NGX_DLSS_Feature_Flags_DoSharpening;
+			break;
+		default:
+			break;
+		}
 	}
 
 	void NvParameter::Set(const char* InName, ID3D11Resource* InValue)
 	{
+#define SetNVarWithName(setVar, name) if ((setVar = InValue ) && nvType == NvParameterType::NvD3D12Resource ) ((ID3D12Resource*)setVar)->SetName(name)
 		constexpr NvParameterType nvType = NvD3D11Resource;
-		Set_Internal(InName, (ULongLong)InValue, nvType);
+
+		const Util::NvParameter inParameter = Util::NvParameterToEnum(InName);
+
+		switch (inParameter)
+		{
+		case Util::NvParameter::DLSS_Input_Bias_Current_Color_Mask:
+			SetNVarWithName(InputBiasCurrentColorMask, L"Color");
+			break;
+		case Util::NvParameter::Color:
+			SetNVarWithName(Color, L"Color");
+			break;
+		case Util::NvParameter::Depth:
+			SetNVarWithName(Depth, L"Depth");
+			break;
+		case Util::NvParameter::MotionVectors:
+			SetNVarWithName(MotionVectors, L"MotionVectors");
+			break;
+		case Util::NvParameter::Output:
+			SetNVarWithName(Output, L"Output");
+			break;
+		case Util::NvParameter::TransparencyMask:
+			SetNVarWithName(TransparencyMask, L"TransparencyMask");
+			break;
+		case Util::NvParameter::ExposureTexture:
+			SetNVarWithName(ExposureTexture, L"ExposureTexture");
+			break;
+		default:
+			break;
+		}
+#undef SetNVarWithName
 	}
 
 	void NvParameter::Set(const char* InName, ID3D12Resource* InValue)
 	{
+#define SetNVarWithName(setVar, name) if ((setVar = InValue ) && nvType == NvParameterType::NvD3D12Resource ) ((ID3D12Resource*)setVar)->SetName(name)
 		constexpr NvParameterType nvType = NvD3D12Resource;
-		Set_Internal(InName, (ULongLong)InValue, nvType);
+
+		const Util::NvParameter inParameter = Util::NvParameterToEnum(InName);
+
+		switch (inParameter)
+		{
+		case Util::NvParameter::DLSS_Input_Bias_Current_Color_Mask:
+			SetNVarWithName(InputBiasCurrentColorMask, L"Color");
+			break;
+		case Util::NvParameter::Color:
+			SetNVarWithName(Color, L"Color");
+			break;
+		case Util::NvParameter::Depth:
+			SetNVarWithName(Depth, L"Depth");
+			break;
+		case Util::NvParameter::MotionVectors:
+			SetNVarWithName(MotionVectors, L"MotionVectors");
+			break;
+		case Util::NvParameter::Output:
+			SetNVarWithName(Output, L"Output");
+			break;
+		case Util::NvParameter::TransparencyMask:
+			SetNVarWithName(TransparencyMask, L"TransparencyMask");
+			break;
+		case Util::NvParameter::ExposureTexture:
+			SetNVarWithName(ExposureTexture, L"ExposureTexture");
+			break;
+		default:
+			break;
+		}
+#undef SetNVarWithName
 	}
 
 	void NvParameter::Set(const char* InName, void* InValue)
 	{
 		constexpr NvParameterType nvType = NvVoidPtr;
-		Set_Internal(InName, (ULongLong)InValue, nvType);
+
+		const Util::NvParameter inParameter = Util::NvParameterToEnum(InName);
+
+		switch (inParameter)
+		{
+		default:
+			break;
+		}
 	}
 
 	NVSDK_NGX_Result NvParameter::Get(const char* InName, unsigned long long* OutValue) const
 	{
 		constexpr NvParameterType nvType = NvULL;
-		return Get_Internal(InName, (ULongLongPtr)OutValue, nvType);
+		auto result = NVSDK_NGX_Result_Fail;
+
+		const Util::NvParameter inParameter = Util::NvParameterToEnum(InName);
+
+
+		switch (inParameter)
+		{
+		case Util::NvParameter::SizeInBytes:
+			*OutValue = SizeInBytes;
+			break;
+		case Util::NvParameter::OptLevel:
+		case Util::NvParameter::OptLevel_E:
+			*OutValue = OptLevel;
+			break;
+		default:
+			break;
+		}
+		return result;
 	}
 
 	NVSDK_NGX_Result NvParameter::Get(const char* InName, float* OutValue) const
 	{
 		constexpr NvParameterType nvType = NvFloat;
-		return Get_Internal(InName, (ULongLongPtr)OutValue, nvType);
+		auto result = NVSDK_NGX_Result_Fail;
+
+		const Util::NvParameter inParameter = Util::NvParameterToEnum(InName);
+
+
+		switch (inParameter)
+		{
+		case Util::NvParameter::Sharpness:
+			*OutValue = Sharpness;
+			break;
+		default:
+			break;
+		}
+		return result;
 	}
 
 	NVSDK_NGX_Result NvParameter::Get(const char* InName, double* OutValue) const
 	{
 		constexpr NvParameterType nvType = NvDouble;
-		return Get_Internal(InName, (ULongLongPtr)OutValue, nvType);
+		auto result = NVSDK_NGX_Result_Fail;
+
+		const Util::NvParameter inParameter = Util::NvParameterToEnum(InName);
+
+		switch (inParameter)
+		{
+		default:
+			break;
+		}
+		return result;
 	}
 
 	NVSDK_NGX_Result NvParameter::Get(const char* InName, unsigned int* OutValue) const
 	{
 		constexpr NvParameterType nvType = NvUInt;
-		return Get_Internal(InName, (ULongLongPtr)OutValue, nvType);
+		auto result = NVSDK_NGX_Result_Fail;
+
+		const Util::NvParameter inParameter = Util::NvParameterToEnum(InName);
+
+		switch (inParameter)
+		{
+		default:
+			break;
+		}
+		return result;
 	}
 
 	NVSDK_NGX_Result NvParameter::Get(const char* InName, int* OutValue) const
 	{
 		constexpr NvParameterType nvType = NvInt;
-		return Get_Internal(InName, (ULongLongPtr)OutValue, nvType);
+		auto result = NVSDK_NGX_Result_Fail;
+
+		const Util::NvParameter inParameter = Util::NvParameterToEnum(InName);
+
+		switch (inParameter)
+		{
+		case Util::NvParameter::SuperSampling_Available:
+		case Util::NvParameter::SuperSampling_Available_E:
+			*OutValue = true;
+			break;
+		case Util::NvParameter::SuperSampling_FeatureInitResult:
+			*OutValue = NVSDK_NGX_Result_Success;
+			break;
+		case Util::NvParameter::SuperSampling_NeedsUpdatedDriver:
+			*OutValue = false;
+			break;
+		case Util::NvParameter::SuperSampling_MinDriverVersionMinor:
+			*OutValue = 0;
+			break;
+		case Util::NvParameter::SuperSampling_MinDriverVersionMajor:
+			*OutValue = 0;
+			break;
+		case Util::NvParameter::DLSS_Render_Subrect_Dimensions_Width:
+			*OutValue = Width;
+			break;
+		case Util::NvParameter::DLSS_Render_Subrect_Dimensions_Height:
+			*OutValue = Height;
+			break;
+		case Util::NvParameter::OutWidth:
+			*OutValue = OutWidth;
+			break;
+		case Util::NvParameter::OutHeight:
+			*OutValue = OutHeight;
+			break;
+		case Util::NvParameter::DLSS_Get_Dynamic_Max_Render_Width:
+			*OutValue = Width;
+			break;
+		case Util::NvParameter::DLSS_Get_Dynamic_Max_Render_Height:
+			*OutValue = Height;
+			break;
+		case Util::NvParameter::DLSS_Get_Dynamic_Min_Render_Width:
+			//*OutValue = Width / 10;
+			*OutValue = OutWidth;
+			break;
+		case Util::NvParameter::DLSS_Get_Dynamic_Min_Render_Height:
+			//*OutValue = Height / 10;
+			*OutValue = OutHeight;
+			break;
+		case Util::NvParameter::IsDevSnippetBranch:
+		case Util::NvParameter::IsDevSnippetBranch_E:
+			*OutValue = IsDevSnippetBranch; //Dummy value
+			break;
+		default:
+			break;
+		}
+		return result;
 	}
 
 	NVSDK_NGX_Result NvParameter::Get(const char* InName, ID3D11Resource** OutValue) const
 	{
 		constexpr NvParameterType nvType = NvD3D11Resource;
-		return Get_Internal(InName, (ULongLongPtr)OutValue, nvType);
+		auto result = NVSDK_NGX_Result_Fail;
+
+		const Util::NvParameter inParameter = Util::NvParameterToEnum(InName);
+
+		switch (inParameter)
+		{
+		default:
+			break;
+		}
+		return result;
 	}
 
 	NVSDK_NGX_Result NvParameter::Get(const char* InName, ID3D12Resource** OutValue) const
 	{
 		constexpr NvParameterType nvType = NvD3D12Resource;
-		return Get_Internal(InName, (ULongLongPtr)OutValue, nvType);
-	}
+		auto result = NVSDK_NGX_Result_Fail;
 
-	NVSDK_NGX_Result NvParameter::Get(const char* InName, void** OutValue) const
-	{
-		constexpr NvParameterType nvType = NvVoidPtr;
-		return Get_Internal(InName, (ULongLongPtr)OutValue, nvType);
-	}
-
-void NvParameter::Reset()
-{
-}
-
-	void NvParameter::Set_Internal(const char* InName, unsigned long long InValue, NvParameterType ParameterType)
-	{
-#define inValueFloat (*((float*)InValue))
-#define inValueInt (*((int*)InValue))
-#define inValueDouble (*((double*)InValue))
-#define inValueUInt (*((unsigned int*)InValue))
-#define inValueULL (*((unsigned long long*)InValue))
-		//Includes DirectX Resources
-#define inValuePtr (*((void**)InValue))
-
-	const Util::NvParameter inParameter = Util::NvParameterToEnum(InName);
+		const Util::NvParameter inParameter = Util::NvParameterToEnum(InName);
 
 		switch (inParameter)
 		{
-		case Util::NvParameter::MV_Scale_X:
-			MVScaleX = inValueFloat;
+		default:
 			break;
-		case Util::NvParameter::MV_Scale_Y:
-			MVScaleY = inValueFloat;
-			break;
-		case Util::NvParameter::Jitter_Offset_X:
-			JitterOffsetX = inValueFloat;
-			break;
-		case Util::NvParameter::Jitter_Offset_Y:
-			JitterOffsetY = inValueFloat;
-			break;
-		case Util::NvParameter::Sharpness:
-			Sharpness = inValueFloat;
-			break;
-		case Util::NvParameter::Width:
-			Width = inValueInt;
-			break;
-		case Util::NvParameter::Height:
-			Height = inValueInt;
-			break;
-		case Util::NvParameter::DLSS_Render_Subrect_Dimensions_Width:
-			Width = inValueInt;
-			break;
-		case Util::NvParameter::DLSS_Render_Subrect_Dimensions_Height:
-			Height = inValueInt;
-			break;
-		case Util::NvParameter::PerfQualityValue:
-			PerfQualityValue = static_cast<NVSDK_NGX_PerfQuality_Value>(inValueInt);
-			break;
-		case Util::NvParameter::RTXValue:
-			RTXValue = inValueInt;
-			break;
-		case Util::NvParameter::FreeMemOnReleaseFeature:
-			FreeMemOnReleaseFeature = inValueInt;
-			break;
-		case Util::NvParameter::CreationNodeMask:
-			CreationNodeMask = inValueInt;
-			break;
-		case Util::NvParameter::VisibilityNodeMask:
-			VisibilityNodeMask = inValueInt;
-			break;
-		case Util::NvParameter::Reset:
-			ResetRender = inValueInt;
-			break;
-		case Util::NvParameter::OutWidth:
-			OutWidth = inValueInt;
-			break;
-		case Util::NvParameter::OutHeight:
-			OutHeight = inValueInt;
-			break;
-		case Util::NvParameter::DLSS_Feature_Create_Flags:
-			Hdr = inValueInt & NVSDK_NGX_DLSS_Feature_Flags_IsHDR;
-			LowRes = inValueInt & NVSDK_NGX_DLSS_Feature_Flags_MVLowRes;
-			JitterMotion = inValueInt & NVSDK_NGX_DLSS_Feature_Flags_MVJittered;
-			DepthInverted = inValueInt & NVSDK_NGX_DLSS_Feature_Flags_DepthInverted;
-			EnableSharpening = inValueInt & NVSDK_NGX_DLSS_Feature_Flags_DoSharpening;
-			break;
-			// Set_Internal helper
-#define SetNVarWithName(setVar, name) if ((setVar = inValuePtr) && ParameterType == NvParameterType::NvD3D12Resource) ((ID3D12Resource*)setVar)->SetName(name)
-	case Util::NvParameter::DLSS_Input_Bias_Current_Color_Mask:
-		SetNVarWithName(InputBiasCurrentColorMask, L"Color");
-		break;
-	case Util::NvParameter::Color:
-		SetNVarWithName(Color, L"Color");
-		break;
-	case Util::NvParameter::Depth:
-		SetNVarWithName(Depth, L"Depth");
-		break;
-	case Util::NvParameter::MotionVectors:
-		SetNVarWithName(MotionVectors, L"MotionVectors");
-		break;
-	case Util::NvParameter::Output:
-		SetNVarWithName(Output, L"Output");
-		break;
-	case Util::NvParameter::TransparencyMask:
-		SetNVarWithName(TransparencyMask, L"TransparencyMask");
-		break;
-	case Util::NvParameter::ExposureTexture:
-		SetNVarWithName(ExposureTexture, L"ExposureTexture");
-		break;
-	}
-#undef SetNVarWithName
-
-#undef inValueFloat
-#undef inValueInt
-#undef inValueDouble
-#undef inValueUInt
-#undef inValueULL
-#undef inValuePtr
+		}
+		return result;
 	}
 
 	NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_DLSS_GetOptimalSettingsCallback(NVSDK_NGX_Parameter* InParams);
 	NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_DLSS_GetStatsCallback(NVSDK_NGX_Parameter* InParams);
 
-NVSDK_NGX_Result NvParameter::Get_Internal(const char* InName, unsigned long long* OutValue, NvParameterType ParameterType) const
-{
-	const Util::NvParameter inParameter = Util::NvParameterToEnum(InName);
+	NVSDK_NGX_Result NvParameter::Get(const char* InName, void** OutValue) const
+	{
+		constexpr NvParameterType nvType = NvVoidPtr;
+		auto result = NVSDK_NGX_Result_Fail;
 
-#define outValueFloat *((float*)OutValue)
-#define outValueInt *((int*)OutValue)
-#define outValueDouble *((double*)OutValue)
-#define outValueUInt *((unsigned int*)OutValue)
-#define outValueULL *OutValue
-		//Includes DirectX Resources
-#define outValuePtr *((void**)OutValue)
-
-		switch (inParameter)
-		{
-		case Util::NvParameter::Sharpness:
-			outValueFloat = Sharpness;
-			break;
-		case Util::NvParameter::SuperSampling_Available:
-		case Util::NvParameter::SuperSampling_Available_E:
-			outValueInt = true;
-			break;
-		case Util::NvParameter::SuperSampling_FeatureInitResult:
-			outValueInt = NVSDK_NGX_Result_Success;
-			break;
-		case Util::NvParameter::SuperSampling_NeedsUpdatedDriver:
-			outValueInt = 0;
-			break;
-		case Util::NvParameter::SuperSampling_MinDriverVersionMinor:
-			outValueInt = 0;
-			break;
-		case Util::NvParameter::SuperSampling_MinDriverVersionMajor:
-			outValueInt = 0;
-			break;
-		case Util::NvParameter::DLSS_Render_Subrect_Dimensions_Width:
-			outValueInt = Width;
-			break;
-		case Util::NvParameter::DLSS_Render_Subrect_Dimensions_Height:
-			outValueInt = Height;
-			break;
-		case Util::NvParameter::OutWidth:
-			outValueInt = OutWidth;
-			break;
-		case Util::NvParameter::OutHeight:
-			outValueInt = OutHeight;
-			break;
-		case Util::NvParameter::DLSS_Get_Dynamic_Max_Render_Width:
-			outValueInt = Width;
-			break;
-		case Util::NvParameter::DLSS_Get_Dynamic_Max_Render_Height:
-			outValueInt = Height;
-			break;
-		case Util::NvParameter::DLSS_Get_Dynamic_Min_Render_Width:
-			outValueInt = Width / 10;
-			//outValueInt = OutWidth;
-			break;
-		case Util::NvParameter::DLSS_Get_Dynamic_Min_Render_Height:
-			outValueInt = Height / 10;
-			//outValueInt = OutHeight;
-			break;
+		const Util::NvParameter inParameter = Util::NvParameterToEnum(InName);
+		switch (inParameter) {
 		case Util::NvParameter::DLSSOptimalSettingsCallback:
-			outValuePtr = NVSDK_NGX_DLSS_GetOptimalSettingsCallback;
+			*OutValue = NVSDK_NGX_DLSS_GetOptimalSettingsCallback;
+			result = NVSDK_NGX_Result_Success;
 			break;
 		case Util::NvParameter::DLSSGetStatsCallback:
-			outValuePtr = NVSDK_NGX_DLSS_GetStatsCallback;
-			break;
-		case Util::NvParameter::SizeInBytes:
-			outValueULL = 0x1337; //Dummy value
-			break;
-		case Util::NvParameter::OptLevel:
-		case Util::NvParameter::OptLevel_E:
-			outValueInt = 0; //Dummy value
-			break;
-		case Util::NvParameter::IsDevSnippetBranch:
-		case Util::NvParameter::IsDevSnippetBranch_E:
-			outValueInt = 0; //Dummy value
+			*OutValue = NVSDK_NGX_DLSS_GetStatsCallback;
+			result = NVSDK_NGX_Result_Success;
 			break;
 		default:
-#ifdef _DEBUG
-			return NVSDK_NGX_Result_Fail;
-#else
-			return NVSDK_NGX_Result_Success; //lie and hope for the best
-#endif
+			break;
 		}
-#undef outValueFloat
-#undef outValueInt
-#undef outValueDouble
-#undef outValueUInt
-#undef outValueULL
-#undef outValuePtr
-		return NVSDK_NGX_Result_Success;
+		return result;
+	}
+
+	void NvParameter::Reset()
+	{
 	}
 
 	// EvaluateRenderScale helper
@@ -390,13 +488,14 @@ NVSDK_NGX_Result NvParameter::Get_Internal(const char* InName, unsigned long lon
 		return output;
 	}
 
-	struct ScreenDimensions {
+	struct ScreenDimensions 
+	{
 		unsigned int Width = 0;
 		unsigned int Height = 0;
 	};
 
-	inline ScreenDimensions CalcSame(const auto& Width, const auto& Height, const auto& Division_Ratio) {
-		// do a single division now to save on calc time later
+	inline ScreenDimensions CalcSame(const auto& Width, const auto& Height, const auto& Division_Ratio) 
+	{
 		ScreenDimensions output;
 		const auto resolution_Ratio = 1.0f / Division_Ratio;
 		// Multiply is faster than divide
@@ -405,44 +504,51 @@ NVSDK_NGX_Result NvParameter::Get_Internal(const char* InName, unsigned long lon
 		return output;
 	}
 
-	inline ScreenDimensions CalcDifferent(const auto& Width, const auto& Height, const auto& Width_Division_Ratio, const auto& Height_Division_Ratio) {
-		ScreenDimensions output = { 0,0 };
+	inline ScreenDimensions CalcDifferent(const auto& Width, const auto& Height, const auto& Width_Division_Ratio, const auto& Height_Division_Ratio) 
+	{
+		ScreenDimensions output;
 		output.Height = std::lround(Height / Height_Division_Ratio);
 		output.Width = std::lround(Width / Width_Division_Ratio);
 		return output;
 	}
 
-	inline ScreenDimensions Switcher(const std::shared_ptr<Config>& InConfig, const NvParameter* InNvParameter, const UpscalingProfile& InProfile)
+	inline ScreenDimensions DynaResProfile(const std::shared_ptr<Config>& InConfig, const NvParameter& InNvParameter, const UpscalingProfile& InProfile) 
 	{
-		// multiply is generally significantly faster than divide, so store ratio as a multiple
-		// constexpr should occur at compile-time, saving on division later
-		// double is vastly more accurate than float, use it curing compute when useful and cheap
+		ScreenDimensions output;
+		// TODO
+		return output;
+	}
 
+	inline ScreenDimensions FixedResProfile(const std::shared_ptr<Config>& InConfig, const NvParameter& InNvParameter, const UpscalingProfile& InProfile) 
+	{
+		ScreenDimensions output;
+		// TODO
+		return output;
+	}
+
+	inline ScreenDimensions DLSS2Profile(const std::shared_ptr<Config>& InConfig, const NvParameter& InNvParameter, const UpscalingProfile& InProfile) 
+	{
 		ScreenDimensions output;
 
-		switch (InProfile)
+		float QualityRatio = GetQualityOverrideRatio(InNvParameter.PerfQualityValue, InConfig);
+
+		if (QualityRatio == NO_VALUEf)
+			QualityRatio = DLSS2QualityTable(InNvParameter.PerfQualityValue);
+
+		output = CalcSame(InNvParameter.Width, InNvParameter.Height, QualityRatio);
+
+		return output;
+	}
+
+	inline ScreenDimensions FSR2Profile(const std::shared_ptr<Config>& InConfig, const NvParameter& InNvParameter, const UpscalingProfile& InProfile) 
+	{
+		ScreenDimensions output;
+
+		float QualityRatio = GetQualityOverrideRatio(InNvParameter.PerfQualityValue, InConfig);
+
+		if (QualityRatio == NO_VALUEf)
 		{
-			case UpscalingProfile::DLSS2:
-			{
-				float QualityRatio = GetQualityOverrideRatio(InNvParameter->PerfQualityValue, InConfig);
-
-				if (QualityRatio == NO_VALUEf)
-					QualityRatio = DLSS2QualityTable(InNvParameter->PerfQualityValue);
-
-				output = CalcSame(InNvParameter->Width, InNvParameter->Height, QualityRatio);
-			}
-				break;
-			case UpscalingProfile::FSR2:
-			{
-				float QualityRatio = GetQualityOverrideRatio(InNvParameter->PerfQualityValue, InConfig);
-
-				if (QualityRatio != NO_VALUEf)
-				{
-					output = CalcSame(InNvParameter->Width, InNvParameter->Height, QualityRatio);
-				} 
-				else
-				{
-					FfxFsr2QualityMode fsrQualityMode = DLSS2FSR2QualityTable(InNvParameter->PerfQualityValue);
+			FfxFsr2QualityMode fsrQualityMode = DLSS2FSR2QualityTable(InNvParameter.PerfQualityValue);
 
 					if (fsrQualityMode != NO_VALUEi)
 					{
@@ -468,21 +574,32 @@ NVSDK_NGX_Result NvParameter::Get_Internal(const char* InName, unsigned long lon
 					}
 				}
 			}
+		}
+		else
+			output = CalcSame(InNvParameter.Width, InNvParameter.Height, QualityRatio);
+
+		return output;
+	}
+
+	inline ScreenDimensions Switcher(const std::shared_ptr<Config>& InConfig, const NvParameter& InNvParameter, const UpscalingProfile& InProfile)
+	{
+		ScreenDimensions output;
+
+		switch (InProfile)
+		{
+			case UpscalingProfile::DLSS2:
+				output = DLSS2Profile(InConfig, InNvParameter, InProfile);
+				break;
+			case UpscalingProfile::FSR2:
+				output = FSR2Profile(InConfig, InNvParameter, InProfile);
 				break;
 			case UpscalingProfile::DynaRes:
-			{
-
-			}
+				output = DynaResProfile(InConfig, InNvParameter, InProfile);
 				break;
-			case UpscalingProfile::Fixed:
-			{
-
-			}
+			case UpscalingProfile::FixedRes:
+				output = FixedResProfile(InConfig, InNvParameter, InProfile);
 				break;
 			default:
-			{
-
-			}
 				// no correlated value, add some logging?
 				break;
 		}
@@ -491,14 +608,14 @@ NVSDK_NGX_Result NvParameter::Get_Internal(const char* InName, unsigned long lon
 
 	void NvParameter::EvaluateRenderScale()
 	{
-		constexpr auto defaultRatioVertical = 2.0f;
-		constexpr auto defaultRatioHorizontal = 2.0f;
-
 		const std::shared_ptr<Config> config = CyberFsrContext::instance()->MyConfig;
 
-		auto dimensions = Switcher(config, this, config->UpscalerProfile);
+		auto dimensions = Switcher(config, *this, config->UpscalerProfile);
 
 		if (dimensions.Width == 0 || dimensions.Height == 0) {
+			constexpr auto defaultRatioVertical = 2.0f;
+			constexpr auto defaultRatioHorizontal = 2.0f;
+
 			dimensions = CalcSame(dimensions.Width, dimensions.Height, defaultRatioVertical);
 			//CalcDifferent(dimensions.Width, dimensions.Height, defaultRatioVertical, defaultRatioHorizontal);
 		}
@@ -516,8 +633,14 @@ NVSDK_NGX_Result NvParameter::Get_Internal(const char* InName, unsigned long lon
 
 	NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_DLSS_GetStatsCallback(NVSDK_NGX_Parameter* InParams)
 	{
+		NvParameter& castedRef = *(NvParameter*)InParams;
 		//Somehow check for allocated memory
 		//Then set values: SizeInBytes, OptLevel, IsDevSnippetBranch
+
+		castedRef.OptLevel = 0;
+		castedRef.IsDevSnippetBranch = 0;
+		castedRef.SizeInBytes = 0x1337;
+
 		return NVSDK_NGX_Result_Success;
 	}
 }
