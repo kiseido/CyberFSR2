@@ -72,14 +72,14 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_GetParameters(NVSDK_NGX_Parameter** OutParamete
 //TODO External Memory Tracking
 NVSDK_NGX_Result NVSDK_NGX_D3D12_GetCapabilityParameters(NVSDK_NGX_Parameter** OutParameters)
 {
-	*OutParameters = new CyberNvParameter();
+	*OutParameters = CyberNvParameter::GetFreshParameter();
 	return NVSDK_NGX_Result_Success;
 }
 
 //TODO
 NVSDK_NGX_Result NVSDK_NGX_D3D12_AllocateParameters(NVSDK_NGX_Parameter** OutParameters)
 {
-	*OutParameters = new CyberNvParameter();
+	*OutParameters = CyberNvParameter::GetFreshParameter();
 	return NVSDK_NGX_Result_Success;
 }
 

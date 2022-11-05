@@ -15,8 +15,12 @@ namespace CyberFSR
 		NvVoidPtr
 	};
 
+	struct NvParameter;
+
 	struct NvParameter : NVSDK_NGX_Parameter
 	{
+		static NvParameter* GetFreshParameter();
+		static void RecycleParameter(NvParameter*);
 		unsigned int Width{}, Height{}, OutWidth{}, OutHeight{};
 		NVSDK_NGX_PerfQuality_Value PerfQualityValue = NVSDK_NGX_PerfQuality_Value_Balanced;
 		bool RTXValue{}, FreeMemOnReleaseFeature{};

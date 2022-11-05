@@ -7,7 +7,7 @@
 constexpr float NO_VALUEf = -128.125;
 constexpr int NO_VALUEi = -128;
 
-void defaulted() {
+void BadThingHappened() {
 	int a = 0;
 	a = a + 1;
 }
@@ -23,7 +23,7 @@ namespace CyberFSR
 		switch (inParameter)
 		{
 		default:
-			defaulted();
+			BadThingHappened();
 			break;
 		}
 	}
@@ -57,7 +57,7 @@ namespace CyberFSR
 		}
 			break;
 		default:
-			defaulted();
+			BadThingHappened();
 			break;
 		}
 	}
@@ -71,7 +71,7 @@ namespace CyberFSR
 		switch (inParameter)
 		{
 		default:
-			defaulted();
+			BadThingHappened();
 			break;
 		}
 	}
@@ -109,7 +109,7 @@ namespace CyberFSR
 			VisibilityNodeMask = InValue;
 			break;
 		default:
-			defaulted();
+			BadThingHappened();
 			break;
 		}
 	}
@@ -142,7 +142,7 @@ namespace CyberFSR
 			EnableSharpening = InValue & NVSDK_NGX_DLSS_Feature_Flags_DoSharpening;
 			break;
 		default:
-			defaulted();
+			BadThingHappened();
 			break;
 		}
 	}
@@ -178,7 +178,7 @@ namespace CyberFSR
 			SetNVarWithName(ExposureTexture, L"ExposureTexture");
 			break;
 		default:
-			defaulted();
+			BadThingHappened();
 			break;
 		}
 #undef SetNVarWithName
@@ -215,7 +215,7 @@ namespace CyberFSR
 			SetNVarWithName(ExposureTexture, L"ExposureTexture");
 			break;
 		default:
-			defaulted();
+			BadThingHappened();
 			break;
 		}
 #undef SetNVarWithName
@@ -230,7 +230,7 @@ namespace CyberFSR
 		switch (inParameter)
 		{
 		default:
-			defaulted();
+			BadThingHappened();
 			break;
 		}
 	}
@@ -238,7 +238,7 @@ namespace CyberFSR
 	NVSDK_NGX_Result NvParameter::Get(const char* InName, unsigned long long* OutValue) const
 	{
 		constexpr NvParameterType nvType = NvULL;
-		auto result = NVSDK_NGX_Result_Fail;
+		auto result = NVSDK_NGX_Result_Success;
 
 		const Util::NvParameter inParameter = Util::NvParameterToEnum(InName);
 
@@ -253,7 +253,8 @@ namespace CyberFSR
 			*OutValue = OptLevel;
 			break;
 		default:
-			defaulted();
+			BadThingHappened();
+			result = NVSDK_NGX_Result_Fail;
 			break;
 		}
 		return result;
@@ -262,7 +263,7 @@ namespace CyberFSR
 	NVSDK_NGX_Result NvParameter::Get(const char* InName, float* OutValue) const
 	{
 		constexpr NvParameterType nvType = NvFloat;
-		auto result = NVSDK_NGX_Result_Fail;
+		auto result = NVSDK_NGX_Result_Success;
 
 		const Util::NvParameter inParameter = Util::NvParameterToEnum(InName);
 
@@ -276,7 +277,8 @@ namespace CyberFSR
 			*OutValue = FrameTimeDeltaInMsec;
 			break;
 		default:
-			defaulted();
+			BadThingHappened();
+			result = NVSDK_NGX_Result_Fail;
 			break;
 		}
 		return result;
@@ -285,14 +287,15 @@ namespace CyberFSR
 	NVSDK_NGX_Result NvParameter::Get(const char* InName, double* OutValue) const
 	{
 		constexpr NvParameterType nvType = NvDouble;
-		auto result = NVSDK_NGX_Result_Fail;
+		auto result = NVSDK_NGX_Result_Success;
 
 		const Util::NvParameter inParameter = Util::NvParameterToEnum(InName);
 
 		switch (inParameter)
 		{
 		default:
-			defaulted();
+			BadThingHappened();
+			result = NVSDK_NGX_Result_Fail;
 			break;
 		}
 		return result;
@@ -301,7 +304,7 @@ namespace CyberFSR
 	NVSDK_NGX_Result NvParameter::Get(const char* InName, unsigned int* OutValue) const
 	{
 		constexpr NvParameterType nvType = NvUInt;
-		auto result = NVSDK_NGX_Result_Fail;
+		auto result = NVSDK_NGX_Result_Success;
 
 		const Util::NvParameter inParameter = Util::NvParameterToEnum(InName);
 
@@ -338,7 +341,8 @@ namespace CyberFSR
 			*OutValue = true;
 			break;
 		default:
-			defaulted();
+			BadThingHappened();
+			result = NVSDK_NGX_Result_Fail;
 			break;
 		}
 		return result;
@@ -347,7 +351,7 @@ namespace CyberFSR
 	NVSDK_NGX_Result NvParameter::Get(const char* InName, int* OutValue) const
 	{
 		constexpr NvParameterType nvType = NvInt;
-		auto result = NVSDK_NGX_Result_Fail;
+		auto result = NVSDK_NGX_Result_Success;
 
 		const Util::NvParameter inParameter = Util::NvParameterToEnum(InName);
 
@@ -370,7 +374,8 @@ namespace CyberFSR
 			*OutValue = IsDevSnippetBranch; //Dummy value
 			break;
 		default:
-			defaulted();
+			BadThingHappened();
+			result = NVSDK_NGX_Result_Fail;
 			break;
 		}
 		return result;
@@ -379,14 +384,15 @@ namespace CyberFSR
 	NVSDK_NGX_Result NvParameter::Get(const char* InName, ID3D11Resource** OutValue) const
 	{
 		constexpr NvParameterType nvType = NvD3D11Resource;
-		auto result = NVSDK_NGX_Result_Fail;
+		auto result = NVSDK_NGX_Result_Success;
 
 		const Util::NvParameter inParameter = Util::NvParameterToEnum(InName);
 
 		switch (inParameter)
 		{
 		default:
-			defaulted();
+			BadThingHappened();
+			result = NVSDK_NGX_Result_Fail;
 			break;
 		}
 		return result;
@@ -395,14 +401,15 @@ namespace CyberFSR
 	NVSDK_NGX_Result NvParameter::Get(const char* InName, ID3D12Resource** OutValue) const
 	{
 		constexpr NvParameterType nvType = NvD3D12Resource;
-		auto result = NVSDK_NGX_Result_Fail;
+		auto result = NVSDK_NGX_Result_Success;
 
 		const Util::NvParameter inParameter = Util::NvParameterToEnum(InName);
 
 		switch (inParameter)
 		{
 		default:
-			defaulted();
+			BadThingHappened();
+			result = NVSDK_NGX_Result_Fail;
 			break;
 		}
 		return result;
@@ -414,7 +421,7 @@ namespace CyberFSR
 	NVSDK_NGX_Result NvParameter::Get(const char* InName, void** OutValue) const
 	{
 		constexpr NvParameterType nvType = NvVoidPtr;
-		auto result = NVSDK_NGX_Result_Fail;
+		auto result = NVSDK_NGX_Result_Success;
 
 		const Util::NvParameter inParameter = Util::NvParameterToEnum(InName);
 
@@ -428,6 +435,8 @@ namespace CyberFSR
 			result = NVSDK_NGX_Result_Success;
 			break;
 		default:
+			BadThingHappened();
+			result = NVSDK_NGX_Result_Fail;
 			break;
 		}
 		return result;
@@ -483,6 +492,7 @@ namespace CyberFSR
 			output = FFX_FSR2_QUALITY_MODE_QUALITY;
 			break;
 		case NVSDK_NGX_PerfQuality_Value_UltraQuality:
+			//BadThingHappened();
 			break;
 		}
 		return (FfxFsr2QualityMode)output;
@@ -511,6 +521,7 @@ namespace CyberFSR
 			output = config->QualityRatio_UltraQuality.value_or(NO_VALUEf);
 			break;
 		default:
+			BadThingHappened();
 			// no correlated value, add some logging?
 			break;
 		}
@@ -525,9 +536,9 @@ namespace CyberFSR
 
 	inline ScreenDimensions CalcSame(const auto& Width, const auto& Height, const auto& Division_Ratio) 
 	{
-		ScreenDimensions output;
+		// Multiply is way faster than divide, do a single divide now to avoid it later
 		const auto resolution_Ratio = 1.0f / Division_Ratio;
-		// Multiply is faster than divide
+		ScreenDimensions output;
 		output.Height = std::lround(Height * resolution_Ratio);
 		output.Width = std::lround(Width * resolution_Ratio);
 		return output;
@@ -583,24 +594,27 @@ namespace CyberFSR
 					{
 						const FfxErrorCode err = ffxFsr2GetRenderResolutionFromQualityMode(&output.Width, &output.Height, InNvParameter->Width, InNvParameter->Height, fsrQualityMode);
 #ifdef _DEBUG
-					switch (err)
-					{
-					case FFX_OK:
-						// all good!
-						break;
-					case FFX_ERROR_INVALID_POINTER:
-						//printf("EvaluateRenderScale error: FFX_ERROR_INVALID_POINTER");
-						break;
-					case FFX_ERROR_INVALID_ENUM:
-						//printf("EvaluateRenderScale error: FFX_ERROR_INVALID_ENUM");
-						break;
-					default:
-						//printf("EvaluateRenderScale error: default");
-						// bad crap!
-						break;
+						switch (err)
+						{
+						case FFX_OK:
+							// all good!
+						BadThingHappened();
+							break;
+						case FFX_ERROR_INVALID_POINTER:
+							//printf("EvaluateRenderScale error: FFX_ERROR_INVALID_POINTER");
+						BadThingHappened();
+							break;
+						case FFX_ERROR_INVALID_ENUM:
+							//printf("EvaluateRenderScale error: FFX_ERROR_INVALID_ENUM");
+						BadThingHappened();
+							break;
+						default:
+							//printf("EvaluateRenderScale error: default");
+							// bad crap!
+						BadThingHappened();
+							break;
 					}
 #endif
-					}
 				}
 			}
 		}
@@ -629,6 +643,7 @@ namespace CyberFSR
 				output = FixedResProfile(InConfig, InNvParameter, InProfile);
 				break;
 			default:
+				BadThingHappened();
 				// no correlated value, add some logging?
 				break;
 		}
@@ -651,6 +666,50 @@ namespace CyberFSR
 
 		OutWidth = dimensions.Width;
 		OutHeight = dimensions.Height;
+	}
+
+
+	namespace ParameterRepository 
+	{
+		static const UINT Size = 1024;
+		Error_Resilient_Boolean Parameter_In_Use_Bool[Size] = {};
+		NvParameter Parameters[Size] = {};
+	};
+
+	NvParameter* NvParameter::GetFreshParameter()
+	{
+		NvParameter* output = nullptr;
+
+		for (int i = 0; i < ParameterRepository::Size && output == nullptr; i++) {
+			const Error_Resilient_Boolean sanitizedBool = Sanitize_Bool(ParameterRepository::Parameter_In_Use_Bool[i]);
+			switch (sanitizedBool)
+			{
+			case CyberFSR::ER_FALSE:
+				ParameterRepository::Parameter_In_Use_Bool[i] = ER_TRUE;
+				output = &ParameterRepository::Parameters[i];
+				break;
+			case CyberFSR::ER_TRUE:
+				break;
+			case CyberFSR::Unknown:
+				// bad thing, ram corruption or bad code?
+				break;
+			default:
+				break;
+			}
+		}
+		return output;
+	}
+
+	void NvParameter::RecycleParameter(NvParameter* recyclePointer)
+	{
+		const __int64 index = (recyclePointer - ParameterRepository::Parameters) / (sizeof(NvParameter)*8);
+		if (index > ParameterRepository::Size)
+		{
+			// throw bad shit happening code here
+			return;
+		}
+		auto& inUse = ParameterRepository::Parameter_In_Use_Bool[index];
+		inUse = ER_FALSE;
 	}
 
 	NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_DLSS_GetOptimalSettingsCallback(NVSDK_NGX_Parameter* InParams)

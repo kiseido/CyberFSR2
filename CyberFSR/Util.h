@@ -96,6 +96,29 @@ namespace CyberFSR
 			throw std::exception();
 		}
 	}
+	enum Error_Resilient_Boolean {
+		ER_TRUE = ~0,
+		ER_FALSE = 0,
+		Unknown = ER_TRUE << (sizeof(int) * 8) / 2,
+	};
+
+	inline Error_Resilient_Boolean Sanitize_Bool(const Error_Resilient_Boolean& InValue) {
+		Error_Resilient_Boolean output = Unknown;
+
+		int scale = 0;
+
+		for (int i = 0; i < sizeof(Error_Resilient_Boolean) * 8; i++) {
+			bool bit = (InValue >> i) & 1;
+			scale += bit ? 1 : -1;
+		}
+		if (scale < 0)
+			output = ER_FALSE;
+		else if (scale > 0)
+			output = ER_TRUE;
+
+		return output;
+	};
+
 }
 
 inline FfxFsr2InitializationFlagBits operator&(const FfxFsr2InitializationFlagBits& a, const bool& b) {

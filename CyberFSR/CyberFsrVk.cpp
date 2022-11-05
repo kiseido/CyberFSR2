@@ -59,19 +59,19 @@ NVSDK_NGX_Result NVSDK_NGX_VULKAN_GetParameters(NVSDK_NGX_Parameter** OutParamet
 
 NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_VULKAN_AllocateParameters(NVSDK_NGX_Parameter** OutParameters)
 {
-	*OutParameters = new CyberNvParameter();
+	*OutParameters = CyberNvParameter::GetFreshParameter();
 	return NVSDK_NGX_Result_Success;
 }
 
 NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_VULKAN_GetCapabilityParameters(NVSDK_NGX_Parameter** OutParameters)
 {
-	*OutParameters = new CyberNvParameter();
+	*OutParameters = CyberNvParameter::GetFreshParameter();
 	return NVSDK_NGX_Result_Success;
 }
 
 NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_VULKAN_DestroyParameters(NVSDK_NGX_Parameter* InParameters)
 {
-	delete InParameters;
+	CyberNvParameter::RecycleParameter( (CyberNvParameter*) InParameters);
 	return NVSDK_NGX_Result_Success;
 }
 
