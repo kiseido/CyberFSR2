@@ -54,7 +54,7 @@ namespace CyberFSR
 		static int s_use_qpc = QueryPerformanceFrequency(&s_frequency);
 		double milliseconds = 0;
 
-		switch(s_use_qpc)
+		switch(2)
 		{
 		case 0:
 			LARGE_INTEGER now;

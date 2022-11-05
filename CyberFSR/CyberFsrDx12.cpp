@@ -15,6 +15,7 @@ NVSDK_NGX_API NVSDK_NGX_Result NVSDK_NGX_D3D12_Init_Ext(unsigned long long InApp
 	unsigned long long unknown0)
 {
 	// cyberpunk enters here
+	// cyberpunk 2077 id: 100152211, sdk version: 100152211
 	return NVSDK_NGX_Result_Success;
 }
 
@@ -25,16 +26,6 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_Init(unsigned long long InApplicationId, const 
 
 NVSDK_NGX_API NVSDK_NGX_Result NVSDK_NGX_D3D12_Init_ProjectID(const char* InProjectId, NVSDK_NGX_EngineType InEngineType, const char* InEngineVersion, const wchar_t* InApplicationDataPath, ID3D12Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion)
 {
-//typedef enum NVSDK_NGX_EngineType
-//{
-//	NVSDK_NGX_ENGINE_TYPE_CUSTOM = 0,
-//		NVSDK_NGX_ENGINE_TYPE_UNREAL,<<<< the game tells us it is unreal!
-//		NVSDK_NGX_ENGINE_TYPE_UNITY,
-//		NVSDK_NGX_ENGINE_TYPE_OMNIVERSE,
-//		NVSDK_NGX_ENGINE_COUNT
-//} NVSDK_NGX_EngineType;
-	//return NVSDK_NGX_D3D12_Init_Ext(0x1337, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion, 0);
-
 	CyberFSR::IncomingEngineType = InEngineType;
 
 	switch (InEngineType)
@@ -75,7 +66,8 @@ NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D12_Shutdown1(ID3D12Device* InDevice)
 //Deprecated Parameter Function - Internal Memory Tracking
 NVSDK_NGX_Result NVSDK_NGX_D3D12_GetParameters(NVSDK_NGX_Parameter** OutParameters)
 {
-	*OutParameters = CyberContext::instance()->AllocateParameter();
+	//*OutParameters = CyberContext::instance()->AllocateParameter();
+	*OutParameters = CyberNvParameter::GetFreshParameter();
 	return NVSDK_NGX_Result_Success;
 }
 
@@ -96,7 +88,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_AllocateParameters(NVSDK_NGX_Parameter** OutPar
 //TODO
 NVSDK_NGX_Result NVSDK_NGX_D3D12_DestroyParameters(NVSDK_NGX_Parameter* InParameters)
 {
-	delete InParameters;
+	CyberNvParameter::RecycleParameter((CyberNvParameter*)InParameters);
 	return NVSDK_NGX_Result_Success;
 }
 
@@ -141,12 +133,14 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_CreateFeature(ID3D12GraphicsCommandList* InCmdL
 	initParams.displaySize.height = inParams->OutHeight;
 
 	initParams.flags = 0 |
-		(config->DepthInverted		.value_or(inParams->DepthInverted)	& FFX_FSR2_ENABLE_DEPTH_INVERTED ) |
-		(config->AutoExposure		.value_or(inParams->AutoExposure)	& FFX_FSR2_ENABLE_AUTO_EXPOSURE ) |
-		(config->HDR				.value_or(inParams->Hdr)			& FFX_FSR2_ENABLE_HIGH_DYNAMIC_RANGE) |
-		(config->JitterCancellation	.value_or(inParams->JitterMotion)	& FFX_FSR2_ENABLE_MOTION_VECTORS_JITTER_CANCELLATION) |
-		(config->DisplayResolution	.value_or(!inParams->LowRes)		& FFX_FSR2_ENABLE_DISPLAY_RESOLUTION_MOTION_VECTORS) |
-		(config->InfiniteFarPlane	.value_or(false)					& FFX_FSR2_ENABLE_DEPTH_INFINITE);
+		(config->HDR				.value_or(inParams->Hdr)		? FFX_FSR2_ENABLE_HIGH_DYNAMIC_RANGE : 0) |
+		(config->DisplayResolution	.value_or(!inParams->LowRes)		? FFX_FSR2_ENABLE_DISPLAY_RESOLUTION_MOTION_VECTORS : 0) |
+		(config->JitterCancellation	.value_or(inParams->JitterMotion)	? FFX_FSR2_ENABLE_MOTION_VECTORS_JITTER_CANCELLATION : 0) |
+		(config->DepthInverted		.value_or(inParams->DepthInverted)	? FFX_FSR2_ENABLE_DEPTH_INVERTED : 0) |
+		(config->InfiniteFarPlane	.value_or(false)					? FFX_FSR2_ENABLE_DEPTH_INFINITE : 0) |
+		(config->AutoExposure		.value_or(inParams->AutoExposure)	? FFX_FSR2_ENABLE_AUTO_EXPOSURE : 0) |
+		(false ? FFX_FSR2_ENABLE_DYNAMIC_RESOLUTION : 0) |
+		(false ? FFX_FSR2_ENABLE_TEXTURE1D_USAGE : 0);
 
 	errorCode = ffxFsr2ContextCreate(&deviceContext->FsrContext, &initParams);
 	FFX_ASSERT(errorCode == FFX_OK);
@@ -161,7 +155,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_ReleaseFeature(NVSDK_NGX_Handle* InHandle)
 	auto deviceContext = CyberContext::instance()->Contexts[InHandle->Id].get();
 	FfxErrorCode errorCode = ffxFsr2ContextDestroy(&deviceContext->FsrContext);
 	FFX_ASSERT(errorCode == FFX_OK);
-	CyberContext::instance()->DeleteContext(InHandle);
+	CyberContext::instance()->DeleteContext(InHandle); // delete all associated parameters too?
 	return NVSDK_NGX_Result_Success;
 }
 
@@ -194,19 +188,19 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCm
 
 		FfxFsr2DispatchDescription dispatchParameters = {};
 		dispatchParameters.commandList = ffxGetCommandListDX12(InCmdList);
-		dispatchParameters.color = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->Color, (wchar_t*)L"FSR2_InputColor");
-		dispatchParameters.depth = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->Depth, (wchar_t*)L"FSR2_InputDepth");
-		dispatchParameters.motionVectors = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->MotionVectors, (wchar_t*)L"FSR2_InputMotionVectors");
-		dispatchParameters.exposure = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->ExposureTexture, (wchar_t*)L"FSR2_InputExposure");
+		dispatchParameters.color = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->Color, L"FSR2_InputColor");
+		dispatchParameters.depth = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->Depth, L"FSR2_InputDepth");
+		dispatchParameters.motionVectors = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->MotionVectors, L"FSR2_InputMotionVectors");
+		dispatchParameters.exposure = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->ExposureTexture, L"FSR2_InputExposure");
 
 		//Not sure if these two actually work
 		if (!config->DisableReactiveMask.value_or(false))
 		{
-			dispatchParameters.reactive = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->InputBiasCurrentColorMask, (wchar_t*)L"FSR2_InputReactiveMap");
-			dispatchParameters.transparencyAndComposition = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->TransparencyMask, (wchar_t*)L"FSR2_TransparencyAndCompositionMap");
+			dispatchParameters.reactive = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->InputBiasCurrentColorMask, L"FSR2_InputReactiveMap");
+			dispatchParameters.transparencyAndComposition = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->TransparencyMask, L"FSR2_TransparencyAndCompositionMap");
 		}
 
-		dispatchParameters.output = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->Output, (wchar_t*)L"FSR2_OutputUpscaledColor", FFX_RESOURCE_STATE_UNORDERED_ACCESS);
+		dispatchParameters.output = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->Output, L"FSR2_OutputUpscaledColor", FFX_RESOURCE_STATE_UNORDERED_ACCESS);
 
 		dispatchParameters.jitterOffset.x = inParams->JitterOffsetX;
 		dispatchParameters.jitterOffset.y = inParams->JitterOffsetY;
@@ -217,16 +211,26 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCm
 		dispatchParameters.reset = inParams->ResetRender;
 
 		float sharpness = CyberUtil::ConvertSharpness(inParams->Sharpness, config->SharpnessRange);
-		dispatchParameters.enableSharpening = config->EnableSharpening.value_or(inParams->EnableSharpening);
-		dispatchParameters.sharpness = config->Sharpness.value_or(sharpness);
+		
+		if (config->EnableSharpening.value_or(inParams->EnableSharpening)) {
+			dispatchParameters.enableSharpening = true;
+			if (config->Sharpness.has_value())
+			{
+				dispatchParameters.sharpness = config->Sharpness.value();
+			}
+			else if (sharpness > 0 && sharpness <= 1.0f) {
+				dispatchParameters.sharpness = sharpness;
+			}
+		}
 
-		////deltatime hax
-		//static double lastFrameTime;
-		//double currentTime = CyberUtil::MillisecondsNow();
-		//double deltaTime = (currentTime - lastFrameTime);
-		//lastFrameTime = currentTime;
+		//deltatime hax
+		static double lastFrameTime;
+		double currentTime = CyberUtil::MillisecondsNow();
+		double deltaTime = (currentTime - lastFrameTime);
+		lastFrameTime = currentTime;
 
-		dispatchParameters.frameTimeDelta = inParams->FrameTimeDeltaInMsec;
+		dispatchParameters.frameTimeDelta = deltaTime;
+		//dispatchParameters.frameTimeDelta = inParams->FrameTimeDeltaInMsec;
 		dispatchParameters.preExposure = inParams->preExposure;
 		dispatchParameters.renderSize.width = inParams->Width;
 		dispatchParameters.renderSize.height = inParams->Height;

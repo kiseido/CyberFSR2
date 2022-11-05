@@ -51,9 +51,10 @@ namespace CyberFSR
 		case Util::NvParameter::Sharpness: {
 			static float lastSharp;
 			Sharpness = InValue;
-			if (Sharpness != lastSharp)
+			if (Sharpness != lastSharp) {
 				ResetRender = true;
-			lastSharp = Sharpness;
+				lastSharp = Sharpness;
+			}
 		}
 			break;
 		default:
@@ -135,11 +136,13 @@ namespace CyberFSR
 			ResetRender = InValue;
 			break;
 		case Util::NvParameter::DLSS_Feature_Create_Flags:
-			Hdr = InValue & NVSDK_NGX_DLSS_Feature_Flags_IsHDR;
-			LowRes = InValue & NVSDK_NGX_DLSS_Feature_Flags_MVLowRes;
-			JitterMotion = InValue & NVSDK_NGX_DLSS_Feature_Flags_MVJittered;
-			DepthInverted = InValue & NVSDK_NGX_DLSS_Feature_Flags_DepthInverted;
-			EnableSharpening = InValue & NVSDK_NGX_DLSS_Feature_Flags_DoSharpening;
+			Hdr = InValue & NVSDK_NGX_DLSS_Feature_Flags::NVSDK_NGX_DLSS_Feature_Flags_IsHDR;
+			LowRes = InValue & NVSDK_NGX_DLSS_Feature_Flags::NVSDK_NGX_DLSS_Feature_Flags_MVLowRes;
+			JitterMotion = InValue & NVSDK_NGX_DLSS_Feature_Flags::NVSDK_NGX_DLSS_Feature_Flags_MVJittered;
+			DepthInverted = InValue & NVSDK_NGX_DLSS_Feature_Flags::NVSDK_NGX_DLSS_Feature_Flags_DepthInverted;
+			//Reserved = InValue & NVSDK_NGX_DLSS_Feature_Flags::NVSDK_NGX_DLSS_Feature_Flags_Reserved_0;
+			EnableSharpening = InValue & NVSDK_NGX_DLSS_Feature_Flags::NVSDK_NGX_DLSS_Feature_Flags_DoSharpening;
+			AutoExposure = InValue & NVSDK_NGX_DLSS_Feature_Flags::NVSDK_NGX_DLSS_Feature_Flags_AutoExposure;
 			break;
 		default:
 			BadThingHappened();
@@ -732,6 +735,8 @@ namespace CyberFSR
 				// bad thing happened, memory corruption?
 			}
 			inUse = Error_Resilient_Boolean::ER_FALSE;
+			NvParameter& param = ParameterRepository::Parameters[index];
+			param = {};
 		}
 		else
 		{
