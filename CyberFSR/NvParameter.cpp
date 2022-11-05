@@ -724,6 +724,16 @@ namespace CyberFSR
 		return output;
 	}
 
+	NvParameter* NvParameter::GetFreshCapabilityParameter() {
+		NvParameter* const output = GetFreshParameter();
+		if (output != nullptr)
+		{
+			output->RTXValue = NVSDK_NGX_RTX_Value_On;
+
+		}
+		return output;
+	}
+
 	void NvParameter::RecycleParameter(NvParameter* recyclePointer)
 	{
 		const __int64 index = (recyclePointer - ParameterRepository::Parameters) / (sizeof(NvParameter)*8);

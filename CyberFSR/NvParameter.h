@@ -20,7 +20,9 @@ namespace CyberFSR
 	struct NvParameter : NVSDK_NGX_Parameter
 	{
 		static NvParameter* GetFreshParameter();
+		static NvParameter* GetFreshCapabilityParameter();
 		static void RecycleParameter(NvParameter*);
+
 		unsigned int Width{}, Height{}, OutWidth{}, OutHeight{};
 		NVSDK_NGX_PerfQuality_Value PerfQualityValue = NVSDK_NGX_PerfQuality_Value_Balanced;
 		bool RTXValue{}, FreeMemOnReleaseFeature{};
@@ -32,7 +34,7 @@ namespace CyberFSR
 
 		long long SizeInBytes{};
 
-		bool DepthInverted{}, AutoExposure{}, Hdr{}, EnableSharpening{}, JitterMotion{}, LowRes{};
+		bool DepthInverted{}, AutoExposure{}, Hdr{}, EnableSharpening{}, JitterMotion{}, LowRes{}, EnableDynamicResolution{}, EnableTexture1DUsage{};
 
 		float FrameTimeDeltaInMsec = 0.0f;
 

@@ -74,7 +74,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_GetParameters(NVSDK_NGX_Parameter** OutParamete
 //TODO External Memory Tracking
 NVSDK_NGX_Result NVSDK_NGX_D3D12_GetCapabilityParameters(NVSDK_NGX_Parameter** OutParameters)
 {
-	*OutParameters = CyberNvParameter::GetFreshParameter();
+	*OutParameters = CyberNvParameter::GetFreshCapabilityParameter();
 	return NVSDK_NGX_Result_Success;
 }
 
@@ -139,8 +139,8 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_CreateFeature(ID3D12GraphicsCommandList* InCmdL
 		(config->DepthInverted		.value_or(inParams->DepthInverted)	? FFX_FSR2_ENABLE_DEPTH_INVERTED : 0) |
 		(config->InfiniteFarPlane	.value_or(false)					? FFX_FSR2_ENABLE_DEPTH_INFINITE : 0) |
 		(config->AutoExposure		.value_or(inParams->AutoExposure)	? FFX_FSR2_ENABLE_AUTO_EXPOSURE : 0) |
-		(false ? FFX_FSR2_ENABLE_DYNAMIC_RESOLUTION : 0) |
-		(false ? FFX_FSR2_ENABLE_TEXTURE1D_USAGE : 0);
+		(inParams->EnableDynamicResolution ? FFX_FSR2_ENABLE_DYNAMIC_RESOLUTION : 0) |
+		(inParams->EnableTexture1DUsage ? FFX_FSR2_ENABLE_TEXTURE1D_USAGE : 0);
 
 	errorCode = ffxFsr2ContextCreate(&deviceContext->FsrContext, &initParams);
 	FFX_ASSERT(errorCode == FFX_OK);
