@@ -5,6 +5,8 @@ namespace CyberFSR
 	typedef unsigned long long ULongLong;
 	typedef ULongLong* ULongLongPtr;
 
+	typedef std::pair<unsigned int, unsigned int> ScreenDimensions;
+
 	enum class Error_Resilient_Boolean : int 
 	{
 		ER_TRUE = ~0,

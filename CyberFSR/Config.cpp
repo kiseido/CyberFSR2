@@ -67,7 +67,7 @@ namespace CyberFSR
 			UpscalerProfile = readUpscalingProfile("Upscaling", "UpscalerProfile").value_or(UpscalingProfile::DLSS2);
 
 			// Quality Overrides
-			Divisor_Auto = readFloat("QualityOverrides", "Auto");
+			Divisor_Auto = readFloat("QualityOverrides", "Auto").value_or(0);
 			Divisor_UltraQuality = readFloat("QualityOverrides", "UltraQuality").value_or(0);
 			Divisor_Quality = readFloat("QualityOverrides", "Quality").value_or(0);
 			Divisor_Balanced = readFloat("QualityOverrides", "Balanced").value_or(0);
@@ -75,20 +75,20 @@ namespace CyberFSR
 			Divisor_UltraPerformance = readFloat("QualityOverrides", "UltraPerformance").value_or(0);
 
 			// Quality Overrides
-			Resolution_Auto = readPairUnInteger("StaticResolution", "Auto");
-			Resolution_UltraQuality = readPairUnInteger("StaticResolution", "UltraQuality").value_or(std::pair{0,0});
-			Resolution_Quality = readPairUnInteger("StaticResolution", "Quality").value_or(std::pair{ 0,0 });
-			Resolution_Balanced = readPairUnInteger("StaticResolution", "Balanced").value_or(std::pair{ 0,0 });
-			Resolution_Performance = readPairUnInteger("StaticResolution", "Performance").value_or(std::pair{ 0,0 });
-			Resolution_UltraPerformance = readPairUnInteger("StaticResolution", "UltraPerformance").value_or(std::pair{ 0,0 });
+			Resolution_Auto = readScreenDimensions("StaticResolution", "Auto").value_or(std::pair{ 0,0 });
+			Resolution_UltraQuality = readScreenDimensions("StaticResolution", "UltraQuality").value_or(std::pair{2560,1440});
+			Resolution_Quality = readScreenDimensions("StaticResolution", "Quality").value_or(std::pair{ 1920,1080 });
+			Resolution_Balanced = readScreenDimensions("StaticResolution", "Balanced").value_or(std::pair{ 1600,900 });
+			Resolution_Performance = readScreenDimensions("StaticResolution", "Performance").value_or(std::pair{ 1280,720 });
+			Resolution_UltraPerformance = readScreenDimensions("StaticResolution", "UltraPerformance").value_or(std::pair{ 1024,576 });
 
 			// Quality Overrides
-			FPSTarget_Auto = readPairUnInteger("FPSTarget", "UltraQuality");
-			FPSTarget_UltraQuality = readPairUnInteger("FPSTarget", "UltraQuality").value_or(std::pair{ 0,0 });
-			FPSTarget_Quality = readPairUnInteger("FPSTarget", "Quality").value_or(std::pair{ 0,0 });
-			FPSTarget_Balanced = readPairUnInteger("FPSTarget", "Balanced").value_or(std::pair{ 0,0 });
-			FPSTarget_Performance = readPairUnInteger("FPSTarget", "Performance").value_or(std::pair{ 0,0 });
-			FPSTarget_UltraPerformance = readPairUnInteger("FPSTarget", "UltraPerformance").value_or(std::pair{ 0,0 });
+			FPSTarget_Auto = readScreenDimensions("FPSTarget", "UltraQuality").value_or(std::pair{ 0,0 });
+			FPSTarget_UltraQuality = readScreenDimensions("FPSTarget", "UltraQuality").value_or(std::pair{ 0,0 });
+			FPSTarget_Quality = readScreenDimensions("FPSTarget", "Quality").value_or(std::pair{ 0,0 });
+			FPSTarget_Balanced = readScreenDimensions("FPSTarget", "Balanced").value_or(std::pair{ 0,0 });
+			FPSTarget_Performance = readScreenDimensions("FPSTarget", "Performance").value_or(std::pair{ 0,0 });
+			FPSTarget_UltraPerformance = readScreenDimensions("FPSTarget", "UltraPerformance").value_or(std::pair{ 0,0 });
 
 			UE_DepthInverted = readBool("EngineUnreal", "DepthInverted").value_or(false) ? Trinary::ON : Trinary::OFF;
 			UE_JitterCancellation = readBool("EngineUnreal", "JitterCancellation").value_or(false) ? Trinary::ON : Trinary::OFF;
@@ -162,9 +162,9 @@ namespace CyberFSR
 		return output;
 	}
 
-	std::optional<std::pair<unsigned int, unsigned int>> Config::readPairUnInteger(std::string section, std::string key)
+	std::optional<ScreenDimensions> Config::readScreenDimensions(std::string section, std::string key)
 	{
-		std::optional<std::pair<unsigned int, unsigned int>> output = std::nullopt;
+		std::optional<ScreenDimensions> output = std::nullopt;
 		std::optional<std::string> valueOpt = readString(section, key);
 		if (valueOpt.has_value())
 		{
@@ -175,7 +175,10 @@ namespace CyberFSR
 				const size_t delimiterLocation = values.find(delimiter);
 				auto width = values.substr(0, delimiterLocation);
 				auto height = values.substr(1, delimiterLocation);
-				output = std::pair(std::stoi(width), std::stoi(height));
+				ScreenDimensions out;
+				out.second = std::stoi(height);
+				out.first = std::stoi(width);
+				output = out;
 			}
 			catch (const std::bad_optional_access&) // missing or auto value
 			{

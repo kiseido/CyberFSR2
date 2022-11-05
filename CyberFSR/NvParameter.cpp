@@ -528,45 +528,67 @@ namespace CyberFSR
 		return output;
 	}
 
-	struct ScreenDimensions 
+	inline ScreenDimensions GetFixedResFromQuality(const NVSDK_NGX_PerfQuality_Value& input, const std::shared_ptr<Config>& config)
 	{
-		unsigned int Width = 0;
-		unsigned int Height = 0;
-	};
+
+	}
 
 	inline ScreenDimensions CalcSame(const auto& Width, const auto& Height, const auto& Division_Ratio) 
 	{
 		// Multiply is way faster than divide, do a single divide now to avoid it later
 		const auto resolution_Ratio = 1.0f / Division_Ratio;
 		ScreenDimensions output;
-		output.Height = std::lround(Height * resolution_Ratio);
-		output.Width = std::lround(Width * resolution_Ratio);
+		output.first = std::lround(Width * resolution_Ratio);
+		output.second = std::lround(Height * resolution_Ratio);
 		return output;
 	}
 
 	inline ScreenDimensions CalcDifferent(const auto& Width, const auto& Height, const auto& Width_Division_Ratio, const auto& Height_Division_Ratio) 
 	{
 		ScreenDimensions output;
-		output.Height = std::lround(Height / Height_Division_Ratio);
-		output.Width = std::lround(Width / Width_Division_Ratio);
+		output.first = std::lround(Width / Width_Division_Ratio);
+		output.second = std::lround(Height / Height_Division_Ratio);
 		return output;
 	}
 
-	inline ScreenDimensions DynaResProfile(const std::shared_ptr<Config>& InConfig, const NvParameter& InNvParameter, const UpscalingProfile& InProfile) 
+	inline ScreenDimensions DynaResProfile(const std::shared_ptr<Config>& InConfig, const NvParameter& InNvParameter) 
 	{
 		ScreenDimensions output;
 		// TODO
 		return output;
 	}
 
-	inline ScreenDimensions FixedResProfile(const std::shared_ptr<Config>& InConfig, const NvParameter& InNvParameter, const UpscalingProfile& InProfile) 
+	inline ScreenDimensions FixedResProfile(const std::shared_ptr<Config>& InConfig, const NvParameter& InNvParameter) 
 	{
 		ScreenDimensions output;
-		// TODO
+
+		switch (InNvParameter.PerfQualityValue)
+		{
+		case NVSDK_NGX_PerfQuality_Value_UltraPerformance:
+			output = InConfig->Resolution_UltraPerformance;
+			break;
+		case NVSDK_NGX_PerfQuality_Value_MaxPerf:
+			output = InConfig->Resolution_Performance;
+			break;
+		case NVSDK_NGX_PerfQuality_Value_Balanced:
+			output = InConfig->Resolution_Balanced;
+			break;
+		case NVSDK_NGX_PerfQuality_Value_MaxQuality:
+			output = InConfig->Resolution_Quality;
+			break;
+		case NVSDK_NGX_PerfQuality_Value_UltraQuality:
+			output = InConfig->Resolution_UltraQuality;
+			break;
+		default:
+			BadThingHappened();
+			// no correlated value, add some logging?
+			break;
+		}
+
 		return output;
 	}
 
-	inline ScreenDimensions DLSS2Profile(const std::shared_ptr<Config>& InConfig, const NvParameter& InNvParameter, const UpscalingProfile& InProfile) 
+	inline ScreenDimensions DLSS2Profile(const std::shared_ptr<Config>& InConfig, const NvParameter& InNvParameter) 
 	{
 		ScreenDimensions output;
 
@@ -580,7 +602,7 @@ namespace CyberFSR
 		return output;
 	}
 
-	inline ScreenDimensions FSR2Profile(const std::shared_ptr<Config>& InConfig, const NvParameter& InNvParameter, const UpscalingProfile& InProfile) 
+	inline ScreenDimensions FSR2Profile(const std::shared_ptr<Config>& InConfig, const NvParameter& InNvParameter) 
 	{
 		ScreenDimensions output;
 
@@ -590,32 +612,31 @@ namespace CyberFSR
 		{
 			FfxFsr2QualityMode fsrQualityMode = DLSS2FSR2QualityTable(InNvParameter.PerfQualityValue);
 
-					if (fsrQualityMode != NO_VALUEi)
-					{
-						const FfxErrorCode err = ffxFsr2GetRenderResolutionFromQualityMode(&output.Width, &output.Height, InNvParameter->Width, InNvParameter->Height, fsrQualityMode);
+			if (fsrQualityMode != NO_VALUEi)
+			{
+				const FfxErrorCode err = ffxFsr2GetRenderResolutionFromQualityMode(&output.first, &output.second, InNvParameter->Width, InNvParameter->Height, fsrQualityMode);
 #ifdef _DEBUG
-						switch (err)
-						{
-						case FFX_OK:
-							// all good!
-						BadThingHappened();
-							break;
-						case FFX_ERROR_INVALID_POINTER:
-							//printf("EvaluateRenderScale error: FFX_ERROR_INVALID_POINTER");
-						BadThingHappened();
-							break;
-						case FFX_ERROR_INVALID_ENUM:
-							//printf("EvaluateRenderScale error: FFX_ERROR_INVALID_ENUM");
-						BadThingHappened();
-							break;
-						default:
-							//printf("EvaluateRenderScale error: default");
-							// bad crap!
-						BadThingHappened();
-							break;
-					}
-#endif
+				switch (err)
+				{
+				case FFX_OK:
+					// all good!
+				BadThingHappened();
+					break;
+				case FFX_ERROR_INVALID_POINTER:
+					//printf("EvaluateRenderScale error: FFX_ERROR_INVALID_POINTER");
+				BadThingHappened();
+					break;
+				case FFX_ERROR_INVALID_ENUM:
+					//printf("EvaluateRenderScale error: FFX_ERROR_INVALID_ENUM");
+				BadThingHappened();
+					break;
+				default:
+					//printf("EvaluateRenderScale error: default");
+					// bad crap!
+				BadThingHappened();
+					break;
 				}
+#endif
 			}
 		}
 		else
@@ -631,16 +652,16 @@ namespace CyberFSR
 		switch (InProfile)
 		{
 			case UpscalingProfile::DLSS2:
-				output = DLSS2Profile(InConfig, InNvParameter, InProfile);
+				output = DLSS2Profile(InConfig, InNvParameter);
 				break;
 			case UpscalingProfile::FSR2:
-				output = FSR2Profile(InConfig, InNvParameter, InProfile);
+				output = FSR2Profile(InConfig, InNvParameter);
 				break;
 			case UpscalingProfile::DynaRes:
-				output = DynaResProfile(InConfig, InNvParameter, InProfile);
+				output = DynaResProfile(InConfig, InNvParameter);
 				break;
 			case UpscalingProfile::FixedRes:
-				output = FixedResProfile(InConfig, InNvParameter, InProfile);
+				output = FixedResProfile(InConfig, InNvParameter);
 				break;
 			default:
 				BadThingHappened();
@@ -656,16 +677,16 @@ namespace CyberFSR
 
 		auto dimensions = Switcher(config, *this, config->UpscalerProfile);
 
-		if (dimensions.Width == 0 || dimensions.Height == 0) {
+		if (dimensions.first == 0 || dimensions.second == 0) {
 			static const float defaultRatioVertical = 2.0f;
 			static const float defaultRatioHorizontal = 2.0f;
 
-			dimensions = CalcSame(dimensions.Width, dimensions.Height, defaultRatioVertical);
+			dimensions = CalcSame(dimensions.first, dimensions.second, defaultRatioVertical);
 			//CalcDifferent(dimensions.Width, dimensions.Height, defaultRatioVertical, defaultRatioHorizontal);
 		}
 
-		OutWidth = dimensions.Width;
-		OutHeight = dimensions.Height;
+		OutWidth = dimensions.first;
+		OutHeight = dimensions.second;
 	}
 
 
@@ -715,7 +736,7 @@ namespace CyberFSR
 		else
 		{
 			// throw bad shit happening code here
-			DebugBreak;
+			DebugBreak();
 			return;
 		}
 	}

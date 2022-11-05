@@ -28,7 +28,7 @@ namespace CyberFSR
 		CyberFSR::UpscalingProfile UpscalerProfile;
 
 		// Quality Divisor
-		std::optional<float> Divisor_Auto;
+		float Divisor_Auto;
 		float Divisor_UltraQuality;
 		float Divisor_Quality;
 		float Divisor_Balanced;
@@ -36,20 +36,20 @@ namespace CyberFSR
 		float Divisor_UltraPerformance;
 
 		//  Render Resolution Overrides
-		std::optional<std::pair<unsigned int, unsigned int>> Resolution_Auto;
-		std::pair<unsigned int, unsigned int> Resolution_UltraQuality;
-		std::pair<unsigned int, unsigned int> Resolution_Quality;
-		std::pair<unsigned int, unsigned int> Resolution_Balanced;
-		std::pair<unsigned int, unsigned int> Resolution_Performance;
-		std::pair<unsigned int, unsigned int> Resolution_UltraPerformance;
+		ScreenDimensions Resolution_Auto;
+		ScreenDimensions Resolution_UltraQuality;
+		ScreenDimensions Resolution_Quality;
+		ScreenDimensions Resolution_Balanced;
+		ScreenDimensions Resolution_Performance;
+		ScreenDimensions Resolution_UltraPerformance;
 
 		//  Render Resolution Overrides
-		std::optional<std::pair<unsigned int, unsigned int>> FPSTarget_Auto;
-		std::pair<unsigned int, unsigned int> FPSTarget_UltraQuality;
-		std::pair<unsigned int, unsigned int> FPSTarget_Quality;
-		std::pair<unsigned int, unsigned int> FPSTarget_Balanced;
-		std::pair<unsigned int, unsigned int> FPSTarget_Performance;
-		std::pair<unsigned int, unsigned int> FPSTarget_UltraPerformance;
+		ScreenDimensions FPSTarget_Auto;
+		ScreenDimensions FPSTarget_UltraQuality;
+		ScreenDimensions FPSTarget_Quality;
+		ScreenDimensions FPSTarget_Balanced;
+		ScreenDimensions FPSTarget_Performance;
+		ScreenDimensions FPSTarget_UltraPerformance;
 
 //   ██████╗██╗   ██╗███████╗████████╗ ██████╗ ███╗   ███╗               
 //  ██╔════╝██║   ██║██╔════╝╚══██╔══╝██╔═══██╗████╗ ████║               
@@ -186,7 +186,7 @@ namespace CyberFSR
 		std::optional<SharpnessRangeModifier> readSharpnessRange(std::string section, std::string key);
 		std::optional<ViewMethod> readViewMethod(std::string section, std::string key);
 		std::optional<UpscalingProfile> readUpscalingProfile(std::string section, std::string key);
-		std::optional<std::pair<unsigned int, unsigned int>> readPairUnInteger(std::string section, std::string key);
+		std::optional<std::pair<unsigned int, unsigned int>> readScreenDimensions(std::string section, std::string key);
 	};
 }
 

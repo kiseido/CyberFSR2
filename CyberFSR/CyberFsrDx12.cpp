@@ -14,6 +14,7 @@ NVSDK_NGX_API NVSDK_NGX_Result NVSDK_NGX_D3D12_Init_Ext(unsigned long long InApp
 	ID3D12Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion,
 	unsigned long long unknown0)
 {
+	// cyberpunk enters here
 	return NVSDK_NGX_Result_Success;
 }
 
