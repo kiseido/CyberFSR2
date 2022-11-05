@@ -77,7 +77,7 @@ namespace CyberFSR
 	{
 		float output;
 
-		if (range == SharpnessRangeModifier::Extended)
+		if (range.has_value() && range.value() == SharpnessRangeModifier::Extended)
 		{
 			// normalize sharpness value to [0, 1] range
 			// originally in range [-0.99, 1]
@@ -88,7 +88,7 @@ namespace CyberFSR
 		{
 			output = sharpness;
 		}
-		return 0;
+		return output * 0.99f;
 	}
 
 	SharpnessRangeModifier Util::SharpnessRangeModifierMap(const char* in)
@@ -178,7 +178,9 @@ namespace CyberFSR
 			{NVSDK_NGX_Parameter_OptLevel, NvParameter::OptLevel},
 			{NVSDK_NGX_EParameter_OptLevel, NvParameter::OptLevel_E},
 			{NVSDK_NGX_Parameter_IsDevSnippetBranch, NvParameter::IsDevSnippetBranch},
-			{NVSDK_NGX_EParameter_IsDevSnippetBranch, NvParameter::IsDevSnippetBranch_E}
+			{NVSDK_NGX_EParameter_IsDevSnippetBranch, NvParameter::IsDevSnippetBranch_E},
+
+			{NVSDK_NGX_Parameter_FrameTimeDeltaInMsec, NvParameter::FrameTimeDeltaInMsec},
 		};
 
 		return NvParamTranslation[std::string(name)];

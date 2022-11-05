@@ -30,6 +30,10 @@ namespace CyberFSR
 
 		bool DepthInverted{}, AutoExposure{}, Hdr{}, EnableSharpening{}, JitterMotion{}, LowRes{};
 
+		float FrameTimeDeltaInMsec = 0.0f;
+
+		float preExposure = 1.0f;
+
 		//external Resources
 		void* InputBiasCurrentColorMask{};
 		void* Color{};

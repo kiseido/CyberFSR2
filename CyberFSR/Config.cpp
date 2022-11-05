@@ -75,12 +75,12 @@ namespace CyberFSR
 			QualityRatio_Performance = readFloat("Upscaling", "Divisor_Performance");
 			QualityRatio_UltraPerformance = readFloat("Upscaling", "Divisor_UltraPerformance");
 
-			// Quality Overrides
-			QualityRatio_UltraQuality = readFloat("Upscaling", "Resolution_UltraQuality");
-			QualityRatio_Quality = readFloat("Upscaling", "Resolution_Quality");
-			QualityRatio_Balanced = readFloat("Upscaling", "Resolution_Balanced");
-			QualityRatio_Performance = readFloat("Upscaling", "Resolution_Performance");
-			QualityRatio_UltraPerformance = readFloat("Upscaling", "Resolution_UltraPerformance");
+			//// Quality Overrides
+			//QualityRatio_UltraQuality = readFloat("Upscaling", "Resolution_UltraQuality");
+			//QualityRatio_Quality = readFloat("Upscaling", "Resolution_Quality");
+			//QualityRatio_Balanced = readFloat("Upscaling", "Resolution_Balanced");
+			//QualityRatio_Performance = readFloat("Upscaling", "Resolution_Performance");
+			//QualityRatio_UltraPerformance = readFloat("Upscaling", "Resolution_UltraPerformance");
 		}
 
 		auto exeName = Util::ExePath().filename();
@@ -102,7 +102,7 @@ namespace CyberFSR
 	std::optional<std::string> Config::readString(std::string section, std::string key, bool lowercase)
 	{
 		std::optional<std::string> output = std::nullopt;
-		std::string value = ini.GetValue(section.c_str(), key.c_str(), "auto");
+		auto value = ini.GetValue(section.c_str(), key.c_str(), "auto");
 
 		std::string lower = value;
 		std::transform(
@@ -123,22 +123,25 @@ namespace CyberFSR
 	std::optional<float> Config::readFloat(std::string section, std::string key)
 	{
 		std::optional<float> output = std::nullopt;
-		auto value = readString(section, key);
-		try
+		std::optional<std::string> valueOpt = readString(section, key);
+		if (valueOpt.has_value())
 		{
-			output = std::stof(value.value());
-		}
-		catch (const std::bad_optional_access&) // missing or auto value
-		{
-			output = std::nullopt;
-		}
-		catch (const std::invalid_argument&) // invalid float string for std::stof
-		{
-			output = std::nullopt;
-		}
-		catch (const std::out_of_range&) // out of range for 32 bit float
-		{
-			output = std::nullopt;
+			try
+			{
+				output = std::stof(valueOpt.value());
+			}
+			catch (const std::bad_optional_access&) // missing or auto value
+			{
+				output = std::nullopt;
+			}
+			catch (const std::invalid_argument&) // invalid float string for std::stof
+			{
+				output = std::nullopt;
+			}
+			catch (const std::out_of_range&) // out of range for 32 bit float
+			{
+				output = std::nullopt;
+			}
 		}
 
 		return output;
@@ -160,6 +163,9 @@ namespace CyberFSR
 			{
 				output = false;
 			}
+			else {
+				//?!?
+			}
 		}
 
 		return output;
@@ -168,10 +174,10 @@ namespace CyberFSR
 	std::optional<SharpnessRangeModifier> Config::readSharpnessRange(std::string section, std::string key)
 	{
 		std::optional<SharpnessRangeModifier> output = std::nullopt;
-		auto value = readString(section, key, true);
+		auto valueOpt = readString(section, key, true);
 
-		if (value)
-			output = Util::SharpnessRangeModifierMap(value.value().c_str());
+		if (valueOpt.has_value())
+			output = Util::SharpnessRangeModifierMap(valueOpt.value().c_str());
 
 		return output;
 	}
@@ -179,10 +185,10 @@ namespace CyberFSR
 	std::optional<ViewMethod> Config::readViewMethod(std::string section, std::string key)
 	{
 		std::optional<ViewMethod> output = std::nullopt;
-		auto value = readString(section, key, true);
+		auto valueOpt = readString(section, key, true);
 
-		if (value)
-			output = Util::ViewMethodMap(value.value().c_str());
+		if (valueOpt.has_value())
+			output = Util::ViewMethodMap(valueOpt.value().c_str());
 
 		return output;
 	}

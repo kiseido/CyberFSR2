@@ -7,6 +7,11 @@
 constexpr float NO_VALUEf = -128.125;
 constexpr int NO_VALUEi = -128;
 
+void defaulted() {
+	int a = 0;
+	a = a + 1;
+}
+
 namespace CyberFSR
 {
 	void NvParameter::Set(const char* InName, unsigned long long InValue)
@@ -18,6 +23,7 @@ namespace CyberFSR
 		switch (inParameter)
 		{
 		default:
+			defaulted();
 			break;
 		}
 	}
@@ -42,10 +48,16 @@ namespace CyberFSR
 		case Util::NvParameter::Jitter_Offset_Y:
 			JitterOffsetY = InValue;
 			break;
-		case Util::NvParameter::Sharpness:
+		case Util::NvParameter::Sharpness: {
+			static float lastSharp;
 			Sharpness = InValue;
+			if (Sharpness != lastSharp)
+				ResetRender = true;
+			lastSharp = Sharpness;
+		}
 			break;
 		default:
+			defaulted();
 			break;
 		}
 	}
@@ -59,6 +71,7 @@ namespace CyberFSR
 		switch (inParameter)
 		{
 		default:
+			defaulted();
 			break;
 		}
 	}
@@ -68,19 +81,6 @@ namespace CyberFSR
 		constexpr NvParameterType nvType = NvUInt;
 
 		const Util::NvParameter inParameter = Util::NvParameterToEnum(InName);
-
-		switch (inParameter)
-		{
-		default:
-			break;
-		}
-	}
-
-	void NvParameter::Set(const char* InName, int InValue)
-	{
-		constexpr NvParameterType nvType = NvInt;
-
-	const Util::NvParameter inParameter = Util::NvParameterToEnum(InName);
 
 		switch (inParameter)
 		{
@@ -96,6 +96,32 @@ namespace CyberFSR
 		case Util::NvParameter::DLSS_Render_Subrect_Dimensions_Height:
 			Height = InValue;
 			break;
+		case Util::NvParameter::OutWidth:
+			OutWidth = InValue;
+			break;
+		case Util::NvParameter::OutHeight:
+			OutHeight = InValue;
+			break;
+		case Util::NvParameter::CreationNodeMask:
+			CreationNodeMask = InValue;
+			break;
+		case Util::NvParameter::VisibilityNodeMask:
+			VisibilityNodeMask = InValue;
+			break;
+		default:
+			defaulted();
+			break;
+		}
+	}
+
+	void NvParameter::Set(const char* InName, int InValue)
+	{
+		constexpr NvParameterType nvType = NvInt;
+
+		const Util::NvParameter inParameter = Util::NvParameterToEnum(InName);
+
+		switch (inParameter)
+		{
 		case Util::NvParameter::PerfQualityValue:
 			PerfQualityValue = static_cast<NVSDK_NGX_PerfQuality_Value>(InValue);
 			break;
@@ -105,20 +131,8 @@ namespace CyberFSR
 		case Util::NvParameter::FreeMemOnReleaseFeature:
 			FreeMemOnReleaseFeature = InValue;
 			break;
-		case Util::NvParameter::CreationNodeMask:
-			CreationNodeMask = InValue;
-			break;
-		case Util::NvParameter::VisibilityNodeMask:
-			VisibilityNodeMask = InValue;
-			break;
 		case Util::NvParameter::Reset:
 			ResetRender = InValue;
-			break;
-		case Util::NvParameter::OutWidth:
-			OutWidth = InValue;
-			break;
-		case Util::NvParameter::OutHeight:
-			OutHeight = InValue;
 			break;
 		case Util::NvParameter::DLSS_Feature_Create_Flags:
 			Hdr = InValue & NVSDK_NGX_DLSS_Feature_Flags_IsHDR;
@@ -128,6 +142,7 @@ namespace CyberFSR
 			EnableSharpening = InValue & NVSDK_NGX_DLSS_Feature_Flags_DoSharpening;
 			break;
 		default:
+			defaulted();
 			break;
 		}
 	}
@@ -163,6 +178,7 @@ namespace CyberFSR
 			SetNVarWithName(ExposureTexture, L"ExposureTexture");
 			break;
 		default:
+			defaulted();
 			break;
 		}
 #undef SetNVarWithName
@@ -199,6 +215,7 @@ namespace CyberFSR
 			SetNVarWithName(ExposureTexture, L"ExposureTexture");
 			break;
 		default:
+			defaulted();
 			break;
 		}
 #undef SetNVarWithName
@@ -213,6 +230,7 @@ namespace CyberFSR
 		switch (inParameter)
 		{
 		default:
+			defaulted();
 			break;
 		}
 	}
@@ -235,6 +253,7 @@ namespace CyberFSR
 			*OutValue = OptLevel;
 			break;
 		default:
+			defaulted();
 			break;
 		}
 		return result;
@@ -253,7 +272,11 @@ namespace CyberFSR
 		case Util::NvParameter::Sharpness:
 			*OutValue = Sharpness;
 			break;
+		case Util::NvParameter::FrameTimeDeltaInMsec:
+			*OutValue = FrameTimeDeltaInMsec;
+			break;
 		default:
+			defaulted();
 			break;
 		}
 		return result;
@@ -269,6 +292,7 @@ namespace CyberFSR
 		switch (inParameter)
 		{
 		default:
+			defaulted();
 			break;
 		}
 		return result;
@@ -283,43 +307,6 @@ namespace CyberFSR
 
 		switch (inParameter)
 		{
-		default:
-			break;
-		}
-		return result;
-	}
-
-	NVSDK_NGX_Result NvParameter::Get(const char* InName, int* OutValue) const
-	{
-		constexpr NvParameterType nvType = NvInt;
-		auto result = NVSDK_NGX_Result_Fail;
-
-		const Util::NvParameter inParameter = Util::NvParameterToEnum(InName);
-
-		switch (inParameter)
-		{
-		case Util::NvParameter::SuperSampling_Available:
-		case Util::NvParameter::SuperSampling_Available_E:
-			*OutValue = true;
-			break;
-		case Util::NvParameter::SuperSampling_FeatureInitResult:
-			*OutValue = NVSDK_NGX_Result_Success;
-			break;
-		case Util::NvParameter::SuperSampling_NeedsUpdatedDriver:
-			*OutValue = false;
-			break;
-		case Util::NvParameter::SuperSampling_MinDriverVersionMinor:
-			*OutValue = 0;
-			break;
-		case Util::NvParameter::SuperSampling_MinDriverVersionMajor:
-			*OutValue = 0;
-			break;
-		case Util::NvParameter::DLSS_Render_Subrect_Dimensions_Width:
-			*OutValue = Width;
-			break;
-		case Util::NvParameter::DLSS_Render_Subrect_Dimensions_Height:
-			*OutValue = Height;
-			break;
 		case Util::NvParameter::OutWidth:
 			*OutValue = OutWidth;
 			break;
@@ -340,11 +327,50 @@ namespace CyberFSR
 			//*OutValue = Height / 10;
 			*OutValue = OutHeight;
 			break;
+		case Util::NvParameter::DLSS_Render_Subrect_Dimensions_Width:
+			*OutValue = Width;
+			break;
+		case Util::NvParameter::DLSS_Render_Subrect_Dimensions_Height:
+			*OutValue = Height;
+			break;
+		case Util::NvParameter::SuperSampling_Available:
+		case Util::NvParameter::SuperSampling_Available_E:
+			*OutValue = true;
+			break;
+		default:
+			defaulted();
+			break;
+		}
+		return result;
+	}
+
+	NVSDK_NGX_Result NvParameter::Get(const char* InName, int* OutValue) const
+	{
+		constexpr NvParameterType nvType = NvInt;
+		auto result = NVSDK_NGX_Result_Fail;
+
+		const Util::NvParameter inParameter = Util::NvParameterToEnum(InName);
+
+		switch (inParameter)
+		{
+		case Util::NvParameter::SuperSampling_FeatureInitResult:
+			*OutValue = NVSDK_NGX_Result_Success;
+			break;
+		case Util::NvParameter::SuperSampling_NeedsUpdatedDriver:
+			*OutValue = false;
+			break;
+		case Util::NvParameter::SuperSampling_MinDriverVersionMinor:
+			*OutValue = 0;
+			break;
+		case Util::NvParameter::SuperSampling_MinDriverVersionMajor:
+			*OutValue = 0;
+			break;
 		case Util::NvParameter::IsDevSnippetBranch:
 		case Util::NvParameter::IsDevSnippetBranch_E:
 			*OutValue = IsDevSnippetBranch; //Dummy value
 			break;
 		default:
+			defaulted();
 			break;
 		}
 		return result;
@@ -360,6 +386,7 @@ namespace CyberFSR
 		switch (inParameter)
 		{
 		default:
+			defaulted();
 			break;
 		}
 		return result;
@@ -375,6 +402,7 @@ namespace CyberFSR
 		switch (inParameter)
 		{
 		default:
+			defaulted();
 			break;
 		}
 		return result;
@@ -389,6 +417,7 @@ namespace CyberFSR
 		auto result = NVSDK_NGX_Result_Fail;
 
 		const Util::NvParameter inParameter = Util::NvParameterToEnum(InName);
+
 		switch (inParameter) {
 		case Util::NvParameter::DLSSOptimalSettingsCallback:
 			*OutValue = NVSDK_NGX_DLSS_GetOptimalSettingsCallback;

@@ -77,7 +77,9 @@ namespace CyberFSR
 			OptLevel,
 			OptLevel_E,
 			IsDevSnippetBranch,
-			IsDevSnippetBranch_E
+			IsDevSnippetBranch_E,
+
+			FrameTimeDeltaInMsec
 		};
 
 		NvParameter NvParameterToEnum(const char* name);

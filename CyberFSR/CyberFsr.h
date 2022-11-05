@@ -56,12 +56,12 @@ namespace CyberFSR
 	class FeatureContext
 	{
 	public:
-		std::unique_ptr<ViewMatrixHook> ViewMatrix;
-		NVSDK_NGX_Handle Handle;
-		ID3D12Device* DxDevice;
-		FfxFsr2Context FsrContext;
-		FfxFsr2ContextDescription FsrContextDescription;
-		std::unique_ptr<DebugOverlay> DebugLayer;
+		std::unique_ptr<ViewMatrixHook> ViewMatrix = NULL;
+		NVSDK_NGX_Handle Handle = { NULL };
+		ID3D12Device* DxDevice = NULL;
+		FfxFsr2Context FsrContext = { NULL };
+		FfxFsr2ContextDescription FsrContextDescription = { NULL };
+		std::unique_ptr<DebugOverlay> DebugLayer = NULL;
 		std::vector<unsigned char> ScratchBuffer;
 
 		unsigned int Width{}, Height{}, RenderWidth{}, RenderHeight{};

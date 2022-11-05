@@ -154,10 +154,10 @@ void hSetComputeRootSignature(ID3D12GraphicsCommandList* commandList, ID3D12Root
 
 void HookSetComputeRootSignature(ID3D12GraphicsCommandList* InCmdList)
 {
-	constexpr int offset = 0xE8 / sizeof(void*);
+	constexpr int offset = 0xE8 / sizeof(void*); // ?!? rando magic
 
 	void** cmdListVTable = *reinterpret_cast<void***>(InCmdList);
-	const auto computeRootSigFuncVTable = reinterpret_cast<SETCOMPUTEROOTSIGNATURE*>(cmdListVTable + offset);
+	SETCOMPUTEROOTSIGNATURE* const computeRootSigFuncVTable = reinterpret_cast<SETCOMPUTEROOTSIGNATURE*>(cmdListVTable + offset);
 
 	if (oSetComputeRootSignature == nullptr)
 	{
@@ -173,7 +173,7 @@ void HookSetComputeRootSignature(ID3D12GraphicsCommandList* InCmdList)
 		Freeze(&threads);
 		VirtualProtect(computeRootSigFuncVTable, sizeof(void*), PAGE_READWRITE, &oldProtect);
 		*computeRootSigFuncVTable = &hSetComputeRootSignature;
-		VirtualProtect(computeRootSigFuncVTable, sizeof(void*), oldProtect, nullptr);
+		VirtualProtect(computeRootSigFuncVTable, sizeof(void*), oldProtect, 0);
 		Unfreeze(&threads);
 	}
 }
