@@ -273,9 +273,6 @@ namespace CyberFSR
 		case Util::NvParameter::Sharpness:
 			*OutValue = Sharpness;
 			break;
-		case Util::NvParameter::FrameTimeDeltaInMsec:
-			*OutValue = FrameTimeDeltaInMsec;
-			break;
 		default:
 			BadThingHappened();
 			result = NVSDK_NGX_Result_Fail;
@@ -323,12 +320,12 @@ namespace CyberFSR
 			*OutValue = Height;
 			break;
 		case Util::NvParameter::DLSS_Get_Dynamic_Min_Render_Width:
-			//*OutValue = Width / 10;
-			*OutValue = OutWidth;
+			*OutValue = Width / 10;
+			//*OutValue = OutWidth;
 			break;
 		case Util::NvParameter::DLSS_Get_Dynamic_Min_Render_Height:
-			//*OutValue = Height / 10;
-			*OutValue = OutHeight;
+			*OutValue = Height / 10;
+			//*OutValue = OutHeight;
 			break;
 		case Util::NvParameter::DLSS_Render_Subrect_Dimensions_Width:
 			*OutValue = Width;
@@ -501,30 +498,33 @@ namespace CyberFSR
 	// EvaluateRenderScale helper
 	inline float GetQualityOverrideRatio(const NVSDK_NGX_PerfQuality_Value& input, const std::shared_ptr<Config>& config)
 	{
-		float output = NO_VALUEf;
+		float output = 0;
 
 		switch (input)
 		{
 		case NVSDK_NGX_PerfQuality_Value_UltraPerformance:
-			output = config->QualityRatio_UltraPerformance.value_or(NO_VALUEf);
+			output = config->Divisor_UltraPerformance;
 			break;
 		case NVSDK_NGX_PerfQuality_Value_MaxPerf:
-			output = config->QualityRatio_Performance.value_or(NO_VALUEf);
+			output = config->Divisor_Performance;
 			break;
 		case NVSDK_NGX_PerfQuality_Value_Balanced:
-			output = config->QualityRatio_Balanced.value_or(NO_VALUEf);
+			output = config->Divisor_Balanced;
 			break;
 		case NVSDK_NGX_PerfQuality_Value_MaxQuality:
-			output = config->QualityRatio_Quality.value_or(NO_VALUEf);
+			output = config->Divisor_Quality;
 			break;
 		case NVSDK_NGX_PerfQuality_Value_UltraQuality:
-			output = config->QualityRatio_UltraQuality.value_or(NO_VALUEf);
+			output = config->Divisor_UltraQuality;
 			break;
 		default:
 			BadThingHappened();
 			// no correlated value, add some logging?
 			break;
 		}
+
+		if (output == 0)
+			output = NO_VALUEf;
 		return output;
 	}
 
@@ -657,8 +657,8 @@ namespace CyberFSR
 		auto dimensions = Switcher(config, *this, config->UpscalerProfile);
 
 		if (dimensions.Width == 0 || dimensions.Height == 0) {
-			constexpr auto defaultRatioVertical = 2.0f;
-			constexpr auto defaultRatioHorizontal = 2.0f;
+			static const float defaultRatioVertical = 2.0f;
+			static const float defaultRatioHorizontal = 2.0f;
 
 			dimensions = CalcSame(dimensions.Width, dimensions.Height, defaultRatioVertical);
 			//CalcDifferent(dimensions.Width, dimensions.Height, defaultRatioVertical, defaultRatioHorizontal);
@@ -671,7 +671,7 @@ namespace CyberFSR
 
 	namespace ParameterRepository 
 	{
-		static const UINT Size = 1024;
+		constexpr UINT Size = 1024;
 		Error_Resilient_Boolean Parameter_In_Use_Bool[Size] = {};
 		NvParameter Parameters[Size] = {};
 	};
@@ -684,13 +684,13 @@ namespace CyberFSR
 			const Error_Resilient_Boolean sanitizedBool = Sanitize_Bool(ParameterRepository::Parameter_In_Use_Bool[i]);
 			switch (sanitizedBool)
 			{
-			case CyberFSR::ER_FALSE:
-				ParameterRepository::Parameter_In_Use_Bool[i] = ER_TRUE;
+			case Error_Resilient_Boolean::ER_FALSE:
+				ParameterRepository::Parameter_In_Use_Bool[i] = Error_Resilient_Boolean::ER_TRUE;
 				output = &ParameterRepository::Parameters[i];
 				break;
-			case CyberFSR::ER_TRUE:
+			case Error_Resilient_Boolean::ER_TRUE:
 				break;
-			case CyberFSR::Unknown:
+			case Error_Resilient_Boolean::Unknown:
 				// bad thing, ram corruption or bad code?
 				break;
 			default:
@@ -703,13 +703,21 @@ namespace CyberFSR
 	void NvParameter::RecycleParameter(NvParameter* recyclePointer)
 	{
 		const __int64 index = (recyclePointer - ParameterRepository::Parameters) / (sizeof(NvParameter)*8);
-		if (index > ParameterRepository::Size)
+		if (index < ParameterRepository::Size)
+		{
+			Error_Resilient_Boolean& inUse = ParameterRepository::Parameter_In_Use_Bool[index];
+			if (inUse != Error_Resilient_Boolean::ER_TRUE)
+			{
+				// bad thing happened, memory corruption?
+			}
+			inUse = Error_Resilient_Boolean::ER_FALSE;
+		}
+		else
 		{
 			// throw bad shit happening code here
+			DebugBreak;
 			return;
 		}
-		auto& inUse = ParameterRepository::Parameter_In_Use_Bool[index];
-		inUse = ER_FALSE;
 	}
 
 	NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_DLSS_GetOptimalSettingsCallback(NVSDK_NGX_Parameter* InParams)

@@ -1,34 +1,70 @@
-#pragma once
+﻿#pragma once
 #include "pch.h"
+#include "CommonStuff.h"
 
 namespace CyberFSR 
 {
-	enum class SharpnessRangeModifier
-	{
-		Normal,
-		Extended,
-	};
-
-	enum class ViewMethod
-	{
-		Config,
-		Cyberpunk2077,
-		RDR2,
-	};
-
-	enum class UpscalingProfile
-	{
-		FSR2,
-		DLSS2,
-		DynaRes,
-		FixedRes
-	};
+	enum class Error_Resilient_Boolean;
+	enum class Trinary;
+	enum class SharpnessRangeModifier;
+	enum class ViewMethod;
+	enum class UpscalingProfile;
 
 	class Config
 	{
 	public:
 		Config(std::string fileName);
 
+//   ██████╗ ███████╗███╗   ██╗███████╗██████╗  █████╗ ██╗     
+//  ██╔════╝ ██╔════╝████╗  ██║██╔════╝██╔══██╗██╔══██╗██║     
+//  ██║  ███╗█████╗  ██╔██╗ ██║█████╗  ██████╔╝███████║██║     
+//  ██║   ██║██╔══╝  ██║╚██╗██║██╔══╝  ██╔══██╗██╔══██║██║     
+//  ╚██████╔╝███████╗██║ ╚████║███████╗██║  ██║██║  ██║███████╗
+//   ╚═════╝ ╚══════╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝
+//                                                             
+		bool DoEngineSpecific = true;
+
+		// Upscale type
+		CyberFSR::UpscalingProfile UpscalerProfile;
+
+		// Quality Divisor
+		std::optional<float> Divisor_Auto;
+		float Divisor_UltraQuality;
+		float Divisor_Quality;
+		float Divisor_Balanced;
+		float Divisor_Performance;
+		float Divisor_UltraPerformance;
+
+		//  Render Resolution Overrides
+		std::optional<std::pair<unsigned int, unsigned int>> Resolution_Auto;
+		std::pair<unsigned int, unsigned int> Resolution_UltraQuality;
+		std::pair<unsigned int, unsigned int> Resolution_Quality;
+		std::pair<unsigned int, unsigned int> Resolution_Balanced;
+		std::pair<unsigned int, unsigned int> Resolution_Performance;
+		std::pair<unsigned int, unsigned int> Resolution_UltraPerformance;
+
+		//  Render Resolution Overrides
+		std::optional<std::pair<unsigned int, unsigned int>> FPSTarget_Auto;
+		std::pair<unsigned int, unsigned int> FPSTarget_UltraQuality;
+		std::pair<unsigned int, unsigned int> FPSTarget_Quality;
+		std::pair<unsigned int, unsigned int> FPSTarget_Balanced;
+		std::pair<unsigned int, unsigned int> FPSTarget_Performance;
+		std::pair<unsigned int, unsigned int> FPSTarget_UltraPerformance;
+
+//   ██████╗██╗   ██╗███████╗████████╗ ██████╗ ███╗   ███╗               
+//  ██╔════╝██║   ██║██╔════╝╚══██╔══╝██╔═══██╗████╗ ████║               
+//  ██║     ██║   ██║███████╗   ██║   ██║   ██║██╔████╔██║█████╗         
+//  ██║     ██║   ██║╚════██║   ██║   ██║   ██║██║╚██╔╝██║╚════╝         
+//  ╚██████╗╚██████╔╝███████║   ██║   ╚██████╔╝██║ ╚═╝ ██║               
+//   ╚═════╝ ╚═════╝ ╚══════╝   ╚═╝    ╚═════╝ ╚═╝     ╚═╝               
+//                                                           
+//  ███████╗███╗   ██╗ ██████╗ ██╗███╗   ██╗███████╗                     
+//  ██╔════╝████╗  ██║██╔════╝ ██║████╗  ██║██╔════╝                     
+//  █████╗  ██╔██╗ ██║██║  ███╗██║██╔██╗ ██║█████╗                       
+//  ██╔══╝  ██║╚██╗██║██║   ██║██║██║╚██╗██║██╔══╝                       
+//  ███████╗██║ ╚████║╚██████╔╝██║██║ ╚████║███████╗                     
+//  ╚══════╝╚═╝  ╚═══╝ ╚═════╝ ╚═╝╚═╝  ╚═══╝╚══════╝          
+//                                                                                                                                                                                          
 		// Depth
 		std::optional<bool> DepthInverted;
 
@@ -64,25 +100,78 @@ namespace CyberFSR
 		std::optional<float> Sharpness;
 		std::optional<SharpnessRangeModifier> SharpnessRange;
 
-		// Upscale type
-		UpscalingProfile UpscalerProfile;
+		bool DilateMotionVectors = false;
 
-		// Upscale Ratio Override
-		std::optional<float> StaticRatioOverride;
 
-		// Quality Overrides
-		std::optional<float> QualityRatio_UltraQuality;
-		std::optional<float> QualityRatio_Quality;
-		std::optional<float> QualityRatio_Balanced;
-		std::optional<float> QualityRatio_Performance;
-		std::optional<float> QualityRatio_UltraPerformance;
+//  ██╗   ██╗███╗   ██╗██████╗ ███████╗ █████╗ ██╗                       
+//  ██║   ██║████╗  ██║██╔══██╗██╔════╝██╔══██╗██║                       
+//  ██║   ██║██╔██╗ ██║██████╔╝█████╗  ███████║██║█████╗                 
+//  ██║   ██║██║╚██╗██║██╔══██╗██╔══╝  ██╔══██║██║╚════╝                 
+//  ╚██████╔╝██║ ╚████║██║  ██║███████╗██║  ██║███████╗                  
+//   ╚═════╝ ╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚══════╝                  
+//                                              
+		// Unreal fixes
+		Trinary UE_DilateMotionVectors = Trinary::ON;
+		Trinary UE_DoNaviSceneColor = Trinary::ON;
 
-		//  Render Resolution Overrides
-		std::optional<std::pair<unsigned int, unsigned int>> QualityResolution_UltraQuality;
-		std::optional<std::pair<unsigned int, unsigned int>> QualityResolution_Quality;
-		std::optional<std::pair<unsigned int, unsigned int>> QualityResolution_Balanced;
-		std::optional<std::pair<unsigned int, unsigned int>> QualityResolution_Performance;
-		std::optional<std::pair<unsigned int, unsigned int>> QualityResolution_UltraPerformance;
+		// Depth
+		Trinary UE_DepthInverted = Trinary::TBD;
+
+		// Motion
+		Trinary UE_JitterCancellation = Trinary::TBD;
+		Trinary UE_DisplayResolution = Trinary::TBD;
+
+		// View
+		Trinary UE_NearPlane = Trinary::TBD;
+		Trinary UE_FarPlane = Trinary::TBD;
+		Trinary UE_InfiniteFarPlane = Trinary::TBD;
+
+		//Hotfix for Steam Deck
+		Trinary UE_DisableReactiveMask = Trinary::TBD;
+
+//  ██╗   ██╗███╗   ██╗██╗████████╗██╗   ██╗                             
+//  ██║   ██║████╗  ██║██║╚══██╔══╝╚██╗ ██╔╝                             
+//  ██║   ██║██╔██╗ ██║██║   ██║    ╚████╔╝█████╗                        
+//  ██║   ██║██║╚██╗██║██║   ██║     ╚██╔╝ ╚════╝                        
+//  ╚██████╔╝██║ ╚████║██║   ██║      ██║                                
+//   ╚═════╝ ╚═╝  ╚═══╝╚═╝   ╚═╝      ╚═╝                                
+//                                          
+		// Depth
+		Trinary Unity_DepthInverted = Trinary::TBD;
+
+		// Motion
+		Trinary Unity_JitterCancellation = Trinary::TBD;
+		Trinary Unity_DisplayResolution = Trinary::TBD;
+
+		// View
+		Trinary Unity_NearPlane = Trinary::TBD;
+		Trinary Unity_FarPlane = Trinary::TBD;
+		Trinary Unity_InfiniteFarPlane = Trinary::TBD;
+
+		//Hotfix for Steam Deck
+		Trinary Unity_DisableReactiveMask = Trinary::TBD;
+
+//   ██████╗ ███╗   ███╗███╗   ██╗██╗██╗   ██╗███████╗██████╗ ███████╗███████╗    
+//  ██╔═══██╗████╗ ████║████╗  ██║██║██║   ██║██╔════╝██╔══██╗██╔════╝██╔════╝    
+//  ██║   ██║██╔████╔██║██╔██╗ ██║██║██║   ██║█████╗  ██████╔╝███████╗█████╗█████╗
+//  ██║   ██║██║╚██╔╝██║██║╚██╗██║██║╚██╗ ██╔╝██╔══╝  ██╔══██╗╚════██║██╔══╝╚════╝
+//  ╚██████╔╝██║ ╚═╝ ██║██║ ╚████║██║ ╚████╔╝ ███████╗██║  ██║███████║███████╗    
+//   ╚═════╝ ╚═╝     ╚═╝╚═╝  ╚═══╝╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝    
+//                                                                                  
+		// Depth
+		Trinary Omniverse_DepthInverted = Trinary::TBD;
+
+		// Motion
+		Trinary Omniverse_JitterCancellation = Trinary::TBD;
+		Trinary Omniverse_DisplayResolution = Trinary::TBD;
+
+		// View
+		Trinary Omniverse_NearPlane = Trinary::TBD;
+		Trinary Omniverse_FarPlane = Trinary::TBD;
+		Trinary Omniverse_InfiniteFarPlane = Trinary::TBD;
+
+		//Hotfix for Steam Deck
+		Trinary Omniverse_DisableReactiveMask = Trinary::TBD;
 
 		void Reload();
 
@@ -96,6 +185,9 @@ namespace CyberFSR
 		std::optional<bool> readBool(std::string section, std::string key);
 		std::optional<SharpnessRangeModifier> readSharpnessRange(std::string section, std::string key);
 		std::optional<ViewMethod> readViewMethod(std::string section, std::string key);
-		//std::optional<UpscalingProfile> readUpscalingProfile(std::string section, std::string key);
+		std::optional<UpscalingProfile> readUpscalingProfile(std::string section, std::string key);
+		std::optional<std::pair<unsigned int, unsigned int>> readPairUnInteger(std::string section, std::string key);
 	};
 }
+
+// Altus used a lovely website for the big text: https://patorjk.com/software/taag/#p=display&c=c%2B%2B&f=ANSI%20Shadow&t=engine%0Aoverrides 

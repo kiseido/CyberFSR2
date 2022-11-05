@@ -64,23 +64,54 @@ namespace CyberFSR
 			DisableReactiveMask = readBool("Hotfix", "DisableReactiveMask");
 
 			// Upscale type
-			UpscalerProfile = UpscalingProfile::DLSS2;//readUpscalingProfile("Upscaling", "UpscalerProfile").value_or(UpscalingProfile::DLSS2);
-
-			StaticRatioOverride = readFloat("Upscaling", "Static_Ratio");
+			UpscalerProfile = readUpscalingProfile("Upscaling", "UpscalerProfile").value_or(UpscalingProfile::DLSS2);
 
 			// Quality Overrides
-			QualityRatio_UltraQuality = readFloat("Upscaling", "Divisor_UltraQuality");
-			QualityRatio_Quality = readFloat("Upscaling", "Divisor_Quality");
-			QualityRatio_Balanced = readFloat("Upscaling", "Divisor_Balanced");
-			QualityRatio_Performance = readFloat("Upscaling", "Divisor_Performance");
-			QualityRatio_UltraPerformance = readFloat("Upscaling", "Divisor_UltraPerformance");
+			Divisor_Auto = readFloat("QualityOverrides", "Auto");
+			Divisor_UltraQuality = readFloat("QualityOverrides", "UltraQuality").value_or(0);
+			Divisor_Quality = readFloat("QualityOverrides", "Quality").value_or(0);
+			Divisor_Balanced = readFloat("QualityOverrides", "Balanced").value_or(0);
+			Divisor_Performance = readFloat("QualityOverrides", "Performance").value_or(0);
+			Divisor_UltraPerformance = readFloat("QualityOverrides", "UltraPerformance").value_or(0);
 
-			//// Quality Overrides
-			//QualityRatio_UltraQuality = readFloat("Upscaling", "Resolution_UltraQuality");
-			//QualityRatio_Quality = readFloat("Upscaling", "Resolution_Quality");
-			//QualityRatio_Balanced = readFloat("Upscaling", "Resolution_Balanced");
-			//QualityRatio_Performance = readFloat("Upscaling", "Resolution_Performance");
-			//QualityRatio_UltraPerformance = readFloat("Upscaling", "Resolution_UltraPerformance");
+			// Quality Overrides
+			Resolution_Auto = readPairUnInteger("StaticResolution", "Auto");
+			Resolution_UltraQuality = readPairUnInteger("StaticResolution", "UltraQuality").value_or(std::pair{0,0});
+			Resolution_Quality = readPairUnInteger("StaticResolution", "Quality").value_or(std::pair{ 0,0 });
+			Resolution_Balanced = readPairUnInteger("StaticResolution", "Balanced").value_or(std::pair{ 0,0 });
+			Resolution_Performance = readPairUnInteger("StaticResolution", "Performance").value_or(std::pair{ 0,0 });
+			Resolution_UltraPerformance = readPairUnInteger("StaticResolution", "UltraPerformance").value_or(std::pair{ 0,0 });
+
+			// Quality Overrides
+			FPSTarget_Auto = readPairUnInteger("FPSTarget", "UltraQuality");
+			FPSTarget_UltraQuality = readPairUnInteger("FPSTarget", "UltraQuality").value_or(std::pair{ 0,0 });
+			FPSTarget_Quality = readPairUnInteger("FPSTarget", "Quality").value_or(std::pair{ 0,0 });
+			FPSTarget_Balanced = readPairUnInteger("FPSTarget", "Balanced").value_or(std::pair{ 0,0 });
+			FPSTarget_Performance = readPairUnInteger("FPSTarget", "Performance").value_or(std::pair{ 0,0 });
+			FPSTarget_UltraPerformance = readPairUnInteger("FPSTarget", "UltraPerformance").value_or(std::pair{ 0,0 });
+
+			UE_DepthInverted = readBool("EngineUnreal", "DepthInverted").value_or(false) ? Trinary::ON : Trinary::OFF;
+			UE_JitterCancellation = readBool("EngineUnreal", "JitterCancellation").value_or(false) ? Trinary::ON : Trinary::OFF;
+			UE_DisplayResolution = readBool("EngineUnreal", "DisplayResolution").value_or(false) ? Trinary::ON : Trinary::OFF;
+			UE_NearPlane = readFloat("EngineUnreal", "NearPlane").value_or(false) ? Trinary::ON : Trinary::OFF;
+			UE_FarPlane = readFloat("EngineUnreal", "FarPlane").value_or(false) ? Trinary::ON : Trinary::OFF;
+			UE_InfiniteFarPlane = readBool("EngineUnreal", "InfiniteFarPlane").value_or(false) ? Trinary::ON : Trinary::OFF;
+
+			Unity_DepthInverted = readBool("EngineUnreal", "DepthInverted").value_or(false) ? Trinary::ON : Trinary::OFF;
+			Unity_JitterCancellation = readBool("EngineUnreal", "JitterCancellation").value_or(false) ? Trinary::ON : Trinary::OFF;
+			Unity_DisplayResolution = readBool("EngineUnreal", "DisplayResolution").value_or(false) ? Trinary::ON : Trinary::OFF;
+			Unity_NearPlane = readFloat("EngineUnreal", "NearPlane").value_or(false) ? Trinary::ON : Trinary::OFF;
+			Unity_FarPlane = readFloat("EngineUnreal", "FarPlane").value_or(false) ? Trinary::ON : Trinary::OFF;
+			Unity_InfiniteFarPlane = readBool("EngineUnreal", "InfiniteFarPlane").value_or(false) ? Trinary::ON : Trinary::OFF;
+
+			Omniverse_DepthInverted = readBool("EngineUnreal", "DepthInverted").value_or(false) ? Trinary::ON : Trinary::OFF;
+			Omniverse_JitterCancellation = readBool("EngineUnreal", "JitterCancellation").value_or(false) ? Trinary::ON : Trinary::OFF;
+			Omniverse_DisplayResolution = readBool("EngineUnreal", "DisplayResolution").value_or(false) ? Trinary::ON : Trinary::OFF;
+			Omniverse_NearPlane = readFloat("EngineUnreal", "NearPlane").value_or(false) ? Trinary::ON : Trinary::OFF;
+			Omniverse_FarPlane = readFloat("EngineUnreal", "FarPlane").value_or(false) ? Trinary::ON : Trinary::OFF;
+			Omniverse_InfiniteFarPlane = readBool("EngineUnreal", "InfiniteFarPlane").value_or(false) ? Trinary::ON : Trinary::OFF;
+
+
 		}
 
 		auto exeName = Util::ExePath().filename();
@@ -116,6 +147,49 @@ namespace CyberFSR
 
 		if (lower != "auto")
 			output = lowercase ? lower : value;
+
+		return output;
+	}
+
+	std::optional<UpscalingProfile> Config::readUpscalingProfile(std::string section, std::string key)
+	{
+		std::optional<UpscalingProfile> output = std::nullopt;
+		std::optional<std::string> valueOpt = readString(section, key);
+		if (valueOpt.has_value())
+		{
+			output = Util::UpscalingProfileMap(valueOpt.value().c_str());
+		}
+		return output;
+	}
+
+	std::optional<std::pair<unsigned int, unsigned int>> Config::readPairUnInteger(std::string section, std::string key)
+	{
+		std::optional<std::pair<unsigned int, unsigned int>> output = std::nullopt;
+		std::optional<std::string> valueOpt = readString(section, key);
+		if (valueOpt.has_value())
+		{
+			try
+			{
+				constexpr auto delimiter = "x";
+				const auto& values = valueOpt.value();
+				const size_t delimiterLocation = values.find(delimiter);
+				auto width = values.substr(0, delimiterLocation);
+				auto height = values.substr(1, delimiterLocation);
+				output = std::pair(std::stoi(width), std::stoi(height));
+			}
+			catch (const std::bad_optional_access&) // missing or auto value
+			{
+				output = std::nullopt;
+			}
+			catch (const std::invalid_argument&) // invalid float string for std::stof
+			{
+				output = std::nullopt;
+			}
+			catch (const std::out_of_range&) // out of range for 32 bit float
+			{
+				output = std::nullopt;
+			}
+		}
 
 		return output;
 	}
