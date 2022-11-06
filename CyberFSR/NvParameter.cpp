@@ -7,11 +7,6 @@
 constexpr float NO_VALUEf = -128.125;
 constexpr int NO_VALUEi = -128;
 
-void BadThingHappened() {
-	int a = 0;
-	a = a + 1;
-}
-
 namespace CyberFSR
 {
 	void NvParameter::Set(const char* InName, unsigned long long InValue)
@@ -37,10 +32,14 @@ namespace CyberFSR
 		switch (inParameter)
 		{
 		case Util::NvParameter::MV_Scale_X:
+			//MVScaleX = InValue / 2;
 			MVScaleX = InValue;
+			//MVScaleX = OutWidth;
 			break;
 		case Util::NvParameter::MV_Scale_Y:
+			//MVScaleY = InValue / 2;
 			MVScaleY = InValue;
+			//MVScaleY = OutHeight;
 			break;
 		case Util::NvParameter::Jitter_Offset_X:
 			JitterOffsetX = InValue;
@@ -245,7 +244,6 @@ namespace CyberFSR
 		auto result = NVSDK_NGX_Result_Success;
 
 		const Util::NvParameter inParameter = Util::NvParameterToEnum(InName);
-
 
 		switch (inParameter)
 		{
@@ -769,6 +767,7 @@ namespace CyberFSR
 			if (inUse != Error_Resilient_Boolean::ER_TRUE)
 			{
 				// bad thing happened, memory corruption?
+				BadThingHappened();
 			}
 			inUse = Error_Resilient_Boolean::ER_FALSE;
 			NvParameter& param = ParameterRepository::Parameters[index];
@@ -806,7 +805,7 @@ namespace CyberFSR
 			//Somehow check for allocated memory
 			//Then set values: SizeInBytes, OptLevel, IsDevSnippetBranch
 
-			castedRef.OptLevel = 0;
+			castedRef.OptLevel = NVSDK_NGX_OPT_LEVEL_DEVELOP;
 			castedRef.IsDevSnippetBranch = 0;
 			castedRef.SizeInBytes = 0x1337;
 

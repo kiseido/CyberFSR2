@@ -2,6 +2,17 @@
 
 namespace CyberFSR
 {
+	inline bool compareIgnoreCase(const std::string&, const std::string&);
+	void BadThingHappened();
+
+	namespace Timer {
+		inline auto GetHighPrecisionTimeNow();
+		inline auto NanoSecondsBetween(const auto& a, const auto& b);
+		inline auto MilliSecondsBetween(const auto& a, const auto& b);
+		long long NanoSecondsNow();
+		long long MilliSecondsNow();
+	}
+
 	typedef unsigned long long ULongLong;
 	typedef ULongLong* ULongLongPtr;
 

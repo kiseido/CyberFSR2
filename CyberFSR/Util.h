@@ -6,6 +6,7 @@ namespace CyberFSR
 {
 	namespace Util
 	{
+		static int TimerType = 2;
 		std::filesystem::path ExePath();
 
 		std::filesystem::path DllPath();
