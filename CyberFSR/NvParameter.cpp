@@ -51,7 +51,8 @@ namespace CyberFSR
 		case Util::NvParameter::Sharpness: {
 			static float lastSharp;
 			Sharpness = InValue;
-			if (Sharpness != lastSharp) {
+			if (Sharpness != lastSharp) 
+			{
 				ResetRender = true;
 				lastSharp = Sharpness;
 			}
@@ -677,6 +678,8 @@ namespace CyberFSR
 	{
 		const std::shared_ptr<Config> config = CyberFsrContext::instance()->MyConfig;
 
+		const ScreenDimensions ScreenOrWindowDimension = {Width, Height};
+
 		auto dimensions = Switcher(config, *this, config->UpscalerProfile);
 
 		if (dimensions.first == 0 || dimensions.second == 0) {
@@ -686,10 +689,23 @@ namespace CyberFSR
 			dimensions = CalcSame(dimensions.first, dimensions.second, defaultRatioVertical);
 			//CalcDifferent(dimensions.Width, dimensions.Height, defaultRatioVertical, defaultRatioHorizontal);
 		}
-		Width = dimensions.first;
-		Height = dimensions.second;
+		Width = ScreenOrWindowDimension.first;
+		Height = ScreenOrWindowDimension.second;
+
 		OutWidth = dimensions.first;
 		OutHeight = dimensions.second;
+
+		Max_Render_Width = ScreenOrWindowDimension.first * 1.1f;
+		Max_Render_Height = ScreenOrWindowDimension.second * 1.1f;
+
+		Min_Render_Width = ScreenOrWindowDimension.first / 10;
+		Min_Render_Height = ScreenOrWindowDimension.second / 10;
+
+		Render_Subrect_Dimensions_Width = 64;
+		Render_Subrect_Dimensions_Height = 64;
+
+		EnableDynamicResolution = true;
+		FrameTimeDeltaInMsec = (double) 6.7f;
 	}
 
 
@@ -739,6 +755,7 @@ namespace CyberFSR
 		if (output != nullptr)
 		{
 			output->RTXValue = true;
+			output->EvaluateRenderScale();
 		}
 		return output;
 	}
@@ -759,8 +776,9 @@ namespace CyberFSR
 		}
 		else
 		{
+			BadThingHappened();
 			// throw bad shit happening code here
-			DebugBreak();
+			//DebugBreak();
 			return;
 		}
 	}
