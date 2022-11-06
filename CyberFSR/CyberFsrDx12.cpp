@@ -10,22 +10,38 @@
 // external\nvngx_dlss_sdk\include\nvsdk_ngx_defs.h
 // external\nvngx_dlss_sdk\include\nvsdk_ngx_helpers.h
 
-NVSDK_NGX_API NVSDK_NGX_Result NVSDK_NGX_D3D12_Init_Ext(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath,
-	ID3D12Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion,
-	unsigned long long unknown0)
+NVSDK_NGX_API NVSDK_NGX_Result NVSDK_NGX_D3D12_Init_Ext(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath, ID3D12Device* InDevice, NVSDK_NGX_Version InSDKVersion, const NVSDK_NGX_FeatureCommonInfo* APointer, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo)
 {
 	// cyberpunk enters here
 	// cyberpunk 2077 id: 100152211, sdk version: 100152211
-	return NVSDK_NGX_Result_Success;
+	
+	// InFeatureInfo has important info!!!?!
+
+	auto output = NVSDK_NGX_Result_Success;
+
+	auto loggingInfo = InFeatureInfo->LoggingInfo;
+	auto internalData = InFeatureInfo->InternalData;
+	auto pathListInfo = InFeatureInfo->PathListInfo;
+
+	return output;
 }
 
 NVSDK_NGX_Result NVSDK_NGX_D3D12_Init(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath, ID3D12Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion)
 {
-	return NVSDK_NGX_D3D12_Init_Ext(InApplicationId, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion, 0);
+	// InFeatureInfo has important info!!!?!
+	auto output = NVSDK_NGX_Result_Success;
+
+	//output = NVSDK_NGX_D3D12_Init_Ext(InApplicationId, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion, 0);
+
+	return output;
 }
 
 NVSDK_NGX_API NVSDK_NGX_Result NVSDK_NGX_D3D12_Init_ProjectID(const char* InProjectId, NVSDK_NGX_EngineType InEngineType, const char* InEngineVersion, const wchar_t* InApplicationDataPath, ID3D12Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion)
 {
+	// InFeatureInfo has important info!!!?!
+
+	auto output = NVSDK_NGX_Result_Success;
+
 	CyberFSR::IncomingEngineType = InEngineType;
 
 	switch (InEngineType)
@@ -40,13 +56,16 @@ NVSDK_NGX_API NVSDK_NGX_Result NVSDK_NGX_D3D12_Init_ProjectID(const char* InProj
 		break;
 	case NVSDK_NGX_ENGINE_COUNT:
 		// we should not see this state
-		return NVSDK_NGX_Result_Fail;
+		CyberFSR::BadThingHappened();
+		output = NVSDK_NGX_Result_Fail;
+		break;
 	default:
 		// we should not see this state
-		return NVSDK_NGX_Result_Fail;
+		CyberFSR::BadThingHappened();
+		output = NVSDK_NGX_Result_Fail;
 		break;
 	}
-	return NVSDK_NGX_Result_Success;
+	return output;
 }
 
 NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D12_Shutdown(void)
@@ -102,52 +121,108 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_GetScratchBufferSize(NVSDK_NGX_Feature InFeatur
 NVSDK_NGX_Result NVSDK_NGX_D3D12_CreateFeature(ID3D12GraphicsCommandList* InCmdList, NVSDK_NGX_Feature InFeatureID,
 	const NVSDK_NGX_Parameter* InParameters, NVSDK_NGX_Handle** OutHandle)
 {
-	const auto inParams = dynamic_cast<const CyberNvParameter*>(InParameters);
 
-	ID3D12Device* device;
-	InCmdList->GetDevice(IID_PPV_ARGS(&device));
+	switch (InFeatureID)
+	{
+	case NVSDK_NGX_Feature_Reserved0:
+		CyberFSR::BadThingHappened();
+		break;
+	case NVSDK_NGX_Feature_SuperSampling:
+	{
+		const auto inParams = dynamic_cast<const CyberNvParameter*>(InParameters);
 
-	auto instance = CyberContext::instance();
-	auto config = instance->MyConfig;
-	auto deviceContext = CyberContext::instance()->CreateContext();
-	deviceContext->ViewMatrix = CyberHooker::Create(*config);
+		ID3D12Device* device;
+		InCmdList->GetDevice(IID_PPV_ARGS(&device));
+
+		auto instance = CyberContext::instance();
+		auto config = instance->MyConfig;
+		auto deviceContext = CyberContext::instance()->CreateContext();
+		deviceContext->ViewMatrix = CyberHooker::Create(*config);
 #ifdef DEBUG_FEATURES
-	deviceContext->DebugLayer = std::make_unique<DebugOverlay>(device, InCmdList);
+		deviceContext->DebugLayer = std::make_unique<DebugOverlay>(device, InCmdList);
 #endif
 
-	* OutHandle = &deviceContext->Handle;
+		* OutHandle = &deviceContext->Handle;
 
-	auto initParams = deviceContext->FsrContextDescription;
+		auto initParams = deviceContext->FsrContextDescription;
 
-	const size_t scratchBufferSize = ffxFsr2GetScratchMemorySizeDX12();
-	deviceContext->ScratchBuffer = std::vector<unsigned char>(scratchBufferSize);
-	auto scratchBuffer = deviceContext->ScratchBuffer.data();
+		const size_t scratchBufferSize = ffxFsr2GetScratchMemorySizeDX12();
+		deviceContext->ScratchBuffer = std::vector<unsigned char>(scratchBufferSize);
+		auto scratchBuffer = deviceContext->ScratchBuffer.data();
 
-	FfxErrorCode errorCode = ffxFsr2GetInterfaceDX12(&initParams.callbacks, device, scratchBuffer, scratchBufferSize);
-	FFX_ASSERT(errorCode == FFX_OK);
+		FfxErrorCode errorCode = ffxFsr2GetInterfaceDX12(&initParams.callbacks, device, scratchBuffer, scratchBufferSize);
+		FFX_ASSERT(errorCode == FFX_OK);
 
-	initParams.device = ffxGetDeviceDX12(device);
-	initParams.maxRenderSize.width = inParams->Width;
-	initParams.maxRenderSize.height = inParams->Height;
-	initParams.displaySize.width = inParams->OutWidth;
-	initParams.displaySize.height = inParams->OutHeight;
+		initParams.device = ffxGetDeviceDX12(device);
+		initParams.maxRenderSize.width = inParams->Width;
+		initParams.maxRenderSize.height = inParams->Height;
+		initParams.displaySize.width = inParams->OutWidth;
+		initParams.displaySize.height = inParams->OutHeight;
 
-	initParams.flags = 0 |
-		(config->HDR				.value_or(inParams->Hdr)		? FFX_FSR2_ENABLE_HIGH_DYNAMIC_RANGE : 0) |
-		(config->DisplayResolution	.value_or(!inParams->LowRes)		? FFX_FSR2_ENABLE_DISPLAY_RESOLUTION_MOTION_VECTORS : 0) |
-		(config->JitterCancellation	.value_or(inParams->JitterMotion)	? FFX_FSR2_ENABLE_MOTION_VECTORS_JITTER_CANCELLATION : 0) |
-		(config->DepthInverted		.value_or(inParams->DepthInverted)	? FFX_FSR2_ENABLE_DEPTH_INVERTED : 0) |
-		(config->InfiniteFarPlane	.value_or(false)					? FFX_FSR2_ENABLE_DEPTH_INFINITE : 0) |
-		(config->AutoExposure		.value_or(inParams->AutoExposure)	? FFX_FSR2_ENABLE_AUTO_EXPOSURE : 0) |
-		(inParams->EnableDynamicResolution ? FFX_FSR2_ENABLE_DYNAMIC_RESOLUTION : 0) |
-		(inParams->EnableTexture1DUsage ? FFX_FSR2_ENABLE_TEXTURE1D_USAGE : 0);
+		initParams.flags = 0 |
+			(config->HDR.value_or(inParams->Hdr) ? FFX_FSR2_ENABLE_HIGH_DYNAMIC_RANGE : 0) |
+			(config->DisplayResolution.value_or(!inParams->LowRes) ? FFX_FSR2_ENABLE_DISPLAY_RESOLUTION_MOTION_VECTORS : 0) |
+			(config->JitterCancellation.value_or(inParams->JitterMotion) ? FFX_FSR2_ENABLE_MOTION_VECTORS_JITTER_CANCELLATION : 0) |
+			(config->DepthInverted.value_or(inParams->DepthInverted) ? FFX_FSR2_ENABLE_DEPTH_INVERTED : 0) |
+			(config->InfiniteFarPlane.value_or(false) ? FFX_FSR2_ENABLE_DEPTH_INFINITE : 0) |
+			(config->AutoExposure.value_or(inParams->AutoExposure) ? FFX_FSR2_ENABLE_AUTO_EXPOSURE : 0) |
+			(inParams->EnableDynamicResolution ? FFX_FSR2_ENABLE_DYNAMIC_RESOLUTION : 0) |
+			(inParams->EnableTexture1DUsage ? FFX_FSR2_ENABLE_TEXTURE1D_USAGE : 0);
 
-	errorCode = ffxFsr2ContextCreate(&deviceContext->FsrContext, &initParams);
-	FFX_ASSERT(errorCode == FFX_OK);
+		errorCode = ffxFsr2ContextCreate(&deviceContext->FsrContext, &initParams);
+		FFX_ASSERT(errorCode == FFX_OK);
 
-	HookSetComputeRootSignature(InCmdList);
+		HookSetComputeRootSignature(InCmdList);
 
-	return NVSDK_NGX_Result_Success;
+		return NVSDK_NGX_Result_Success;
+	}
+	case NVSDK_NGX_Feature_InPainting:
+		CyberFSR::BadThingHappened();
+		break;
+	case NVSDK_NGX_Feature_ImageSuperResolution:
+		CyberFSR::BadThingHappened();
+		break;
+	case NVSDK_NGX_Feature_SlowMotion:
+		CyberFSR::BadThingHappened();
+		break;
+	case NVSDK_NGX_Feature_VideoSuperResolution:
+		CyberFSR::BadThingHappened();
+		break;
+	case NVSDK_NGX_Feature_Reserved1:
+		CyberFSR::BadThingHappened();
+		break;
+	case NVSDK_NGX_Feature_Reserved2:
+		CyberFSR::BadThingHappened();
+		break;
+	case NVSDK_NGX_Feature_Reserved3:
+		CyberFSR::BadThingHappened();
+		break;
+	case NVSDK_NGX_Feature_ImageSignalProcessing:
+		CyberFSR::BadThingHappened();
+		break;
+	case NVSDK_NGX_Feature_DeepResolve:
+		CyberFSR::BadThingHappened();
+		break;
+	case NVSDK_NGX_Feature_Reserved4:
+		CyberFSR::BadThingHappened();
+		break;
+	case NVSDK_NGX_Feature_Count:
+		CyberFSR::BadThingHappened();
+		break;
+	case NVSDK_NGX_Feature_Reserved_SDK:
+		CyberFSR::BadThingHappened();
+		break;
+	case NVSDK_NGX_Feature_Reserved_Core:
+		CyberFSR::BadThingHappened();
+		break;
+	case NVSDK_NGX_Feature_Reserved_Unknown:
+		CyberFSR::BadThingHappened();
+		break;
+	default:
+		CyberFSR::BadThingHappened();
+		break;
+	}
+	return NVSDK_NGX_Result_Fail;
 }
 
 NVSDK_NGX_Result NVSDK_NGX_D3D12_ReleaseFeature(NVSDK_NGX_Handle* InHandle)
