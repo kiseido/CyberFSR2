@@ -163,6 +163,11 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCm
 {
 	ID3D12RootSignature* orgRootSig = nullptr;
 
+	bool shouldCancel = false;
+
+	if (InCallback != nullptr)
+		InCallback(0, shouldCancel);
+
 	rootSigMutex.lock();
 	if (commandListVector.contains(InCmdList))
 	{
@@ -174,11 +179,17 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCm
 	}
 	rootSigMutex.unlock();
 
+	if (InCallback != nullptr)
+		InCallback(1, shouldCancel);
+
 	ID3D12Device* device;
 	InCmdList->GetDevice(IID_PPV_ARGS(&device));
 	auto instance = CyberContext::instance();
 	auto config = instance->MyConfig;
 	auto deviceContext = CyberContext::instance()->Contexts[InFeatureHandle->Id].get();
+
+	if (InCallback != nullptr)
+		InCallback(5, shouldCancel);
 
 	if (orgRootSig)
 	{
@@ -192,6 +203,9 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCm
 		dispatchParameters.depth = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->Depth, L"FSR2_InputDepth");
 		dispatchParameters.motionVectors = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->MotionVectors, L"FSR2_InputMotionVectors");
 		dispatchParameters.exposure = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->ExposureTexture, L"FSR2_InputExposure");
+
+		if (InCallback != nullptr)
+			InCallback(10, shouldCancel);
 
 		//Not sure if these two actually work
 		if (!config->DisableReactiveMask.value_or(false))
@@ -222,6 +236,8 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCm
 				dispatchParameters.sharpness = sharpness;
 			}
 		}
+		if (InCallback != nullptr)
+			InCallback(20, shouldCancel);
 
 		//deltatime hax
 		static double lastFrameTime;
@@ -235,12 +251,18 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCm
 		dispatchParameters.renderSize.width = inParams->Width;
 		dispatchParameters.renderSize.height = inParams->Height;
 
+		if (InCallback != nullptr)
+			InCallback(30, shouldCancel);
+
 		//Hax Zone
 		dispatchParameters.cameraFar = deviceContext->ViewMatrix->GetFarPlane();
 		dispatchParameters.cameraNear = deviceContext->ViewMatrix->GetNearPlane();
 		dispatchParameters.cameraFovAngleVertical = DirectX::XMConvertToRadians(deviceContext->ViewMatrix->GetFov());
 		FfxErrorCode errorCode = ffxFsr2ContextDispatch(fsrContext, &dispatchParameters);
 		FFX_ASSERT(errorCode == FFX_OK);
+
+		if (InCallback != nullptr)
+			InCallback(40, shouldCancel);
 
 		InCmdList->SetComputeRootSignature(orgRootSig);
 	}
@@ -250,6 +272,9 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCm
 #endif
 
 	myCommandList = InCmdList;
+
+	if (InCallback != nullptr)
+		InCallback(100, shouldCancel);
 
 	return NVSDK_NGX_Result_Success;
 }

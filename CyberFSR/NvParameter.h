@@ -19,13 +19,16 @@ namespace CyberFSR
 
 	struct NvParameter : NVSDK_NGX_Parameter
 	{
+	private:
+		//NvParameter();
+	public:
 		static NvParameter* GetFreshParameter();
 		static NvParameter* GetFreshCapabilityParameter();
 		static void RecycleParameter(NvParameter*);
+		static bool WhosParameterIsItAnyway(NvParameter*);
 
-		unsigned int Width{}, Height{}, OutWidth{}, OutHeight{};
+		unsigned int Width{}, Height{}, OutWidth{}, OutHeight{}, Max_Render_Width{}, Max_Render_Height{}, Min_Render_Width{}, Min_Render_Height{}, Render_Subrect_Dimensions_Width{}, Render_Subrect_Dimensions_Height{};
 		NVSDK_NGX_PerfQuality_Value PerfQualityValue = NVSDK_NGX_PerfQuality_Value_Balanced;
-		bool RTXValue{}, FreeMemOnReleaseFeature{};
 		int CreationNodeMask{}, VisibilityNodeMask{}, OptLevel = 0, IsDevSnippetBranch = 0;
 		float Sharpness = 1.0f;
 		bool ResetRender{};
@@ -34,7 +37,7 @@ namespace CyberFSR
 
 		long long SizeInBytes{};
 
-		bool DepthInverted{}, AutoExposure{}, Hdr{}, EnableSharpening{}, JitterMotion{}, LowRes{}, EnableDynamicResolution{}, EnableTexture1DUsage{};
+		bool RTXValue{}, FreeMemOnReleaseFeature{}, DepthInverted{}, AutoExposure{}, Hdr{}, EnableSharpening{}, JitterMotion{}, LowRes{}, EnableDynamicResolution{}, EnableTexture1DUsage{};
 
 		float FrameTimeDeltaInMsec = 0.0f;
 

@@ -116,7 +116,7 @@ namespace CyberFSR
 			{"FSR2", UpscalingProfile::FSR2},
 			{"DLSS2", UpscalingProfile::DLSS2},
 			{"DynaRes", UpscalingProfile::DynaRes},
-			{"Fixed", UpscalingProfile::FixedRes}
+			{"FixedRes", UpscalingProfile::FixedRes}
 		};
 		return Translation[std::string(in)];
 	};

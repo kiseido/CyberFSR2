@@ -76,7 +76,7 @@ namespace CyberFSR
 
 			// Quality Overrides
 			Resolution_Auto = readScreenDimensions("StaticResolution", "Auto").value_or(std::pair{ 0,0 });
-			Resolution_UltraQuality = readScreenDimensions("StaticResolution", "UltraQuality").value_or(std::pair{2560,1440});
+			Resolution_UltraQuality = readScreenDimensions("StaticResolution", "UltraQuality").value_or(std::pair{ 2560,1440 });
 			Resolution_Quality = readScreenDimensions("StaticResolution", "Quality").value_or(std::pair{ 1920,1080 });
 			Resolution_Balanced = readScreenDimensions("StaticResolution", "Balanced").value_or(std::pair{ 1600,900 });
 			Resolution_Performance = readScreenDimensions("StaticResolution", "Performance").value_or(std::pair{ 1280,720 });
@@ -110,7 +110,9 @@ namespace CyberFSR
 			Omniverse_NearPlane = readFloat("EngineUnreal", "NearPlane").value_or(false) ? Trinary::ON : Trinary::OFF;
 			Omniverse_FarPlane = readFloat("EngineUnreal", "FarPlane").value_or(false) ? Trinary::ON : Trinary::OFF;
 			Omniverse_InfiniteFarPlane = readBool("EngineUnreal", "InfiniteFarPlane").value_or(false) ? Trinary::ON : Trinary::OFF;
-
+		}
+		else
+		{
 
 		}
 
@@ -160,6 +162,7 @@ namespace CyberFSR
 			output = Util::UpscalingProfileMap(valueOpt.value().c_str());
 		}
 		return output;
+		//return std::nullopt;
 	}
 
 	std::optional<ScreenDimensions> Config::readScreenDimensions(std::string section, std::string key)

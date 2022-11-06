@@ -92,10 +92,10 @@ namespace CyberFSR
 			Height = InValue;
 			break;
 		case Util::NvParameter::DLSS_Render_Subrect_Dimensions_Width:
-			Width = InValue;
+			Render_Subrect_Dimensions_Width = InValue;
 			break;
 		case Util::NvParameter::DLSS_Render_Subrect_Dimensions_Height:
-			Height = InValue;
+			Render_Subrect_Dimensions_Height = InValue;
 			break;
 		case Util::NvParameter::OutWidth:
 			OutWidth = InValue;
@@ -317,28 +317,28 @@ namespace CyberFSR
 			*OutValue = OutHeight;
 			break;
 		case Util::NvParameter::DLSS_Get_Dynamic_Max_Render_Width:
-			*OutValue = Width;
+			*OutValue = Max_Render_Width;
 			break;
 		case Util::NvParameter::DLSS_Get_Dynamic_Max_Render_Height:
-			*OutValue = Height;
+			*OutValue = Max_Render_Height;
 			break;
 		case Util::NvParameter::DLSS_Get_Dynamic_Min_Render_Width:
-			*OutValue = Width / 10;
-			//*OutValue = OutWidth;
+			//*OutValue = Width / 10;
+			*OutValue = Min_Render_Width;
 			break;
 		case Util::NvParameter::DLSS_Get_Dynamic_Min_Render_Height:
-			*OutValue = Height / 10;
-			//*OutValue = OutHeight;
+			//*OutValue = Height / 10;
+			*OutValue = Min_Render_Height;
 			break;
 		case Util::NvParameter::DLSS_Render_Subrect_Dimensions_Width:
-			*OutValue = Width;
+			*OutValue = Render_Subrect_Dimensions_Width;
 			break;
 		case Util::NvParameter::DLSS_Render_Subrect_Dimensions_Height:
-			*OutValue = Height;
+			*OutValue = Render_Subrect_Dimensions_Height;
 			break;
 		case Util::NvParameter::SuperSampling_Available:
 		case Util::NvParameter::SuperSampling_Available_E:
-			*OutValue = true;
+			*OutValue = true; // change this to member!
 			break;
 		default:
 			BadThingHappened();
@@ -444,6 +444,7 @@ namespace CyberFSR
 
 	void NvParameter::Reset()
 	{
+
 	}
 
 	// EvaluateRenderScale helper
@@ -525,7 +526,6 @@ namespace CyberFSR
 			// no correlated value, add some logging?
 			break;
 		}
-
 		if (output == 0)
 			output = NO_VALUEf;
 		return output;
@@ -587,7 +587,6 @@ namespace CyberFSR
 			// no correlated value, add some logging?
 			break;
 		}
-
 		return output;
 	}
 
@@ -687,7 +686,8 @@ namespace CyberFSR
 			dimensions = CalcSame(dimensions.first, dimensions.second, defaultRatioVertical);
 			//CalcDifferent(dimensions.Width, dimensions.Height, defaultRatioVertical, defaultRatioHorizontal);
 		}
-
+		Width = dimensions.first;
+		Height = dimensions.second;
 		OutWidth = dimensions.first;
 		OutHeight = dimensions.second;
 	}
@@ -724,21 +724,30 @@ namespace CyberFSR
 		return output;
 	}
 
+	inline bool IsNvParamInternal(NvParameter* const& pointer)
+	{
+		const long long offset = pointer - ParameterRepository::Parameters;
+		return offset < ParameterRepository::Size && pointer >= ParameterRepository::Parameters;
+	}
+
+	inline ULONGLONG GetIndex(NvParameter*& recyclePointer) {
+		return (recyclePointer - ParameterRepository::Parameters) / (sizeof(NvParameter) * 8);
+	}
+	
 	NvParameter* NvParameter::GetFreshCapabilityParameter() {
 		NvParameter* const output = GetFreshParameter();
 		if (output != nullptr)
 		{
-			output->RTXValue = NVSDK_NGX_RTX_Value_On;
-
+			output->RTXValue = true;
 		}
 		return output;
 	}
 
 	void NvParameter::RecycleParameter(NvParameter* recyclePointer)
 	{
-		const __int64 index = (recyclePointer - ParameterRepository::Parameters) / (sizeof(NvParameter)*8);
-		if (index < ParameterRepository::Size)
+		if (IsNvParamInternal(recyclePointer))
 		{
+			const ULONGLONG index = GetIndex(recyclePointer);
 			Error_Resilient_Boolean& inUse = ParameterRepository::Parameter_In_Use_Bool[index];
 			if (inUse != Error_Resilient_Boolean::ER_TRUE)
 			{
@@ -758,21 +767,38 @@ namespace CyberFSR
 
 	NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_DLSS_GetOptimalSettingsCallback(NVSDK_NGX_Parameter* InParams)
 	{
-		auto* params = (NvParameter*)InParams;
-		params->EvaluateRenderScale();
-		return NVSDK_NGX_Result_Success;
+		if (IsNvParamInternal((NvParameter*)InParams))
+		{
+			NvParameter& params = *(NvParameter*)InParams;
+			params.EvaluateRenderScale();
+			return NVSDK_NGX_Result_Success;
+		}
+		else
+		{
+			BadThingHappened();
+			return NVSDK_NGX_Result_Fail;
+		}
 	}
 
 	NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_DLSS_GetStatsCallback(NVSDK_NGX_Parameter* InParams)
 	{
-		NvParameter& castedRef = *(NvParameter*)InParams;
-		//Somehow check for allocated memory
-		//Then set values: SizeInBytes, OptLevel, IsDevSnippetBranch
+		if (IsNvParamInternal((NvParameter*)InParams))
+		{
+			NvParameter& castedRef = *(NvParameter*)InParams;
+			//Somehow check for allocated memory
+			//Then set values: SizeInBytes, OptLevel, IsDevSnippetBranch
 
-		castedRef.OptLevel = 0;
-		castedRef.IsDevSnippetBranch = 0;
-		castedRef.SizeInBytes = 0x1337;
+			castedRef.OptLevel = 0;
+			castedRef.IsDevSnippetBranch = 0;
+			castedRef.SizeInBytes = 0x1337;
 
-		return NVSDK_NGX_Result_Success;
+			return NVSDK_NGX_Result_Success;
+		}
+		else
+		{
+			BadThingHappened();
+			return NVSDK_NGX_Result_Fail;
+		}
+
 	}
 }
