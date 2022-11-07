@@ -10,7 +10,7 @@
 // external\nvngx_dlss_sdk\include\nvsdk_ngx_defs.h
 // external\nvngx_dlss_sdk\include\nvsdk_ngx_helpers.h
 
-NVSDK_NGX_API NVSDK_NGX_Result NVSDK_NGX_D3D12_Init_Ext(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath, ID3D12Device* InDevice, NVSDK_NGX_Version InSDKVersion, const char* Apointer1, const char* Apointer2)
+NVSDK_NGX_API NVSDK_NGX_Result NVSDK_NGX_D3D12_Init_Ext(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath, ID3D12Device* InDevice, NVSDK_NGX_Version InSDKVersion, const NVSDK_NGX_FeatureCommonInfo* APointer, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo)
 {
 	// cyberpunk enters here
 	// cyberpunk id == 0x0000000005f83393
@@ -22,6 +22,18 @@ NVSDK_NGX_API NVSDK_NGX_Result NVSDK_NGX_D3D12_Init_Ext(unsigned long long InApp
 	return output;
 }
 
+//NVSDK_NGX_API NVSDK_NGX_Result NVSDK_NGX_D3D12_Init_Ext(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath, ID3D12Device* InDevice, NVSDK_NGX_Version InSDKVersion, const char* Apointer1, const char* Apointer2)
+//{
+//	// cyberpunk enters here
+//	// cyberpunk id == 0x0000000005f83393
+//
+//	auto output = NVSDK_NGX_Result_Success;
+//
+//	//CyberFSR::FeatureCommonInfo.LoggingInfo.LoggingCallback("Hello!", NVSDK_NGX_LOGGING_LEVEL_OFF, NVSDK_NGX_Feature_SuperSampling);
+//
+//	return output;
+//}
+
 NVSDK_NGX_Result NVSDK_NGX_D3D12_Init(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath, ID3D12Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion)
 {
 	// InFeatureInfo has important info!!!?!
@@ -30,7 +42,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_Init(unsigned long long InApplicationId, const 
 	// if this is cyberpunk, InFeatureInfo's value seems to actually be InSDKVersion
 
 
-	output = NVSDK_NGX_D3D12_Init_Ext(InApplicationId, InApplicationDataPath, InDevice, InSDKVersion, (char*)InFeatureInfo, 0);
+	output = NVSDK_NGX_D3D12_Init_Ext(InApplicationId, InApplicationDataPath, InDevice, InSDKVersion, InFeatureInfo, 0);
 	//output = NVSDK_NGX_D3D12_Init_Ext(InApplicationId, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion, 0);
 
 	return output;
@@ -152,7 +164,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_CreateFeature(ID3D12GraphicsCommandList* InCmdL
 		deviceContext->DebugLayer = std::make_unique<DebugOverlay>(device, InCmdList);
 #endif
 
-		* OutHandle = &deviceContext->Handle;
+		*OutHandle = &deviceContext->Handle;
 
 		auto initParams = deviceContext->FsrContextDescription;
 
@@ -297,10 +309,20 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCm
 		//Not sure if these two actually work
 		if (!config->DisableReactiveMask.value_or(false))
 		{
-			//dispatchParameters.reactive = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->InputBiasCurrentColorMask, L"FSR2_InputReactiveMap");
-			dispatchParameters.reactive = {NULL};
-			//dispatchParameters.transparencyAndComposition = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->TransparencyMask, L"FSR2_TransparencyAndCompositionMap");
-			dispatchParameters.transparencyAndComposition = {NULL};
+			if(inParams->InputBiasCurrentColorMask)
+				dispatchParameters.reactive = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->InputBiasCurrentColorMask, L"FSR2_InputReactiveMap");
+			else
+				dispatchParameters.reactive = {NULL};
+
+			if (inParams->InputBiasCurrentColorMask)
+				dispatchParameters.transparencyAndComposition = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->TransparencyMask, L"FSR2_TransparencyAndCompositionMap");
+			else
+				dispatchParameters.transparencyAndComposition = {NULL};
+		}
+		else
+		{
+			dispatchParameters.reactive = { NULL };
+			dispatchParameters.transparencyAndComposition = { NULL };
 		}
 
 		dispatchParameters.output = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->Output, L"FSR2_OutputUpscaledColor", FFX_RESOURCE_STATE_UNORDERED_ACCESS);
@@ -342,8 +364,8 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCm
 		dispatchParameters.frameTimeDelta = deltaTime;
 		//dispatchParameters.frameTimeDelta = inParams->FrameTimeDeltaInMsec;
 		dispatchParameters.preExposure = inParams->preExposure;
-		dispatchParameters.renderSize.width = inParams->Width;
-		dispatchParameters.renderSize.height = inParams->Height;
+		dispatchParameters.renderSize.width = inParams->RenderWidth ? inParams->RenderWidth : inParams->Width;
+		dispatchParameters.renderSize.height = inParams->RenderHeight ? inParams->RenderHeight : inParams->Height;
 
 		if (InCallback != nullptr)
 			InCallback(30, shouldCancel);
@@ -351,12 +373,12 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCm
 		//Hax Zone
 		dispatchParameters.cameraFar = deviceContext->ViewMatrix->GetFarPlane();
 		dispatchParameters.cameraNear = deviceContext->ViewMatrix->GetNearPlane();
-			dispatchParameters.cameraFovAngleVertical = DirectX::XMConvertToRadians(deviceContext->ViewMatrix->GetFov());
-		FfxErrorCode errorCode = ffxFsr2ContextDispatch(fsrContext, &dispatchParameters);
-		FFX_ASSERT(errorCode == FFX_OK);
+		dispatchParameters.cameraFovAngleVertical = DirectX::XMConvertToRadians(deviceContext->ViewMatrix->GetFov());
 
 		if (InCallback != nullptr)
-			InCallback(40, shouldCancel);
+			InCallback(50, shouldCancel);
+		FfxErrorCode errorCode = ffxFsr2ContextDispatch(fsrContext, &dispatchParameters);
+		FFX_ASSERT(errorCode == FFX_OK);
 
 		InCmdList->SetComputeRootSignature(orgRootSig);
 	}

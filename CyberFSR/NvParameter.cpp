@@ -684,23 +684,32 @@ namespace CyberFSR
 			static const float defaultRatioVertical = 2.0f;
 			static const float defaultRatioHorizontal = 2.0f;
 
-			dimensions = CalcSame(dimensions.first, dimensions.second, defaultRatioVertical);
+			dimensions = CalcSame(ScreenOrWindowDimension.first, ScreenOrWindowDimension.second, defaultRatioVertical);
 			//CalcDifferent(dimensions.Width, dimensions.Height, defaultRatioVertical, defaultRatioHorizontal);
 		}
-		Width = ScreenOrWindowDimension.first;
-		Height = ScreenOrWindowDimension.second;
+		//Width = ScreenOrWindowDimension.first;
+		//Height = ScreenOrWindowDimension.second;
+		//Width = dimensions.first;
+		//Height = dimensions.second;
 
-		OutWidth = dimensions.first * 1.42;
-		OutHeight = dimensions.second * 1.42;
+		//OutWidth = ScreenOrWindowDimension.first;
+		//OutHeight = ScreenOrWindowDimension.second;
+		OutWidth = dimensions.first;
+		OutHeight = dimensions.second;
 
-		Max_Render_Width = ScreenOrWindowDimension.first * 1.42;
-		Max_Render_Height = ScreenOrWindowDimension.second * 1.42;
+		Max_Render_Width = dimensions.first;
+		Max_Render_Height = dimensions.second;
+		//Max_Render_Width = dimensions.first;
+		//Max_Render_Height = dimensions.second;
 
-		//Min_Render_Width = ScreenOrWindowDimension.first / 10;
-		//Min_Render_Height = ScreenOrWindowDimension.second / 10;
+		//RenderWidth = Width;
+		//RenderHeight = Height;
 
-		//Render_Subrect_Dimensions_Width = 64;
-		//Render_Subrect_Dimensions_Height = 64;
+		Min_Render_Width = ScreenOrWindowDimension.first / 8;
+		Min_Render_Height = ScreenOrWindowDimension.second / 8;
+
+		Render_Subrect_Dimensions_Width = 64;
+		Render_Subrect_Dimensions_Height = 64;
 
 		EnableDynamicResolution = true;
 		FrameTimeDeltaInMsec = (double) 6.7f;
@@ -727,9 +736,11 @@ namespace CyberFSR
 				output = &ParameterRepository::Parameters[i];
 				break;
 			case Error_Resilient_Boolean::ER_TRUE:
+				BadThingHappened();
 				break;
 			case Error_Resilient_Boolean::Unknown:
 				// bad thing, ram corruption or bad code?
+				BadThingHappened();
 				break;
 			default:
 				break;
@@ -749,18 +760,30 @@ namespace CyberFSR
 	}
 	
 	NvParameter* NvParameter::GetFreshCapabilityParameter() {
+		const std::shared_ptr<Config> config = CyberFsrContext::instance()->MyConfig;
+
 		NvParameter* const output = GetFreshParameter();
 		if (output != nullptr)
 		{
 			output->RTXValue = NVSDK_NGX_RTX_Value_On;
-			output->EvaluateRenderScale();
-			output->EnableSharpening = true;
+			if(output->Width && output->Height)
+				output->EvaluateRenderScale();
+			else
+			{
+				output->OutWidth = 3840;
+				output->OutHeight = 2160;
+				output->Width = 800;
+				output->Height = 450;
+				output->Max_Render_Width = 800;
+				output->Max_Render_Height = 450;
+				output->Min_Render_Width = 320;
+				output->Min_Render_Height = 180;
+				//output->RenderWidth = output->Width;
+				//output->RenderHeight = output->Height;
+			}
+			output->EnableSharpening = (*config).EnableSharpening.value_or(true);
 			output->AutoExposure = true;
-			output->Hdr = true;
-			output->Max_Render_Width = 3840;
-			output->Max_Render_Height = 2160;
-			output->Min_Render_Width = 0;
-			output->Min_Render_Height = 0;
+			output->Hdr = (*config).HDR.value_or(false);
 			output->LowRes = false;
 			output->OptLevel = NVSDK_NGX_OPT_LEVEL_RELEASE;
 			output->IsDevSnippetBranch = 0;
