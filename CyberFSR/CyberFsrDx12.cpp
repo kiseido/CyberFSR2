@@ -10,18 +10,14 @@
 // external\nvngx_dlss_sdk\include\nvsdk_ngx_defs.h
 // external\nvngx_dlss_sdk\include\nvsdk_ngx_helpers.h
 
-NVSDK_NGX_API NVSDK_NGX_Result NVSDK_NGX_D3D12_Init_Ext(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath, ID3D12Device* InDevice, NVSDK_NGX_Version InSDKVersion, const NVSDK_NGX_FeatureCommonInfo* APointer, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo)
+NVSDK_NGX_API NVSDK_NGX_Result NVSDK_NGX_D3D12_Init_Ext(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath, ID3D12Device* InDevice, NVSDK_NGX_Version InSDKVersion, const char* Apointer1, const char* Apointer2)
 {
 	// cyberpunk enters here
-	// cyberpunk 2077 id: 100152211, sdk version: 100152211
-	
-	// InFeatureInfo has important info!!!?!
+	// cyberpunk id == 0x0000000005f83393
 
 	auto output = NVSDK_NGX_Result_Success;
 
-	auto loggingInfo = InFeatureInfo->LoggingInfo;
-	auto internalData = InFeatureInfo->InternalData;
-	auto pathListInfo = InFeatureInfo->PathListInfo;
+	//CyberFSR::FeatureCommonInfo.LoggingInfo.LoggingCallback("Hello!", NVSDK_NGX_LOGGING_LEVEL_OFF, NVSDK_NGX_Feature_SuperSampling);
 
 	return output;
 }
@@ -30,7 +26,11 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_Init(unsigned long long InApplicationId, const 
 {
 	// InFeatureInfo has important info!!!?!
 	auto output = NVSDK_NGX_Result_Success;
+	NVSDK_NGX_FeatureCommonInfo* badPtr = (NVSDK_NGX_FeatureCommonInfo*)InSDKVersion;
+	// if this is cyberpunk, InFeatureInfo's value seems to actually be InSDKVersion
 
+
+	output = NVSDK_NGX_D3D12_Init_Ext(InApplicationId, InApplicationDataPath, InDevice, InSDKVersion, (char*)InFeatureInfo, 0);
 	//output = NVSDK_NGX_D3D12_Init_Ext(InApplicationId, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion, 0);
 
 	return output;
