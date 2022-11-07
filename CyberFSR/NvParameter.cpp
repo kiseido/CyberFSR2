@@ -337,7 +337,7 @@ namespace CyberFSR
 			break;
 		case Util::NvParameter::SuperSampling_Available:
 		case Util::NvParameter::SuperSampling_Available_E:
-			*OutValue = true; // change this to member!
+			*OutValue = SuperSampling_Available; // change this to member!
 			break;
 		default:
 			BadThingHappened();
@@ -690,17 +690,17 @@ namespace CyberFSR
 		Width = ScreenOrWindowDimension.first;
 		Height = ScreenOrWindowDimension.second;
 
-		OutWidth = dimensions.first;
-		OutHeight = dimensions.second;
+		OutWidth = dimensions.first * 1.42;
+		OutHeight = dimensions.second * 1.42;
 
-		Max_Render_Width = ScreenOrWindowDimension.first * 1.1f;
-		Max_Render_Height = ScreenOrWindowDimension.second * 1.1f;
+		Max_Render_Width = ScreenOrWindowDimension.first * 1.42;
+		Max_Render_Height = ScreenOrWindowDimension.second * 1.42;
 
-		Min_Render_Width = ScreenOrWindowDimension.first / 10;
-		Min_Render_Height = ScreenOrWindowDimension.second / 10;
+		//Min_Render_Width = ScreenOrWindowDimension.first / 10;
+		//Min_Render_Height = ScreenOrWindowDimension.second / 10;
 
-		Render_Subrect_Dimensions_Width = 64;
-		Render_Subrect_Dimensions_Height = 64;
+		//Render_Subrect_Dimensions_Width = 64;
+		//Render_Subrect_Dimensions_Height = 64;
 
 		EnableDynamicResolution = true;
 		FrameTimeDeltaInMsec = (double) 6.7f;
@@ -752,8 +752,19 @@ namespace CyberFSR
 		NvParameter* const output = GetFreshParameter();
 		if (output != nullptr)
 		{
-			output->RTXValue = true;
+			output->RTXValue = NVSDK_NGX_RTX_Value_On;
 			output->EvaluateRenderScale();
+			output->EnableSharpening = true;
+			output->AutoExposure = true;
+			output->Hdr = true;
+			output->Max_Render_Width = 3840;
+			output->Max_Render_Height = 2160;
+			output->Min_Render_Width = 0;
+			output->Min_Render_Height = 0;
+			output->LowRes = false;
+			output->OptLevel = NVSDK_NGX_OPT_LEVEL_RELEASE;
+			output->IsDevSnippetBranch = 0;
+			output->SuperSampling_Available = true;
 		}
 		return output;
 	}

@@ -26,7 +26,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_Init(unsigned long long InApplicationId, const 
 {
 	// InFeatureInfo has important info!!!?!
 	auto output = NVSDK_NGX_Result_Success;
-	NVSDK_NGX_FeatureCommonInfo* badPtr = (NVSDK_NGX_FeatureCommonInfo*)InSDKVersion;
+
 	// if this is cyberpunk, InFeatureInfo's value seems to actually be InSDKVersion
 
 
@@ -82,11 +82,20 @@ NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D12_Shutdown1(ID3D12Device* InDevice)
 	return NVSDK_NGX_Result_Success;
 }
 
+
+// Nevertheless, due to the possibility that the user will be using an older driver
+// version, NVSDK_NGX_GetParameters may still be used as a fallback if
+// NVSDK_NGX_AllocateParameters
+// or NVSDK_NGX_GetCapabilityParameters return NVSDK_NGX_Result_FAIL_OutOfDate.
+
+// Parameter maps output by NVSDK_NGX_GetParameters are also pre-populated
+// with NGX capabilities and available features.
+// 
 //Deprecated Parameter Function - Internal Memory Tracking
 NVSDK_NGX_Result NVSDK_NGX_D3D12_GetParameters(NVSDK_NGX_Parameter** OutParameters)
 {
 	//*OutParameters = CyberContext::instance()->AllocateParameter();
-	*OutParameters = CyberNvParameter::GetFreshParameter();
+	*OutParameters = CyberNvParameter::GetFreshCapabilityParameter();
 	return NVSDK_NGX_Result_Success;
 }
 
@@ -121,6 +130,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_GetScratchBufferSize(NVSDK_NGX_Feature InFeatur
 NVSDK_NGX_Result NVSDK_NGX_D3D12_CreateFeature(ID3D12GraphicsCommandList* InCmdList, NVSDK_NGX_Feature InFeatureID,
 	const NVSDK_NGX_Parameter* InParameters, NVSDK_NGX_Handle** OutHandle)
 {
+	NVSDK_NGX_Result output = NVSDK_NGX_Result_Fail;
 
 	switch (InFeatureID)
 	{
@@ -154,8 +164,9 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_CreateFeature(ID3D12GraphicsCommandList* InCmdL
 		FFX_ASSERT(errorCode == FFX_OK);
 
 		initParams.device = ffxGetDeviceDX12(device);
-		initParams.maxRenderSize.width = inParams->Width;
-		initParams.maxRenderSize.height = inParams->Height;
+
+		initParams.maxRenderSize.width = inParams->Max_Render_Width;
+		initParams.maxRenderSize.height = inParams->Max_Render_Height;
 		initParams.displaySize.width = inParams->OutWidth;
 		initParams.displaySize.height = inParams->OutHeight;
 
@@ -174,8 +185,9 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_CreateFeature(ID3D12GraphicsCommandList* InCmdL
 
 		HookSetComputeRootSignature(InCmdList);
 
-		return NVSDK_NGX_Result_Success;
+		output = NVSDK_NGX_Result_Success;
 	}
+		break;
 	case NVSDK_NGX_Feature_InPainting:
 		CyberFSR::BadThingHappened();
 		break;
@@ -222,7 +234,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_CreateFeature(ID3D12GraphicsCommandList* InCmdL
 		CyberFSR::BadThingHappened();
 		break;
 	}
-	return NVSDK_NGX_Result_Fail;
+	return output;
 }
 
 NVSDK_NGX_Result NVSDK_NGX_D3D12_ReleaseFeature(NVSDK_NGX_Handle* InHandle)
@@ -285,8 +297,10 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCm
 		//Not sure if these two actually work
 		if (!config->DisableReactiveMask.value_or(false))
 		{
-			dispatchParameters.reactive = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->InputBiasCurrentColorMask, L"FSR2_InputReactiveMap");
-			dispatchParameters.transparencyAndComposition = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->TransparencyMask, L"FSR2_TransparencyAndCompositionMap");
+			//dispatchParameters.reactive = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->InputBiasCurrentColorMask, L"FSR2_InputReactiveMap");
+			dispatchParameters.reactive = {NULL};
+			//dispatchParameters.transparencyAndComposition = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->TransparencyMask, L"FSR2_TransparencyAndCompositionMap");
+			dispatchParameters.transparencyAndComposition = {NULL};
 		}
 
 		dispatchParameters.output = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->Output, L"FSR2_OutputUpscaledColor", FFX_RESOURCE_STATE_UNORDERED_ACCESS);
@@ -299,16 +313,21 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCm
 
 		dispatchParameters.reset = inParams->ResetRender;
 
-		float sharpness = CyberUtil::ConvertSharpness(inParams->Sharpness, config->SharpnessRange);
+		dispatchParameters.enableSharpening = config->EnableSharpening.value_or(inParams->EnableSharpening);
 		
-		if (config->EnableSharpening.value_or(inParams->EnableSharpening)) {
-			dispatchParameters.enableSharpening = true;
+		if (dispatchParameters.enableSharpening) {
+
 			if (config->Sharpness.has_value())
 			{
 				dispatchParameters.sharpness = config->Sharpness.value();
 			}
-			else if (sharpness > 0 && sharpness <= 1.0f) {
-				dispatchParameters.sharpness = sharpness;
+			else
+			{
+				float sharpness = CyberUtil::ConvertSharpness(inParams->Sharpness, config->SharpnessRange);
+				if (sharpness > 0 && sharpness <= 1.0f) 
+				{
+					dispatchParameters.sharpness = sharpness;
+				}
 			}
 		}
 		if (InCallback != nullptr)
@@ -332,7 +351,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCm
 		//Hax Zone
 		dispatchParameters.cameraFar = deviceContext->ViewMatrix->GetFarPlane();
 		dispatchParameters.cameraNear = deviceContext->ViewMatrix->GetNearPlane();
-		dispatchParameters.cameraFovAngleVertical = DirectX::XMConvertToRadians(deviceContext->ViewMatrix->GetFov());
+			dispatchParameters.cameraFovAngleVertical = DirectX::XMConvertToRadians(deviceContext->ViewMatrix->GetFov());
 		FfxErrorCode errorCode = ffxFsr2ContextDispatch(fsrContext, &dispatchParameters);
 		FFX_ASSERT(errorCode == FFX_OK);
 

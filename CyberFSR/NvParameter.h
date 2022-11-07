@@ -37,7 +37,7 @@ namespace CyberFSR
 
 		long long SizeInBytes{};
 
-		bool RTXValue{}, FreeMemOnReleaseFeature{}, DepthInverted{}, AutoExposure{}, Hdr{}, EnableSharpening{}, JitterMotion{}, LowRes{}, EnableDynamicResolution{}, EnableTexture1DUsage{};
+		bool RTXValue{}, FreeMemOnReleaseFeature{}, DepthInverted{}, AutoExposure{}, Hdr{}, EnableSharpening{}, JitterMotion{}, LowRes{}, EnableDynamicResolution{}, EnableTexture1DUsage{}, SuperSampling_Available{};
 
 		float FrameTimeDeltaInMsec = 0.0f;
 

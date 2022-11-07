@@ -10,6 +10,8 @@ class FeatureContext;
 
 namespace CyberFSR
 {
+	static NVSDK_NGX_FeatureCommonInfo FeatureCommonInfo;
+
 	typedef std::variant<
 		void*,
 		std::unique_ptr<ID3D11Resource>,
