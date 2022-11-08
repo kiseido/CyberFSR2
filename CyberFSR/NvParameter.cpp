@@ -530,11 +530,6 @@ namespace CyberFSR
 		return output;
 	}
 
-	inline ScreenDimensions GetFixedResFromQuality(const NVSDK_NGX_PerfQuality_Value& input, const std::shared_ptr<Config>& config)
-	{
-
-	}
-
 	inline ScreenDimensions CalcSame(const auto& Width, const auto& Height, const auto& Division_Ratio) 
 	{
 		// Multiply is way faster than divide, do a single divide now to avoid it later
@@ -550,13 +545,6 @@ namespace CyberFSR
 		ScreenDimensions output;
 		output.first = std::lround(Width / Width_Division_Ratio);
 		output.second = std::lround(Height / Height_Division_Ratio);
-		return output;
-	}
-
-	inline ScreenDimensions DynaResProfile(const std::shared_ptr<Config>& InConfig, const NvParameter& InNvParameter) 
-	{
-		ScreenDimensions output;
-		// TODO
 		return output;
 	}
 
@@ -658,9 +646,6 @@ namespace CyberFSR
 			case UpscalingProfile::FSR2:
 				output = FSR2Profile(InConfig, InNvParameter);
 				break;
-			case UpscalingProfile::DynaRes:
-				output = DynaResProfile(InConfig, InNvParameter);
-				break;
 			case UpscalingProfile::FixedRes:
 				output = FixedResProfile(InConfig, InNvParameter);
 				break;
@@ -694,6 +679,7 @@ namespace CyberFSR
 
 		//OutWidth = ScreenOrWindowDimension.first;
 		//OutHeight = ScreenOrWindowDimension.second;
+
 		OutWidth = dimensions.first;
 		OutHeight = dimensions.second;
 
@@ -708,11 +694,12 @@ namespace CyberFSR
 		Min_Render_Width = ScreenOrWindowDimension.first / 8;
 		Min_Render_Height = ScreenOrWindowDimension.second / 8;
 
-		Render_Subrect_Dimensions_Width = 64;
-		Render_Subrect_Dimensions_Height = 64;
+		Render_Subrect_Dimensions_Width = 16;
+		Render_Subrect_Dimensions_Height = 16;
 
 		EnableDynamicResolution = true;
-		FrameTimeDeltaInMsec = (double) 6.7f;
+		FrameTimeDeltaInMsec = (double) 1.0f / 60.0f;
+		
 	}
 
 

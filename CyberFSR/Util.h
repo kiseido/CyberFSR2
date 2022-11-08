@@ -14,6 +14,7 @@ namespace CyberFSR
 		double MillisecondsNow();
 
 		float ConvertSharpness(float sharpness, std::optional<SharpnessRangeModifier> range);
+		float DynaRes(float TargetMillisecondsPerFrame, bool doTimeInternal, float& MillisecondsSinceLastFrame);
 
 		NvParameter NvParameterToEnum(const char* name);
 		UpscalingProfile UpscalingProfileMap(const char* name);

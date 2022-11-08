@@ -298,10 +298,14 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCm
 
 		FfxFsr2DispatchDescription dispatchParameters = {};
 		dispatchParameters.commandList = ffxGetCommandListDX12(InCmdList);
-		dispatchParameters.color = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->Color, L"FSR2_InputColor");
-		dispatchParameters.depth = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->Depth, L"FSR2_InputDepth");
-		dispatchParameters.motionVectors = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->MotionVectors, L"FSR2_InputMotionVectors");
-		dispatchParameters.exposure = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->ExposureTexture, L"FSR2_InputExposure");
+		dispatchParameters.color = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->Color, L"FSR2_InputColor", FFX_RESOURCE_STATE_COMPUTE_READ);
+		dispatchParameters.depth = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->Depth, L"FSR2_InputDepth", FFX_RESOURCE_STATE_COMPUTE_READ);
+		dispatchParameters.motionVectors = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->MotionVectors, L"FSR2_InputMotionVectors", FFX_RESOURCE_STATE_COMPUTE_READ);
+
+		if (inParams->ExposureTexture)
+			dispatchParameters.exposure = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->ExposureTexture, L"FSR2_InputExposure", FFX_RESOURCE_STATE_COMPUTE_READ);
+		else
+			dispatchParameters.exposure = { NULL, NULL, NULL };
 
 		if (InCallback != nullptr)
 			InCallback(10, shouldCancel);
@@ -310,19 +314,19 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCm
 		if (!config->DisableReactiveMask.value_or(false))
 		{
 			if(inParams->InputBiasCurrentColorMask)
-				dispatchParameters.reactive = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->InputBiasCurrentColorMask, L"FSR2_InputReactiveMap");
+				dispatchParameters.reactive = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->InputBiasCurrentColorMask, L"FSR2_InputReactiveMap", FFX_RESOURCE_STATE_COMPUTE_READ);
 			else
-				dispatchParameters.reactive = {NULL};
+				dispatchParameters.reactive = { NULL, NULL, NULL };
 
 			if (inParams->InputBiasCurrentColorMask)
-				dispatchParameters.transparencyAndComposition = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->TransparencyMask, L"FSR2_TransparencyAndCompositionMap");
+				dispatchParameters.transparencyAndComposition = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->TransparencyMask, L"FSR2_TransparencyAndCompositionMap", FFX_RESOURCE_STATE_UNORDERED_ACCESS);
 			else
-				dispatchParameters.transparencyAndComposition = {NULL};
+				dispatchParameters.transparencyAndComposition = { NULL, NULL, NULL };
 		}
 		else
 		{
-			dispatchParameters.reactive = { NULL };
-			dispatchParameters.transparencyAndComposition = { NULL };
+			dispatchParameters.reactive = { NULL, NULL, NULL };
+			dispatchParameters.transparencyAndComposition = { NULL, NULL, NULL };
 		}
 
 		dispatchParameters.output = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->Output, L"FSR2_OutputUpscaledColor", FFX_RESOURCE_STATE_UNORDERED_ACCESS);
@@ -331,7 +335,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCm
 		dispatchParameters.jitterOffset.y = inParams->JitterOffsetY;
 
 		dispatchParameters.motionVectorScale.x = (float)inParams->MVScaleX;
-		dispatchParameters.motionVectorScale.y = (float)inParams->MVScaleY;
+		dispatchParameters.motionVectorScale.y =(float)inParams->MVScaleY;
 
 		dispatchParameters.reset = inParams->ResetRender;
 
@@ -355,17 +359,24 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCm
 		if (InCallback != nullptr)
 			InCallback(20, shouldCancel);
 
+
+
 		//deltatime hax
 		static double lastFrameTime;
 		double currentTime = CyberUtil::MillisecondsNow();
-		double deltaTime = (currentTime - lastFrameTime);
+		double FrameTimeDeltaInMsec = (currentTime - lastFrameTime);
 		lastFrameTime = currentTime;
 
-		dispatchParameters.frameTimeDelta = deltaTime;
+		float FrameTimeDeltaInMsec;
+		//const float scalar = CyberFSR::Util::DynaRes(1.0f / 60.0f * 1000, true, FrameTimeDeltaInMsec);
+
+		dispatchParameters.frameTimeDelta = (FrameTimeDeltaInMsec < 1 || FrameTimeDeltaInMsec > 100) ? 7: FrameTimeDeltaInMsec;
 		//dispatchParameters.frameTimeDelta = inParams->FrameTimeDeltaInMsec;
+
 		dispatchParameters.preExposure = inParams->preExposure;
-		dispatchParameters.renderSize.width = inParams->RenderWidth ? inParams->RenderWidth : inParams->Width;
-		dispatchParameters.renderSize.height = inParams->RenderHeight ? inParams->RenderHeight : inParams->Height;
+		dispatchParameters.renderSize.width = inParams->Width;
+		dispatchParameters.renderSize.height = inParams->Height;
+		dispatchParameters.
 
 		if (InCallback != nullptr)
 			InCallback(30, shouldCancel);

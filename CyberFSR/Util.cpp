@@ -36,6 +36,51 @@ filesystem::path CyberFSR::Util::ExePath()
 	return exe;
 }
 
+float CyberFSR::Util::DynaRes(float TargetMillisecondsPerFrame, bool doTimeInternal, float& MillisecondsSinceLastFrame)
+{
+	static float output = 0.5;
+
+	static float dynaScalar = 1.0f;
+
+	static float proportional = 1.0f;
+	static float integral = 1.0f;
+	static float derivative = 1.0f;
+
+	constexpr UINT CallHistory = 600;
+	static UINT nextIndexToUse = 0;
+	static float lastCalls[CallHistory]{TargetMillisecondsPerFrame};
+	static float sumTotal = 0;
+
+	static double lastFrameTime;
+	if (doTimeInternal)
+	{
+		double currentTime = CyberFSR::Util::MillisecondsNow();
+		MillisecondsSinceLastFrame = (currentTime - lastFrameTime) * 1000;
+		lastFrameTime = currentTime;
+	}
+
+	float call = TargetMillisecondsPerFrame - MillisecondsSinceLastFrame;
+	sumTotal -= lastCalls[nextIndexToUse];
+	sumTotal += call;
+	lastCalls[nextIndexToUse] = call;
+	nextIndexToUse = (nextIndexToUse + 1) % CallHistory;
+
+	// Do P.I.D black magic here
+
+	float average = sumTotal / CallHistory;
+	float step2 = ((call + average) / 2);
+
+	output += step2 < 1 ? -0.01 : 0.01;
+
+ 	if (output > 1.0f)
+		output = 1.0;
+
+	if (output < 0.4f)
+		output = 0.4f;
+
+	return output;
+}
+
 double CyberFSR::Util::MillisecondsNow()
 {
 	constexpr double MsinSec = (double)1 / (double)1000;
@@ -108,7 +153,6 @@ CyberFSR::UpscalingProfile CyberFSR::Util::UpscalingProfileMap(const char* in)
 	static std::unordered_map<std::string, UpscalingProfile> Translation = {
 		{"FSR2", UpscalingProfile::FSR2},
 		{"DLSS2", UpscalingProfile::DLSS2},
-		{"DynaRes", UpscalingProfile::DynaRes},
 		{"FixedRes", UpscalingProfile::FixedRes}
 	};
 	auto output = Translation[in];

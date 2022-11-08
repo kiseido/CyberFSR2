@@ -51,7 +51,6 @@ namespace CyberFSR
 	{
 		FSR2,
 		DLSS2,
-		DynaRes,
 		FixedRes
 	};
 
