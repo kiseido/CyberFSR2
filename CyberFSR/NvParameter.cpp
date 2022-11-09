@@ -601,7 +601,7 @@ namespace CyberFSR
 
 			if (fsrQualityMode != NO_VALUEi)
 			{
-				const FfxErrorCode err = ffxFsr2GetRenderResolutionFromQualityMode(&output.first, &output.second, InNvParameter->Width, InNvParameter->Height, fsrQualityMode);
+				const FfxErrorCode err = ffxFsr2GetRenderResolutionFromQualityMode(&output.first, &output.second, InNvParameter.Width, InNvParameter.Height, fsrQualityMode);
 #ifdef _DEBUG
 				switch (err)
 				{
@@ -697,7 +697,6 @@ namespace CyberFSR
 
 		EnableDynamicResolution = true;
 		FrameTimeDeltaInMsec = (double) 1.0f / 60.0f;
-		
 	}
 
 
