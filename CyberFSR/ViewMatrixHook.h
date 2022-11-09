@@ -40,6 +40,7 @@ namespace CyberFSR
 		float GetFov();
 		float GetFarPlane();
 		float GetNearPlane();
+		static ID3D12Resource* GetTransparencyMask();
 
 	private:
 		struct CameraParams

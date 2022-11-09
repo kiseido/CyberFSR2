@@ -15,6 +15,14 @@ NVSDK_NGX_API NVSDK_NGX_Result NVSDK_NGX_D3D12_Init_Ext(unsigned long long InApp
 	// cyberpunk enters here
 	// cyberpunk id == 0x0000000005f83393
 
+	switch (InApplicationId)
+	{
+	case 0x5f83393:
+		break;
+	default:
+		break;
+	}
+
 	auto output = NVSDK_NGX_Result_Success;
 
 	//CyberFSR::FeatureCommonInfo.LoggingInfo.LoggingCallback("Hello!", NVSDK_NGX_LOGGING_LEVEL_OFF, NVSDK_NGX_Feature_SuperSampling);
@@ -294,16 +302,29 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCm
 	{
 		const auto inParams = dynamic_cast<const CyberNvParameter*>(InParameters);
 
+		auto color = (ID3D12Resource*)inParams->Color;
+		auto depth = (ID3D12Resource*)inParams->Depth;
+		auto motionVectors = (ID3D12Resource*)inParams->MotionVectors;
+		auto exposureTexture = (ID3D12Resource*)inParams->ExposureTexture;
+		auto inputBiasColorMask = (ID3D12Resource*)inParams->InputBiasCurrentColorMask;
+		auto transparencyMask = (ID3D12Resource*)inParams->TransparencyMask;
+		auto output = (ID3D12Resource*)inParams->Output;
+
+
 		auto* fsrContext = &deviceContext->FsrContext;
 
 		FfxFsr2DispatchDescription dispatchParameters = {};
 		dispatchParameters.commandList = ffxGetCommandListDX12(InCmdList);
-		dispatchParameters.color = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->Color, L"FSR2_InputColor", FFX_RESOURCE_STATE_COMPUTE_READ);
-		dispatchParameters.depth = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->Depth, L"FSR2_InputDepth", FFX_RESOURCE_STATE_COMPUTE_READ);
-		dispatchParameters.motionVectors = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->MotionVectors, L"FSR2_InputMotionVectors", FFX_RESOURCE_STATE_COMPUTE_READ);
 
-		if (inParams->ExposureTexture)
-			dispatchParameters.exposure = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->ExposureTexture, L"FSR2_InputExposure", FFX_RESOURCE_STATE_COMPUTE_READ);
+		dispatchParameters.color = ffxGetResourceDX12(fsrContext, color, L"FSR2_InputColor", FFX_RESOURCE_STATE_COMPUTE_READ, D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING);
+
+		dispatchParameters.depth = ffxGetResourceDX12(fsrContext, depth, L"FSR2_InputDepth", FFX_RESOURCE_STATE_COMPUTE_READ, D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING);
+		dispatchParameters.depth.isDepth = true;
+
+		dispatchParameters.motionVectors = ffxGetResourceDX12(fsrContext, motionVectors, L"FSR2_InputMotionVectors", FFX_RESOURCE_STATE_COMPUTE_READ, D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING);
+
+		if (exposureTexture)
+			dispatchParameters.exposure = ffxGetResourceDX12(fsrContext, exposureTexture, L"FSR2_InputExposure", FFX_RESOURCE_STATE_COMPUTE_READ, D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING);
 		else
 			dispatchParameters.exposure = { NULL, NULL, NULL };
 
@@ -313,15 +334,17 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCm
 		//Not sure if these two actually work
 		if (!config->DisableReactiveMask.value_or(false))
 		{
-			if(inParams->InputBiasCurrentColorMask)
-				dispatchParameters.reactive = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->InputBiasCurrentColorMask, L"FSR2_InputReactiveMap", FFX_RESOURCE_STATE_COMPUTE_READ);
+			if(inputBiasColorMask)
+				dispatchParameters.reactive = ffxGetResourceDX12(fsrContext, inputBiasColorMask, L"FSR2_InputReactiveMap", FFX_RESOURCE_STATE_COMPUTE_READ, D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING);
 			else
 				dispatchParameters.reactive = { NULL, NULL, NULL };
 
-			if (inParams->InputBiasCurrentColorMask)
-				dispatchParameters.transparencyAndComposition = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->TransparencyMask, L"FSR2_TransparencyAndCompositionMap", FFX_RESOURCE_STATE_UNORDERED_ACCESS);
-			else
+			if (transparencyMask)
+				dispatchParameters.transparencyAndComposition = ffxGetResourceDX12(fsrContext, transparencyMask, L"FSR2_TransparencyAndCompositionMap", FFX_RESOURCE_STATE_COMPUTE_READ, D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING);
+			else {
 				dispatchParameters.transparencyAndComposition = { NULL, NULL, NULL };
+				//dispatchParameters.transparencyAndComposition = ffxGetResourceDX12(fsrContext, CyberFSR::ViewMatrixHook::Cyberpunk2077::GetTransparencyMask(), L"FSR2_TransparencyAndCompositionMap", FFX_RESOURCE_STATE_COMPUTE_READ, D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING);
+			}
 		}
 		else
 		{
@@ -329,13 +352,21 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCm
 			dispatchParameters.transparencyAndComposition = { NULL, NULL, NULL };
 		}
 
-		dispatchParameters.output = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->Output, L"FSR2_OutputUpscaledColor", FFX_RESOURCE_STATE_UNORDERED_ACCESS);
+		dispatchParameters.output = ffxGetResourceDX12(fsrContext, output, L"FSR2_OutputUpscaledColor", FFX_RESOURCE_STATE_UNORDERED_ACCESS);
 
 		dispatchParameters.jitterOffset.x = inParams->JitterOffsetX;
 		dispatchParameters.jitterOffset.y = inParams->JitterOffsetY;
 
-		dispatchParameters.motionVectorScale.x = (float)inParams->MVScaleX;
-		dispatchParameters.motionVectorScale.y =(float)inParams->MVScaleY;
+		if (config->DisplayResolution.value_or(false)) 
+		{
+			dispatchParameters.motionVectorScale.x = (float)inParams->OutWidth;
+			dispatchParameters.motionVectorScale.y = (float)inParams->OutHeight;
+		}
+		else 
+		{
+			dispatchParameters.motionVectorScale.x = (float)inParams->MVScaleX;
+			dispatchParameters.motionVectorScale.y = (float)inParams->MVScaleY;
+		}
 
 		dispatchParameters.reset = inParams->ResetRender;
 
@@ -362,21 +393,24 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCm
 
 
 		//deltatime hax
+		double FrameTimeDeltaInMsec;
 		static double lastFrameTime;
 		double currentTime = CyberUtil::MillisecondsNow();
-		double FrameTimeDeltaInMsec = (currentTime - lastFrameTime);
+		FrameTimeDeltaInMsec = (currentTime - lastFrameTime) * 1000;
 		lastFrameTime = currentTime;
 
-		float FrameTimeDeltaInMsec;
 		//const float scalar = CyberFSR::Util::DynaRes(1.0f / 60.0f * 1000, true, FrameTimeDeltaInMsec);
 
 		dispatchParameters.frameTimeDelta = (FrameTimeDeltaInMsec < 1 || FrameTimeDeltaInMsec > 100) ? 7: FrameTimeDeltaInMsec;
 		//dispatchParameters.frameTimeDelta = inParams->FrameTimeDeltaInMsec;
 
-		dispatchParameters.preExposure = inParams->preExposure;
+		if (inParams->preExposure != 0)
+			dispatchParameters.preExposure = inParams->preExposure;
+		else
+			dispatchParameters.preExposure = 100;
+
 		dispatchParameters.renderSize.width = inParams->Width;
 		dispatchParameters.renderSize.height = inParams->Height;
-		dispatchParameters.
 
 		if (InCallback != nullptr)
 			InCallback(30, shouldCancel);

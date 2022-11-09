@@ -427,11 +427,9 @@ namespace CyberFSR
 		switch (inParameter) {
 		case Util::NvParameter::DLSSOptimalSettingsCallback:
 			*OutValue = NVSDK_NGX_DLSS_GetOptimalSettingsCallback;
-			result = NVSDK_NGX_Result_Success;
 			break;
 		case Util::NvParameter::DLSSGetStatsCallback:
 			*OutValue = NVSDK_NGX_DLSS_GetStatsCallback;
-			result = NVSDK_NGX_Result_Success;
 			break;
 		default:
 			BadThingHappened();
@@ -759,10 +757,10 @@ namespace CyberFSR
 			{
 				output->OutWidth = 3840;
 				output->OutHeight = 2160;
-				output->Width = 800;
-				output->Height = 450;
-				output->Max_Render_Width = 800;
-				output->Max_Render_Height = 450;
+				output->Width = 1280;
+				output->Height = 720;
+				output->Max_Render_Width = 1920;
+				output->Max_Render_Height = 1080;
 				output->Min_Render_Width = 320;
 				output->Min_Render_Height = 180;
 				//output->RenderWidth = output->Width;

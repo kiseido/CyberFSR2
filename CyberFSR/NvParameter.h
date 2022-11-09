@@ -34,9 +34,6 @@ namespace CyberFSR
 
 		unsigned int Width{}, Height{}, OutWidth{}, OutHeight{}, Max_Render_Width{}, Max_Render_Height{}, Min_Render_Width{}, Min_Render_Height{}, Render_Subrect_Dimensions_Width{}, Render_Subrect_Dimensions_Height{};
 
-		unsigned int RenderHeight{}, RenderWidth{};
-		static RenderSizeBehaviour RenderSizeBehaviour;
-
 		NVSDK_NGX_PerfQuality_Value PerfQualityValue = NVSDK_NGX_PerfQuality_Value_Balanced;
 		int CreationNodeMask{}, VisibilityNodeMask{}, OptLevel = 0, IsDevSnippetBranch = 0;
 		float Sharpness = 1.0f;
@@ -46,11 +43,11 @@ namespace CyberFSR
 
 		long long SizeInBytes{};
 
-		bool RTXValue{}, FreeMemOnReleaseFeature{}, DepthInverted{}, AutoExposure{}, Hdr{}, EnableSharpening{}, JitterMotion{}, LowRes{}, EnableDynamicResolution{}, EnableTexture1DUsage{true}, SuperSampling_Available{};
+		bool RTXValue{}, FreeMemOnReleaseFeature{}, DepthInverted{}, AutoExposure{}, Hdr{}, EnableSharpening{}, JitterMotion{}, LowRes{}, EnableDynamicResolution{}, EnableTexture1DUsage{false}, SuperSampling_Available{};
 
 		float FrameTimeDeltaInMsec = 0.0f;
 
-		float preExposure = 1.0f;
+		float preExposure{};
 
 		//external Resources
 		void* InputBiasCurrentColorMask{};
