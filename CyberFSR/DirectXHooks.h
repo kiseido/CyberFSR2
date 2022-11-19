@@ -5,7 +5,7 @@ typedef void(__fastcall* SETCOMPUTEROOTSIGNATURE)(ID3D12GraphicsCommandList* com
 
 extern ID3D12CommandList* myCommandList;
 
-extern std::unordered_map<ID3D12GraphicsCommandList*, ID3D12RootSignature*> commandListVector;
+extern std::unordered_map<ID3D12GraphicsCommandList*, std::pair<ID3D12RootSignature*, unsigned long long>> commandListVector;
 
 extern std::mutex rootSigMutex;
 

@@ -6,6 +6,8 @@
 
 namespace CyberFSR
 {
+	ScreenDimensions CyberFsrContext::FinalDisplayResolution = {0,0};
+
 	NvParameter* CyberFsrContext::AllocateParameter()
 	{
 		Parameters.push_back(std::make_unique<NvParameter>());

@@ -55,14 +55,6 @@ std::unique_ptr<ViewMatrixHook> ViewMatrixHook::Create(const Config& config)
 
 	uint64_t mod = 0x0;
 
-	ID3D12Resource* ViewMatrixHook::Cyberpunk2077::GetTransparencyMask() {
-		ID3D12Resource* output = (ID3D12Resource*)mod;
-		if (output != 0x0)
-			output = (ID3D12Resource*)(mod + 0x103baa);
-
-		return output;
-	}
-
 	ViewMatrixHook::Cyberpunk2077::Cyberpunk2077()
 	{
 		if(!mod)

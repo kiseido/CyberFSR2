@@ -15,7 +15,7 @@ SETCOMPUTEROOTSIGNATURE oSetComputeRootSignature = nullptr;
 
 ID3D12CommandList* myCommandList = nullptr;
 
-std::unordered_map<ID3D12GraphicsCommandList*, ID3D12RootSignature*> commandListVector;
+std::unordered_map<ID3D12GraphicsCommandList*, std::pair<ID3D12RootSignature*, unsigned long long>> commandListVector;
 
 std::mutex rootSigMutex;
 
@@ -146,7 +146,7 @@ static VOID Unfreeze(PFROZEN_THREADS pThreads)
 void hSetComputeRootSignature(ID3D12GraphicsCommandList* commandList, ID3D12RootSignature* pRootSignature)
 {
 	rootSigMutex.lock();
-	commandListVector[commandList] = pRootSignature;
+	commandListVector[commandList] = std::make_pair(pRootSignature , CyberFSR::Timer::MilliSecondsNow());
 	rootSigMutex.unlock();
 
 	return oSetComputeRootSignature(commandList, pRootSignature);

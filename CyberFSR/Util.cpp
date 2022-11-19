@@ -55,11 +55,11 @@ float CyberFSR::Util::DynaRes(float TargetMillisecondsPerFrame, bool doTimeInter
 	if (doTimeInternal)
 	{
 		double currentTime = CyberFSR::Util::MillisecondsNow();
-		MillisecondsSinceLastFrame = (currentTime - lastFrameTime) * 1000;
+		MillisecondsSinceLastFrame = (currentTime - lastFrameTime);
 		lastFrameTime = currentTime;
 	}
 
-	float call = TargetMillisecondsPerFrame - MillisecondsSinceLastFrame;
+	float call = (float) (TargetMillisecondsPerFrame - MillisecondsSinceLastFrame);
 	sumTotal -= lastCalls[nextIndexToUse];
 	sumTotal += call;
 	lastCalls[nextIndexToUse] = call;
@@ -83,7 +83,7 @@ float CyberFSR::Util::DynaRes(float TargetMillisecondsPerFrame, bool doTimeInter
 
 double CyberFSR::Util::MillisecondsNow()
 {
-	constexpr double MsinSec = (double)1 / (double)1000;
+	constexpr double MsinSec = (double)1000 / (double)1;
 
 	static LARGE_INTEGER s_frequency;
 	//static int s_use_qpc = QueryPerformanceFrequency(&s_frequency);
@@ -94,7 +94,7 @@ double CyberFSR::Util::MillisecondsNow()
 	case 0:
 		LARGE_INTEGER now;
 		QueryPerformanceCounter(&now);
-		milliseconds = double(1000.0 * now.QuadPart) / s_frequency.QuadPart;
+		milliseconds = double(MsinSec * now.QuadPart) / s_frequency.QuadPart;
 		break;
 	case 1:
 		milliseconds = double(GetTickCount64()); //32bit overflows after 49days... unlikely to hit but still
@@ -182,10 +182,37 @@ CyberFSR::Util::NvParameter CyberFSR::Util::NvParameterToEnum(const char* name)
 
 		{NVSDK_NGX_Parameter_DLSS_Render_Subrect_Dimensions_Width, NvParameter::DLSS_Render_Subrect_Dimensions_Width},
 		{NVSDK_NGX_Parameter_DLSS_Render_Subrect_Dimensions_Height, NvParameter::DLSS_Render_Subrect_Dimensions_Height},
+
+		{NVSDK_NGX_Parameter_DLSS_Input_Color_Subrect_Base_X, NvParameter::DLSS_Input_Color_Subrect_Base_X},
+		{NVSDK_NGX_Parameter_DLSS_Input_Color_Subrect_Base_Y, NvParameter::DLSS_Input_Color_Subrect_Base_Y},
+
+		{NVSDK_NGX_Parameter_DLSS_Input_Depth_Subrect_Base_X, NvParameter::DLSS_Input_Depth_Subrect_Base_X},
+		{NVSDK_NGX_Parameter_DLSS_Input_Depth_Subrect_Base_Y, NvParameter::DLSS_Input_Depth_Subrect_Base_Y},
+
+		{NVSDK_NGX_Parameter_DLSS_Input_MV_SubrectBase_X, NvParameter::DLSS_Input_MV_Subrect_Base_X},
+		{NVSDK_NGX_Parameter_DLSS_Input_MV_SubrectBase_Y, NvParameter::DLSS_Input_MV_Subrect_Base_Y},
+
+		{NVSDK_NGX_Parameter_DLSS_Input_Translucency_SubrectBase_X, NvParameter::DLSS_Input_Translucency_Subrect_Base_X},
+		{NVSDK_NGX_Parameter_DLSS_Input_Translucency_SubrectBase_Y, NvParameter::DLSS_Input_Translucency_Subrect_Base_Y},
+
+		{NVSDK_NGX_Parameter_DLSS_Input_Bias_Current_Color_SubrectBase_X, NvParameter::DLSS_Input_Bias_Current_Color_SubrectBase_X},
+		{NVSDK_NGX_Parameter_DLSS_Input_Bias_Current_Color_SubrectBase_Y, NvParameter::DLSS_Input_Bias_Current_Color_SubrectBase_Y},
+
+		{NVSDK_NGX_Parameter_DLSS_Output_Subrect_Base_X, NvParameter::DLSS_Output_Subrect_Base_X},
+		{NVSDK_NGX_Parameter_DLSS_Output_Subrect_Base_Y, NvParameter::DLSS_Output_Subrect_Base_Y},
+
 		{NVSDK_NGX_Parameter_DLSS_Get_Dynamic_Max_Render_Width, NvParameter::DLSS_Get_Dynamic_Max_Render_Width},
 		{NVSDK_NGX_Parameter_DLSS_Get_Dynamic_Max_Render_Height, NvParameter::DLSS_Get_Dynamic_Max_Render_Height},
+
 		{NVSDK_NGX_Parameter_DLSS_Get_Dynamic_Min_Render_Width, NvParameter::DLSS_Get_Dynamic_Min_Render_Width},
 		{NVSDK_NGX_Parameter_DLSS_Get_Dynamic_Min_Render_Height, NvParameter::DLSS_Get_Dynamic_Min_Render_Height},
+
+		{NVSDK_NGX_Parameter_DLSS_Indicator_Invert_X_Axis, NvParameter::DLSS_Indicator_Invert_X_Axis},
+		{NVSDK_NGX_Parameter_DLSS_Indicator_Invert_Y_Axis, NvParameter::DLSS_Indicator_Invert_Y_Axis},
+
+		{NVSDK_NGX_Parameter_DLSS_Pre_Exposure, NvParameter::Pre_Exposure},
+		{NVSDK_NGX_Parameter_DLSS_Exposure_Scale, NvParameter::Exposure_Scale},
+
 		{NVSDK_NGX_Parameter_Sharpness, NvParameter::Sharpness},
 
 		{NVSDK_NGX_Parameter_DLSSOptimalSettingsCallback, NvParameter::DLSSOptimalSettingsCallback},
@@ -203,6 +230,31 @@ CyberFSR::Util::NvParameter CyberFSR::Util::NvParameterToEnum(const char* name)
 		{NVSDK_NGX_Parameter_TransparencyMask, NvParameter::TransparencyMask},
 		{NVSDK_NGX_Parameter_ExposureTexture, NvParameter::ExposureTexture},
 		{NVSDK_NGX_Parameter_DLSS_Input_Bias_Current_Color_Mask, NvParameter::DLSS_Input_Bias_Current_Color_Mask},
+		{NVSDK_NGX_Parameter_GBuffer_Albedo, NvParameter::GBuffer_Albedo},
+		{NVSDK_NGX_Parameter_GBuffer_Roughness, NvParameter::GBuffer_Roughness},
+		{NVSDK_NGX_Parameter_GBuffer_Metallic, NvParameter::GBuffer_Metallic},
+		{NVSDK_NGX_Parameter_GBuffer_Specular, NvParameter::GBuffer_Specular},
+		{NVSDK_NGX_Parameter_GBuffer_Normals, NvParameter::GBuffer_Normals},
+		{NVSDK_NGX_Parameter_GBuffer_Subsurface, NvParameter::GBuffer_Subsurface},
+		{NVSDK_NGX_Parameter_GBuffer_ShadingModelId, NvParameter::GBuffer_ShadingModelId},
+		{NVSDK_NGX_Parameter_GBuffer_MaterialId, NvParameter::GBuffer_MaterialId},
+		{NVSDK_NGX_Parameter_GBuffer_Atrrib_8, NvParameter::GBuffer_Attrib_8},
+		{NVSDK_NGX_Parameter_GBuffer_Atrrib_9, NvParameter::GBuffer_Attrib_9},
+		{NVSDK_NGX_Parameter_GBuffer_Atrrib_10, NvParameter::GBuffer_Attrib_10},
+		{NVSDK_NGX_Parameter_GBuffer_Atrrib_11, NvParameter::GBuffer_Attrib_11},
+		{NVSDK_NGX_Parameter_GBuffer_Atrrib_12, NvParameter::GBuffer_Attrib_12},
+		{NVSDK_NGX_Parameter_GBuffer_Atrrib_13, NvParameter::GBuffer_Attrib_13},
+		{NVSDK_NGX_Parameter_GBuffer_Atrrib_14, NvParameter::GBuffer_Attrib_14},
+		{NVSDK_NGX_Parameter_GBuffer_Atrrib_15, NvParameter::GBuffer_Attrib_15},
+		{NVSDK_NGX_Parameter_MotionVectors3D, NvParameter::MotionVectors3D},
+		{NVSDK_NGX_Parameter_IsParticleMask, NvParameter::IsParticleMask},
+		{NVSDK_NGX_Parameter_AnimatedTextureMask, NvParameter::AnimatedTextureMask},
+		{NVSDK_NGX_Parameter_DepthHighRes, NvParameter::DepthHighRes},
+		{NVSDK_NGX_Parameter_Position_ViewSpace, NvParameter::Position_ViewSpace},
+		{NVSDK_NGX_Parameter_RayTracingHitDistance, NvParameter::RayTracingHitDistance},
+		{NVSDK_NGX_Parameter_MotionVectorsReflection, NvParameter::MotionVectorsReflection},
+
+		{NVSDK_NGX_Parameter_TonemapperType, NvParameter::TonemapperType},
 
 		{NVSDK_NGX_Parameter_DLSS_Pre_Exposure, NvParameter::Pre_Exposure},
 		{NVSDK_NGX_Parameter_DLSS_Exposure_Scale, NvParameter::Exposure_Scale},
@@ -224,4 +276,63 @@ CyberFSR::Util::NvParameter CyberFSR::Util::NvParameterToEnum(const char* name)
 
 	auto output = NvParamTranslation[name];
 	return output;
+}
+
+
+void CyberFSR::Util::FFXErrorCheck(FfxErrorCode errorCode)
+{
+	switch (errorCode)
+	{
+	case FFX_OK:
+		break;
+	case FFX_ERROR_INVALID_POINTER:
+		CyberFSR::BadThingHappened();
+		break;
+	case FFX_ERROR_INVALID_ALIGNMENT:
+		CyberFSR::BadThingHappened();
+		break;
+	case FFX_ERROR_INVALID_SIZE:
+		CyberFSR::BadThingHappened();
+		break;
+	case FFX_EOF:
+		CyberFSR::BadThingHappened();
+		break;
+	case FFX_ERROR_INVALID_PATH:
+		CyberFSR::BadThingHappened();
+		break;
+	case FFX_ERROR_EOF:
+		CyberFSR::BadThingHappened();
+		break;
+	case FFX_ERROR_MALFORMED_DATA:
+		CyberFSR::BadThingHappened();
+		break;
+	case FFX_ERROR_OUT_OF_MEMORY:
+		CyberFSR::BadThingHappened();
+		break;
+	case FFX_ERROR_INCOMPLETE_INTERFACE:
+		CyberFSR::BadThingHappened();
+		break;
+	case FFX_ERROR_INVALID_ENUM:
+		CyberFSR::BadThingHappened();
+		break;
+	case FFX_ERROR_INVALID_ARGUMENT:
+		CyberFSR::BadThingHappened();
+		break;
+	case FFX_ERROR_OUT_OF_RANGE:
+		CyberFSR::BadThingHappened();
+		break;
+	case FFX_ERROR_NULL_DEVICE:
+		CyberFSR::BadThingHappened();
+		break;
+	case FFX_ERROR_BACKEND_API_ERROR:
+		CyberFSR::BadThingHappened();
+		break;
+	case FFX_ERROR_INSUFFICIENT_MEMORY:
+		CyberFSR::BadThingHappened();
+		break;
+	default:
+		CyberFSR::BadThingHappened();
+		break;
+	}
+	//FFX_ASSERT(errorCode == FFX_OK);
 }

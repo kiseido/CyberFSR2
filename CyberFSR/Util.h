@@ -20,6 +20,7 @@ namespace CyberFSR
 		UpscalingProfile UpscalingProfileMap(const char* name);
 		ViewMethod ViewMethodMap(const char* name);
 		SharpnessRangeModifier SharpnessRangeModifierMap(const char* name);
+		void FFXErrorCheck(FfxErrorCode errorCode);
 	}
 
 	inline void ThrowIfFailed(HRESULT hr)
@@ -49,6 +50,7 @@ namespace CyberFSR
 
 		return (Error_Resilient_Boolean) output;
 	};
+
 
 }
 

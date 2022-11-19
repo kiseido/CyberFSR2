@@ -57,6 +57,15 @@ namespace CyberFSR
 			}
 		}
 			break;
+		case Util::NvParameter::FrameTimeDeltaInMsec:
+			FrameTimeDeltaInMsec = InValue;
+			break;
+		case Util::NvParameter::Pre_Exposure:
+			PreExposure = InValue;
+			break;
+		case Util::NvParameter::Exposure_Scale:
+			ExposureScale = InValue;
+			break;
 		default:
 			BadThingHappened();
 			break;
@@ -97,6 +106,42 @@ namespace CyberFSR
 		case Util::NvParameter::DLSS_Render_Subrect_Dimensions_Height:
 			Render_Subrect_Dimensions_Height = InValue;
 			break;
+		case Util::NvParameter::DLSS_Input_Color_Subrect_Base_X:
+			DLSS_Input_Color_Subrect_Base_X = InValue;
+			break;
+		case Util::NvParameter::DLSS_Input_Color_Subrect_Base_Y:
+			DLSS_Input_Color_Subrect_Base_Y = InValue;
+			break;
+		case Util::NvParameter::DLSS_Input_Depth_Subrect_Base_X:
+			DLSS_Input_Depth_Subrect_Base_X = InValue;
+			break;
+		case Util::NvParameter::DLSS_Input_Depth_Subrect_Base_Y:
+			DLSS_Input_Depth_Subrect_Base_Y = InValue;
+			break;
+		case Util::NvParameter::DLSS_Input_MV_Subrect_Base_X:
+			DLSS_Input_MV_Subrect_Base_X = InValue;
+			break;
+		case Util::NvParameter::DLSS_Input_MV_Subrect_Base_Y:
+			DLSS_Input_MV_Subrect_Base_Y = InValue;
+			break;
+		case Util::NvParameter::DLSS_Input_Translucency_Subrect_Base_X:
+			DLSS_Input_Translucency_Subrect_Base_X = InValue;
+			break;
+		case Util::NvParameter::DLSS_Input_Translucency_Subrect_Base_Y:
+			DLSS_Input_Translucency_Subrect_Base_Y = InValue;
+			break;
+		case Util::NvParameter::DLSS_Output_Subrect_Base_X:
+			DLSS_Output_Subrect_Base_X = InValue;
+			break;
+		case Util::NvParameter::DLSS_Output_Subrect_Base_Y:
+			DLSS_Output_Subrect_Base_Y = InValue;
+			break;
+		case Util::NvParameter::DLSS_Input_Bias_Current_Color_SubrectBase_X:
+			DLSS_Input_Bias_Current_Color_SubrectBase_X = InValue;
+			break;
+		case Util::NvParameter::DLSS_Input_Bias_Current_Color_SubrectBase_Y:
+			DLSS_Input_Bias_Current_Color_SubrectBase_Y = InValue;
+			break;
 		case Util::NvParameter::OutWidth:
 			OutWidth = InValue;
 			break;
@@ -108,6 +153,9 @@ namespace CyberFSR
 			break;
 		case Util::NvParameter::VisibilityNodeMask:
 			VisibilityNodeMask = InValue;
+			break;
+		case Util::NvParameter::TonemapperType:
+			TonemapperType = InValue;
 			break;
 		default:
 			BadThingHappened();
@@ -143,6 +191,15 @@ namespace CyberFSR
 			//Reserved = InValue & NVSDK_NGX_DLSS_Feature_Flags::NVSDK_NGX_DLSS_Feature_Flags_Reserved_0;
 			EnableSharpening = InValue & NVSDK_NGX_DLSS_Feature_Flags::NVSDK_NGX_DLSS_Feature_Flags_DoSharpening;
 			AutoExposure = InValue & NVSDK_NGX_DLSS_Feature_Flags::NVSDK_NGX_DLSS_Feature_Flags_AutoExposure;
+			break;
+		case Util::NvParameter::DLSS_Enable_Output_Subrects:
+			EnableOutputSubrects = InValue;
+			break;		
+		case Util::NvParameter::DLSS_Indicator_Invert_Y_Axis:
+			DLSS_Indicator_Invert_Y_Axis = InValue;
+			break;
+		case Util::NvParameter::DLSS_Indicator_Invert_X_Axis:
+			DLSS_Indicator_Invert_X_Axis = InValue;
 			break;
 		default:
 			BadThingHappened();
@@ -197,7 +254,7 @@ namespace CyberFSR
 		switch (inParameter)
 		{
 		case Util::NvParameter::DLSS_Input_Bias_Current_Color_Mask:
-			SetNVarWithName(InputBiasCurrentColorMask, L"Color");
+			SetNVarWithName(InputBiasCurrentColorMask, L"DLSS.Input.Bias.Current.Color.Mask");
 			break;
 		case Util::NvParameter::Color:
 			SetNVarWithName(Color, L"Color");
@@ -216,6 +273,75 @@ namespace CyberFSR
 			break;
 		case Util::NvParameter::ExposureTexture:
 			SetNVarWithName(ExposureTexture, L"ExposureTexture");
+			break;
+		case Util::NvParameter::GBuffer_Albedo:
+			SetNVarWithName(AlbedoGBuffer, L"GBuffer.Albedo");
+			break;
+		case Util::NvParameter::GBuffer_Roughness:
+			SetNVarWithName(RoughnessGBuffer, L"GBuffer.Roughness");
+			break;
+		case Util::NvParameter::GBuffer_Metallic :
+			SetNVarWithName(MetallicGBuffer, L"GBuffer.Metallic");
+			break;
+		case Util::NvParameter::GBuffer_Specular:
+			SetNVarWithName(SpecularGBuffer, L"GBuffer.Specular");
+			break;
+		case Util::NvParameter::GBuffer_Normals:
+			SetNVarWithName(NormalsGBuffer, L"GBuffer.Normals");
+			break;
+		case Util::NvParameter::GBuffer_Subsurface:
+			SetNVarWithName(SubsurfaceGBuffer, L"GBuffer.Subsurface");
+			break;		
+		case Util::NvParameter::GBuffer_ShadingModelId:
+			SetNVarWithName(ShadingModelIdGBuffer, L"GBuffer.ShadingModelId");
+			break;
+		case Util::NvParameter::GBuffer_MaterialId:
+			SetNVarWithName(MaterialIdGBuffer, L"GBuffer.MaterialId");
+			break;
+		case Util::NvParameter::GBuffer_Attrib_8:
+			SetNVarWithName(Attrib8GBuffer, L"GBuffer.Attrib.8");
+			break;
+		case Util::NvParameter::GBuffer_Attrib_9:
+			SetNVarWithName(Attrib9GBuffer, L"GBuffer.Attrib.9");
+			break;
+		case Util::NvParameter::GBuffer_Attrib_10:
+			SetNVarWithName(Attrib10GBuffer, L"GBuffer.Attrib.10");
+			break;
+		case Util::NvParameter::GBuffer_Attrib_11:
+			SetNVarWithName(Attrib11GBuffer, L"GBuffer.Attrib.11");
+			break;
+		case Util::NvParameter::GBuffer_Attrib_12:
+			SetNVarWithName(Attrib12GBuffer, L"GBuffer.Attrib.12");
+			break;
+		case Util::NvParameter::GBuffer_Attrib_13:
+			SetNVarWithName(Attrib13GBuffer, L"GBuffer.Attrib.13");
+			break;
+		case Util::NvParameter::GBuffer_Attrib_14:
+			SetNVarWithName(Attrib14GBuffer, L"GBuffer.Attrib.14");
+			break;
+		case Util::NvParameter::GBuffer_Attrib_15:
+			SetNVarWithName(Attrib15GBuffer, L"GBuffer.Attrib.15");
+			break;
+		case Util::NvParameter::MotionVectors3D:
+			SetNVarWithName(MotionVectors3D, L"MotionVectors3D");
+			break;
+		case Util::NvParameter::IsParticleMask:
+			SetNVarWithName(IsParticleMask, L"IsParticleMask");
+			break;
+		case Util::NvParameter::AnimatedTextureMask:
+			SetNVarWithName(AnimatedTextureMask, L"AnimatedTextureMask");
+			break;
+		case Util::NvParameter::DepthHighRes:
+			SetNVarWithName(DepthHighRes, L"DepthHighRes");
+			break;
+		case Util::NvParameter::Position_ViewSpace:
+			SetNVarWithName(Position_ViewSpace, L"Position.ViewSpace");
+			break;
+		case Util::NvParameter::RayTracingHitDistance:
+			SetNVarWithName(RayTracingHitDistance, L"RayTracingHitDistance");
+			break;
+		case Util::NvParameter::MotionVectorsReflection:
+			SetNVarWithName(MotionVectorsReflection, L"MotionVectorsReflection");
 			break;
 		default:
 			BadThingHappened();
@@ -602,28 +728,7 @@ namespace CyberFSR
 			if (fsrQualityMode != NO_VALUEi)
 			{
 				const FfxErrorCode err = ffxFsr2GetRenderResolutionFromQualityMode(&output.first, &output.second, InNvParameter.Width, InNvParameter.Height, fsrQualityMode);
-#ifdef _DEBUG
-				switch (err)
-				{
-				case FFX_OK:
-					// all good!
-				BadThingHappened();
-					break;
-				case FFX_ERROR_INVALID_POINTER:
-					//printf("EvaluateRenderScale error: FFX_ERROR_INVALID_POINTER");
-				BadThingHappened();
-					break;
-				case FFX_ERROR_INVALID_ENUM:
-					//printf("EvaluateRenderScale error: FFX_ERROR_INVALID_ENUM");
-				BadThingHappened();
-					break;
-				default:
-					//printf("EvaluateRenderScale error: default");
-					// bad crap!
-				BadThingHappened();
-					break;
-				}
-#endif
+				CyberFSR::Util::FFXErrorCheck(err);
 			}
 		}
 		else
@@ -659,7 +764,8 @@ namespace CyberFSR
 	{
 		const std::shared_ptr<Config> config = CyberFsrContext::instance()->MyConfig;
 
-		const ScreenDimensions ScreenOrWindowDimension = {Width, Height};
+		//if(Width && Height && !(CyberFsrContext::FinalDisplayResolution.first && CyberFsrContext::FinalDisplayResolution.second) )
+			CyberFsrContext::FinalDisplayResolution = {Width, Height};
 
 		auto dimensions = Switcher(config, *this, config->UpscalerProfile);
 
@@ -667,36 +773,43 @@ namespace CyberFSR
 			static const float defaultRatioVertical = 2.0f;
 			static const float defaultRatioHorizontal = 2.0f;
 
-			dimensions = CalcSame(ScreenOrWindowDimension.first, ScreenOrWindowDimension.second, defaultRatioVertical);
+			dimensions = CalcSame(CyberFsrContext::FinalDisplayResolution.first, CyberFsrContext::FinalDisplayResolution.second, defaultRatioVertical);
 			//CalcDifferent(dimensions.Width, dimensions.Height, defaultRatioVertical, defaultRatioHorizontal);
 		}
 		//Width = ScreenOrWindowDimension.first;
 		//Height = ScreenOrWindowDimension.second;
-		//Width = dimensions.first;
-		//Height = dimensions.second;
-
-		//OutWidth = ScreenOrWindowDimension.first;
-		//OutHeight = ScreenOrWindowDimension.second;
+		Width = dimensions.first;
+		Height = dimensions.second;
 
 		OutWidth = dimensions.first;
 		OutHeight = dimensions.second;
 
-		Max_Render_Width = dimensions.first;
-		Max_Render_Height = dimensions.second;
+		//OutWidth = dimensions.first;
+		//OutHeight = dimensions.second;
+
 		//Max_Render_Width = dimensions.first;
 		//Max_Render_Height = dimensions.second;
+		//Max_Render_Width = dimensions.first;
+		//Max_Render_Height = dimensions.second;
+		Max_Render_Width = dimensions.first * 1.42;
+		Max_Render_Height = dimensions.second * 1.42;
 
 		//RenderWidth = Width;
 		//RenderHeight = Height;
 
-		Min_Render_Width = ScreenOrWindowDimension.first / 8;
-		Min_Render_Height = ScreenOrWindowDimension.second / 8;
+		Min_Render_Width = dimensions.first / 4;
+		Min_Render_Height = dimensions.second / 4;
 
-		Render_Subrect_Dimensions_Width = 16;
-		Render_Subrect_Dimensions_Height = 16;
+		Render_Subrect_Dimensions_Width = 8;
+		Render_Subrect_Dimensions_Height = 8;
 
+		EnableTexture1DUsage = true;
 		EnableDynamicResolution = true;
-		FrameTimeDeltaInMsec = (double) 1.0f / 60.0f;
+		//FrameTimeDeltaInMsec = (double) 1.0f / 60.0f;
+
+		//SuperSampling_Available = true;
+		LowRes = false;
+		RTXValue = NVSDK_NGX_RTX_Value_On;
 	}
 
 
@@ -709,15 +822,45 @@ namespace CyberFSR
 
 	NvParameter* NvParameter::GetFreshParameter()
 	{
+		static bool defaultsSet = false;
+		static bool defaultEnableTexture1DUsage;
+		static bool defaultSuperSampling_Available;
+		static bool defaultEnableDynamicResolution;
+		static bool defaultFreeMemOnReleaseFeature;
+		static bool defaultLowRes;
+		static int defaultOptLevel;
+
+		if (!defaultsSet)
+		{
+			defaultsSet = true;
+			auto defaultVal = GetFreshCapabilityParameter();
+			defaultEnableTexture1DUsage = defaultVal->EnableTexture1DUsage;
+			defaultSuperSampling_Available = defaultVal->EnableTexture1DUsage;
+			defaultEnableDynamicResolution = defaultVal->EnableDynamicResolution;
+			defaultFreeMemOnReleaseFeature = defaultVal->FreeMemOnReleaseFeature;
+			defaultOptLevel = defaultVal->OptLevel;
+			defaultLowRes = defaultVal->LowRes;
+			RecycleParameter(defaultVal);
+		}
+
+		Config& config = *CyberFsrContext::instance()->MyConfig;
 		NvParameter* output = nullptr;
 
 		for (int i = 0; i < ParameterRepository::Size && output == nullptr; i++) {
 			const Error_Resilient_Boolean sanitizedBool = Sanitize_Bool(ParameterRepository::Parameter_In_Use_Bool[i]);
 			switch (sanitizedBool)
 			{
-			case Error_Resilient_Boolean::ER_FALSE:
+			case Error_Resilient_Boolean::ER_FALSE: 
+			{
 				ParameterRepository::Parameter_In_Use_Bool[i] = Error_Resilient_Boolean::ER_TRUE;
 				output = &ParameterRepository::Parameters[i];
+				output->EnableTexture1DUsage = defaultEnableTexture1DUsage;
+				output->SuperSampling_Available = defaultEnableTexture1DUsage;
+				output->EnableDynamicResolution = defaultEnableDynamicResolution;
+				output->FreeMemOnReleaseFeature = defaultFreeMemOnReleaseFeature;
+				output->OptLevel = defaultOptLevel;
+				output->LowRes = defaultLowRes;
+			}
 				break;
 			case Error_Resilient_Boolean::ER_TRUE:
 				BadThingHappened();
@@ -744,34 +887,39 @@ namespace CyberFSR
 	}
 	
 	NvParameter* NvParameter::GetFreshCapabilityParameter() {
-		const std::shared_ptr<Config> config = CyberFsrContext::instance()->MyConfig;
+		Config& config = *CyberFsrContext::instance()->MyConfig;
 
-		NvParameter* const output = GetFreshParameter();
+		NvParameter* output = GetFreshParameter();
+
 		if (output != nullptr)
 		{
-			output->RTXValue = NVSDK_NGX_RTX_Value_On;
-			if(output->Width && output->Height)
-				output->EvaluateRenderScale();
+			NvParameter& outputParam = *output;
+			outputParam.RTXValue = NVSDK_NGX_RTX_Value_On;
+
+			if(CyberFSR::CyberFsrContext::FinalDisplayResolution.first && CyberFSR::CyberFsrContext::FinalDisplayResolution.second)
+				outputParam.EvaluateRenderScale();
 			else
 			{
-				output->OutWidth = 3840;
-				output->OutHeight = 2160;
-				output->Width = 1280;
-				output->Height = 720;
-				output->Max_Render_Width = 1920;
-				output->Max_Render_Height = 1080;
-				output->Min_Render_Width = 320;
-				output->Min_Render_Height = 180;
-				//output->RenderWidth = output->Width;
-				//output->RenderHeight = output->Height;
+				outputParam.OutWidth = 3840;
+				outputParam.OutHeight = 2160;
+				outputParam.Width = 320;
+				outputParam.Height = 180;
+				outputParam.Max_Render_Width = 1920;
+				outputParam.Max_Render_Height = 1080;
+				outputParam.Min_Render_Width = 320;
+				outputParam.Min_Render_Height = 180;
+				//output.RenderWidth = output.Width;
+				//output.RenderHeight = output.Height;
 			}
-			output->EnableSharpening = (*config).EnableSharpening.value_or(true);
-			output->AutoExposure = true;
-			output->Hdr = (*config).HDR.value_or(false);
-			output->LowRes = false;
-			output->OptLevel = NVSDK_NGX_OPT_LEVEL_RELEASE;
-			output->IsDevSnippetBranch = 0;
-			output->SuperSampling_Available = true;
+			outputParam.EnableSharpening = config.EnableSharpening.value_or(false);
+			outputParam.AutoExposure = config.AutoExposure.value_or(true);
+			outputParam.Hdr = config.HDR.value_or(true);
+			outputParam.LowRes = !config.DisplayResolution.value_or(true);
+			outputParam.OptLevel = NVSDK_NGX_OPT_LEVEL_DEBUG;
+			outputParam.IsDevSnippetBranch = 0;
+			outputParam.SuperSampling_Available = true;
+			outputParam.EnableDynamicResolution = false;
+			outputParam.FreeMemOnReleaseFeature = true;
 		}
 		return output;
 	}
@@ -806,6 +954,7 @@ namespace CyberFSR
 		{
 			NvParameter& params = *(NvParameter*)InParams;
 			params.EvaluateRenderScale();
+
 			return NVSDK_NGX_Result_Success;
 		}
 		else

@@ -55,6 +55,7 @@ namespace CyberFSR
 			static std::shared_ptr<CyberFsrContext> INSTANCE{ new CyberFsrContext() };
 			return INSTANCE;
 		}
+		static ScreenDimensions FinalDisplayResolution;
 	};
 
 	class FeatureContext
@@ -69,7 +70,7 @@ namespace CyberFSR
 		std::vector<unsigned char> ScratchBuffer;
 
 		unsigned int Width{}, Height{}, RenderWidth{}, RenderHeight{};
-		NVSDK_NGX_PerfQuality_Value PerfQualityValue = NVSDK_NGX_PerfQuality_Value_Balanced;
+		NVSDK_NGX_PerfQuality_Value PerfQualityValue = (NVSDK_NGX_PerfQuality_Value) - 1;
 		float Sharpness = 1.0f;
 		float MVScaleX{}, MVScaleY{};
 		float JitterOffsetX{}, JitterOffsetY{};

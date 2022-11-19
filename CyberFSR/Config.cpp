@@ -76,11 +76,11 @@ namespace CyberFSR
 
 			// Quality Overrides
 			Resolution_Auto = readScreenDimensions("StaticResolution", "Auto").value_or(std::pair{ 0,0 });
-			Resolution_UltraQuality = readScreenDimensions("StaticResolution", "UltraQuality").value_or(std::pair{ 2560,1440 });
-			Resolution_Quality = readScreenDimensions("StaticResolution", "Quality").value_or(std::pair{ 1920,1080 });
-			Resolution_Balanced = readScreenDimensions("StaticResolution", "Balanced").value_or(std::pair{ 1600,900 });
-			Resolution_Performance = readScreenDimensions("StaticResolution", "Performance").value_or(std::pair{ 1280,720 });
-			Resolution_UltraPerformance = readScreenDimensions("StaticResolution", "UltraPerformance").value_or(std::pair{ 800,450 });
+			Resolution_UltraQuality = readScreenDimensions("StaticResolution", "UltraQuality").value_or(std::pair{ 1600,900 });
+			Resolution_Quality = readScreenDimensions("StaticResolution", "Quality").value_or(std::pair{ 1312,738 });
+			Resolution_Balanced = readScreenDimensions("StaticResolution", "Balanced").value_or(std::pair{ 1024,576 });
+			Resolution_Performance = readScreenDimensions("StaticResolution", "Performance").value_or(std::pair{ 736,495 });
+			Resolution_UltraPerformance = readScreenDimensions("StaticResolution", "UltraPerformance").value_or(std::pair{ 448,252 });
 
 			// Quality Overrides
 			FPSTarget_Auto = readScreenDimensions("FPSTarget", "UltraQuality").value_or(std::pair{ 0,0 });

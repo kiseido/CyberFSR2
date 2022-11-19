@@ -32,22 +32,24 @@ namespace CyberFSR
 		static NvParameter* GetFreshCapabilityParameter();
 		static void RecycleParameter(NvParameter*);
 
-		unsigned int Width{}, Height{}, OutWidth{}, OutHeight{}, Max_Render_Width{}, Max_Render_Height{}, Min_Render_Width{}, Min_Render_Height{}, Render_Subrect_Dimensions_Width{}, Render_Subrect_Dimensions_Height{};
+		unsigned int Width{}, Height{}, OutWidth{}, OutHeight{}, Max_Render_Width{}, Max_Render_Height{}, Min_Render_Width{}, Min_Render_Height{}, Render_Subrect_Dimensions_Width{}, Render_Subrect_Dimensions_Height{}, DLSS_Input_Color_Subrect_Base_X{}, DLSS_Input_Color_Subrect_Base_Y{}, DLSS_Input_Depth_Subrect_Base_X{}, DLSS_Input_Depth_Subrect_Base_Y{}, DLSS_Input_MV_Subrect_Base_X{}, DLSS_Input_MV_Subrect_Base_Y{}, DLSS_Input_Translucency_Subrect_Base_X{}, DLSS_Input_Translucency_Subrect_Base_Y{}, DLSS_Output_Subrect_Base_X{}, DLSS_Output_Subrect_Base_Y{}, DLSS_Input_Bias_Current_Color_SubrectBase_X{}, DLSS_Input_Bias_Current_Color_SubrectBase_Y{};
 
-		NVSDK_NGX_PerfQuality_Value PerfQualityValue = NVSDK_NGX_PerfQuality_Value_Balanced;
+		NVSDK_NGX_PerfQuality_Value PerfQualityValue = (NVSDK_NGX_PerfQuality_Value)-1;
 		int CreationNodeMask{}, VisibilityNodeMask{}, OptLevel = 0, IsDevSnippetBranch = 0;
 		float Sharpness = 1.0f;
 		bool ResetRender{};
 		float MVScaleX = 1.0, MVScaleY = 1.0;
 		float JitterOffsetX{}, JitterOffsetY{};
+		unsigned int TonemapperType{};
 
 		long long SizeInBytes{};
 
-		bool RTXValue{}, FreeMemOnReleaseFeature{}, DepthInverted{}, AutoExposure{}, Hdr{}, EnableSharpening{}, JitterMotion{}, LowRes{}, EnableDynamicResolution{}, EnableTexture1DUsage{false}, SuperSampling_Available{};
+		bool RTXValue{}, FreeMemOnReleaseFeature{}, DepthInverted{}, AutoExposure{}, Hdr{}, EnableSharpening{}, JitterMotion{}, LowRes{}, EnableDynamicResolution{}, EnableTexture1DUsage{ false }, SuperSampling_Available{}, EnableOutputSubrects{}, DLSS_Indicator_Invert_X_Axis{}, DLSS_Indicator_Invert_Y_Axis{};
 
 		float FrameTimeDeltaInMsec = 0.0f;
 
-		float preExposure{};
+		float PreExposure{}, ExposureScale{};
+
 
 		//external Resources
 		void* InputBiasCurrentColorMask{};
@@ -57,6 +59,29 @@ namespace CyberFSR
 		void* Output{};
 		void* TransparencyMask{};
 		void* ExposureTexture{};
+		void* AlbedoGBuffer{};
+		void* RoughnessGBuffer{};
+		void* MetallicGBuffer{};
+		void* SpecularGBuffer{};
+		void* NormalsGBuffer{};
+		void* SubsurfaceGBuffer{};
+		void* ShadingModelIdGBuffer{};
+		void* MaterialIdGBuffer{};
+		void* Attrib8GBuffer{};
+		void* Attrib9GBuffer{};
+		void* Attrib10GBuffer{};
+		void* Attrib11GBuffer{};
+		void* Attrib12GBuffer{};
+		void* Attrib13GBuffer{};
+		void* Attrib14GBuffer{};
+		void* Attrib15GBuffer{};
+		void* MotionVectors3D{};
+		void* IsParticleMask{};
+		void* AnimatedTextureMask{};
+		void* DepthHighRes{};
+		void* Position_ViewSpace{};
+		void* RayTracingHitDistance{};
+		void* MotionVectorsReflection{};
 
 		virtual void Set(const char* InName, unsigned long long InValue) override;
 		virtual void Set(const char* InName, float InValue) override;
