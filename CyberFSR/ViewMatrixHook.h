@@ -3,6 +3,8 @@
 
 namespace CyberFSR
 {
+	typedef float ViewMatrixArray[12];
+
 	class ViewMatrixHook
 	{
 	public:
@@ -13,6 +15,7 @@ namespace CyberFSR
 		class Configured;
 		class Cyberpunk2077;
 		class RDR2;
+		class HorizonZeroDawn;
 
 		static std::unique_ptr<ViewMatrixHook> Create(const Config& config);
 	};
@@ -59,6 +62,26 @@ namespace CyberFSR
 	{
 	public:
 		RDR2();
+
+		float GetFov();
+		float GetFarPlane();
+		float GetNearPlane();
+
+	private:
+		struct CameraParams
+		{
+			float Fov;
+			float NearPlane;
+			float FarPlane;
+		};
+
+		CameraParams* camParams = nullptr;
+	};
+
+	class ViewMatrixHook::HorizonZeroDawn : public ViewMatrixHook
+	{
+	public:
+		HorizonZeroDawn();
 
 		float GetFov();
 		float GetFarPlane();

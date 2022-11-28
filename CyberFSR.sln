@@ -13,6 +13,10 @@ Global
 		DebugCyberpunk2077|x86 = DebugCyberpunk2077|x86
 		DebugHorizonZeroDawn|x64 = DebugHorizonZeroDawn|x64
 		DebugHorizonZeroDawn|x86 = DebugHorizonZeroDawn|x86
+		DebugTheAscent|x64 = DebugTheAscent|x64
+		DebugTheAscent|x86 = DebugTheAscent|x86
+		DebugTombRaiderShadowOf|x64 = DebugTombRaiderShadowOf|x64
+		DebugTombRaiderShadowOf|x86 = DebugTombRaiderShadowOf|x86
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
@@ -29,6 +33,14 @@ Global
 		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.DebugHorizonZeroDawn|x64.Build.0 = DebugHorizonZeroDawn|x64
 		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.DebugHorizonZeroDawn|x86.ActiveCfg = DebugHorizonZeroDawn|Win32
 		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.DebugHorizonZeroDawn|x86.Build.0 = DebugHorizonZeroDawn|Win32
+		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.DebugTheAscent|x64.ActiveCfg = DebugTheAscent|x64
+		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.DebugTheAscent|x64.Build.0 = DebugTheAscent|x64
+		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.DebugTheAscent|x86.ActiveCfg = DebugTheAscent|Win32
+		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.DebugTheAscent|x86.Build.0 = DebugTheAscent|Win32
+		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.DebugTombRaiderShadowOf|x64.ActiveCfg = DebugTombRaiderShadowOf|x64
+		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.DebugTombRaiderShadowOf|x64.Build.0 = DebugTombRaiderShadowOf|x64
+		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.DebugTombRaiderShadowOf|x86.ActiveCfg = DebugTombRaiderShadowOf|Win32
+		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.DebugTombRaiderShadowOf|x86.Build.0 = DebugTombRaiderShadowOf|Win32
 		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.Release|x64.ActiveCfg = Release|x64
 		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.Release|x64.Build.0 = Release|x64
 		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.Release|x86.ActiveCfg = Release|Win32

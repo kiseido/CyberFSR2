@@ -11,16 +11,24 @@
 // external\nvngx_dlss_sdk\include\nvsdk_ngx_defs.h
 // external\nvngx_dlss_sdk\include\nvsdk_ngx_helpers.h
 
+CyberFSR::ViewMatrixArray const* internal;
 
-NVSDK_NGX_API NVSDK_NGX_Result NVSDK_NGX_D3D12_Init_Ext(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath, ID3D12Device* InDevice, NVSDK_NGX_Version InSDKVersion, const NVSDK_NGX_FeatureCommonInfo* APointer, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo)
+NVSDK_NGX_API NVSDK_NGX_Result NVSDK_NGX_D3D12_Init_Ext(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath, ID3D12Device* InDevice, NVSDK_NGX_Version InSDKVersion, const NVSDK_NGX_FeatureCommonInfo* APointer, const CyberFSR::ViewMatrixHook::Configured* unknown)
 {
 	// cyberpunk enters here
-	// cyberpunk id == 0x0000000005f83393
+	// cyberpunk id == 0x5f83393 // version 0x13
+	// horizon zero dawn id == 0x607fb07 // version 0x14
+
+	internal = ((CyberFSR::ViewMatrixArray*)APointer->InternalData);
 
 	switch (InApplicationId)
 	{
 	case 0x5f83393:
 		//cyberpunk
+
+		break;
+	case 0x607fb07:
+		//horizon zero dawn
 
 		break;
 	default:
@@ -244,198 +252,225 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_ReleaseFeature(NVSDK_NGX_Handle* InHandle)
 
 NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCmdList, const NVSDK_NGX_Handle* InFeatureHandle, const NVSDK_NGX_Parameter* InParameters, PFN_NVSDK_NGX_ProgressCallback InCallback)
 {
-	ID3D12RootSignature* orgRootSig = nullptr;
-
-	bool shouldCancel = false;
-
-	if (InCallback != nullptr)
-		InCallback(0, shouldCancel);
-
-	rootSigMutex.lock();
-	if (commandListVector.contains(InCmdList))
+	if (((CyberNvParameter*)InParameters)->SuperSampling_Available)
 	{
-		orgRootSig = commandListVector[InCmdList].first;
-	}
-	else
-	{
-		printf("Cant find the RootSig\n");
-	}
-	rootSigMutex.unlock();
+		ID3D12RootSignature* orgRootSig = nullptr;
 
-	if (InCallback != nullptr)
-		InCallback(1, shouldCancel);
+		bool shouldCancel = false;
 
-	ID3D12Device* device;
-	InCmdList->GetDevice(IID_PPV_ARGS(&device));
-	auto instance = CyberContext::instance();
-	auto config = instance->MyConfig;
-	auto deviceContext = CyberContext::instance()->Contexts[InFeatureHandle->Id].get();
+		if (InCallback != nullptr)
+			InCallback(0, shouldCancel);
 
-	if (InCallback != nullptr)
-		InCallback(5, shouldCancel);
-
-	if (orgRootSig)
-	{
-		const auto inParams = dynamic_cast<const CyberNvParameter*>(InParameters);
-
-		auto color = (ID3D12Resource*)inParams->Color;
-		auto depth = (ID3D12Resource*)inParams->Depth;
-		auto motionVectors = (ID3D12Resource*)inParams->MotionVectors;
-		auto exposureTexture = (ID3D12Resource*)inParams->ExposureTexture;
-		auto inputBiasColorMask = (ID3D12Resource*)inParams->InputBiasCurrentColorMask;
-		auto transparencyMask = (ID3D12Resource*)inParams->TransparencyMask;
-		auto output = (ID3D12Resource*)inParams->Output;
-
-
-		auto* fsrContext = &deviceContext->FsrContext;
-
-		FfxFsr2DispatchDescription dispatchParameters = {};
-		dispatchParameters.commandList = ffxGetCommandListDX12(InCmdList);
-
-		dispatchParameters.jitterOffset.x = inParams->JitterOffsetX;
-		dispatchParameters.jitterOffset.y = inParams->JitterOffsetY;
-
-		if (config->DisplayResolution.value_or(false)) 
+		rootSigMutex.lock();
+		if (commandListVector.contains(InCmdList))
 		{
-			dispatchParameters.motionVectorScale.x = (float)inParams->OutWidth;
-			dispatchParameters.motionVectorScale.y = (float)inParams->OutHeight;
+			orgRootSig = commandListVector[InCmdList].first;
 		}
-		else 
+		else
 		{
-			dispatchParameters.motionVectorScale.x = (float)inParams->MVScaleX;
-			dispatchParameters.motionVectorScale.y = (float)inParams->MVScaleY;
+			printf("Cant find the RootSig\n");
 		}
+		rootSigMutex.unlock();
 
-		dispatchParameters.reset = inParams->ResetRender;
+		if (InCallback != nullptr)
+			InCallback(1, shouldCancel);
 
-		dispatchParameters.enableSharpening = config->EnableSharpening.value_or(inParams->EnableSharpening);
-		
-		if (dispatchParameters.enableSharpening) {
+		ID3D12Device* device;
+		InCmdList->GetDevice(IID_PPV_ARGS(&device));
+		auto instance = CyberContext::instance();
+		auto config = instance->MyConfig;
+		auto deviceContext = CyberContext::instance()->Contexts[InFeatureHandle->Id].get();
 
-			if (config->Sharpness.has_value())
+		if (InCallback != nullptr)
+			InCallback(5, shouldCancel);
+
+		if (orgRootSig)
+		{
+			const auto inParams = dynamic_cast<const CyberNvParameter*>(InParameters);
+
+			auto color = (ID3D12Resource*)inParams->Color;
+			auto depth = (ID3D12Resource*)inParams->Depth;
+			auto motionVectors = (ID3D12Resource*)inParams->MotionVectors;
+			auto exposureTexture = (ID3D12Resource*)inParams->ExposureTexture;
+			auto inputBiasColorMask = (ID3D12Resource*)inParams->InputBiasCurrentColorMask;
+			auto transparencyMask = (ID3D12Resource*)inParams->TransparencyMask;
+			auto output = (ID3D12Resource*)inParams->Output;
+
+
+			auto* fsrContext = &deviceContext->FsrContext;
+
+			FfxFsr2DispatchDescription dispatchParameters = {};
+			dispatchParameters.commandList = ffxGetCommandListDX12(InCmdList);
+
+			//const float jitterX = 2.0f * inParams->JitterOffsetX / (float)inParams->MVScaleX;
+			//const float jitterY = -2.0f * inParams->JitterOffsetY / (float)inParams->MVScaleY;
+
+			dispatchParameters.jitterOffset.x = inParams->JitterOffsetX;
+			dispatchParameters.jitterOffset.y = inParams->JitterOffsetY;
+
+
+			if (config->DisplayResolution.value_or(false))
 			{
-				dispatchParameters.sharpness = config->Sharpness.value();
+				dispatchParameters.motionVectorScale.x = (float)inParams->OutWidth;
+				dispatchParameters.motionVectorScale.y = (float)inParams->OutHeight;
 			}
 			else
 			{
-				float sharpness = CyberUtil::ConvertSharpness(inParams->Sharpness, config->SharpnessRange);
-				if (sharpness > 0 && sharpness <= 1.0f) 
+				dispatchParameters.motionVectorScale.x = (float)inParams->MVScaleX;
+				dispatchParameters.motionVectorScale.y = (float)inParams->MVScaleY;
+			}
+
+			dispatchParameters.reset = inParams->ResetRender;
+
+			dispatchParameters.enableSharpening = config->EnableSharpening.value_or(inParams->EnableSharpening);
+
+			if (dispatchParameters.enableSharpening) {
+
+				if (config->Sharpness.has_value())
 				{
-					dispatchParameters.sharpness = sharpness;
+					dispatchParameters.sharpness = config->Sharpness.value();
+				}
+				else
+				{
+					float sharpness = CyberUtil::ConvertSharpness(inParams->Sharpness, config->SharpnessRange);
+					if (sharpness > 0 && sharpness <= 1.0f)
+					{
+						dispatchParameters.sharpness = sharpness;
+					}
 				}
 			}
-		}
-		if (InCallback != nullptr)
-			InCallback(20, shouldCancel);
+			if (InCallback != nullptr)
+				InCallback(20, shouldCancel);
 
 
 
-		//deltatime hax
-		double FrameTimeDeltaInMsec;
-		static double lastFrameTime;
-		double currentTime = CyberUtil::MillisecondsNow();
-		FrameTimeDeltaInMsec = (currentTime - lastFrameTime) * 1000;
-		lastFrameTime = currentTime;
+			//deltatime hax
+			double FrameTimeDeltaInMsec;
+			static double lastFrameTime;
+			double currentTime = CyberUtil::MillisecondsNow();
+			FrameTimeDeltaInMsec = (currentTime - lastFrameTime) * 1000;
+			lastFrameTime = currentTime;
 
-		//const float scalar = CyberFSR::Util::DynaRes(1.0f / 60.0f * 1000, true, FrameTimeDeltaInMsec);
+			//const float scalar = CyberFSR::Util::DynaRes(1.0f / 60.0f * 1000, true, FrameTimeDeltaInMsec);
 
-		dispatchParameters.frameTimeDelta = (FrameTimeDeltaInMsec < 1 || FrameTimeDeltaInMsec > 100) ? 7: FrameTimeDeltaInMsec;
-		//dispatchParameters.frameTimeDelta = inParams->FrameTimeDeltaInMsec;
+			dispatchParameters.frameTimeDelta = (FrameTimeDeltaInMsec < 1 || FrameTimeDeltaInMsec > 100) ? 7 : FrameTimeDeltaInMsec;
+			//dispatchParameters.frameTimeDelta = inParams->FrameTimeDeltaInMsec;
 
-		if (inParams->PreExposure != 0)
 			dispatchParameters.preExposure = inParams->PreExposure;
-		else
-			dispatchParameters.preExposure = 0.0;
 
-		dispatchParameters.renderSize.width = inParams->Width;
-		dispatchParameters.renderSize.height = inParams->Height;
+			dispatchParameters.renderSize.width = inParams->Width;
+			dispatchParameters.renderSize.height = inParams->Height;
 
-		dispatchParameters.color = ffxGetResourceDX12(fsrContext, color, L"FSR2_InputColor", FFX_RESOURCE_STATE_COMPUTE_READ);
+			dispatchParameters.color = ffxGetResourceDX12(fsrContext, color, L"FSR2_InputColor", FFX_RESOURCE_STATE_COMPUTE_READ);
 
-		dispatchParameters.depth = ffxGetResourceDX12(fsrContext, depth, L"FSR2_InputDepth", FFX_RESOURCE_STATE_COMPUTE_READ);
-		dispatchParameters.depth.isDepth = true;
+			dispatchParameters.depth = ffxGetResourceDX12(fsrContext, depth, L"FSR2_InputDepth", FFX_RESOURCE_STATE_COMPUTE_READ);
+			dispatchParameters.depth.isDepth = true;
 
-		dispatchParameters.motionVectors = ffxGetResourceDX12(fsrContext, motionVectors, L"FSR2_InputMotionVectors", FFX_RESOURCE_STATE_COMPUTE_READ);
+			dispatchParameters.motionVectors = ffxGetResourceDX12(fsrContext, motionVectors, L"FSR2_InputMotionVectors", FFX_RESOURCE_STATE_COMPUTE_READ);
 
-		if (exposureTexture)
-			dispatchParameters.exposure = ffxGetResourceDX12(fsrContext, exposureTexture, L"FSR2_InputExposure", FFX_RESOURCE_STATE_COMPUTE_READ);
-		else
-			dispatchParameters.exposure = (FfxResource)NULL;
-
-		//Not sure if these two actually work
-		FfxFsr2GenerateReactiveDescription genReactive{};
-		if (!config->DisableReactiveMask.value_or(false))
-		{
-			if (inputBiasColorMask)
-			{
-				dispatchParameters.reactive = ffxGetResourceDX12(fsrContext, inputBiasColorMask, L"FSR2_InputReactiveMap", FFX_RESOURCE_STATE_COMPUTE_READ);
-				//dispatchParameters.reactive.description.mipCount = 0;
-			}
+			if (exposureTexture)
+				dispatchParameters.exposure = ffxGetResourceDX12(fsrContext, exposureTexture, L"FSR2_InputExposure", FFX_RESOURCE_STATE_UNORDERED_ACCESS);
 			else
-			{
-				dispatchParameters.reactive = (FfxResource)NULL;
-			}
+				dispatchParameters.exposure = (FfxResource)NULL;
 
-			if (transparencyMask)
+			//Not sure if these two actually work
+			FfxFsr2GenerateReactiveDescription genReactive{};
+			if (!config->DisableReactiveMask.value_or(false))
 			{
-				dispatchParameters.transparencyAndComposition = ffxGetResourceDX12(fsrContext, transparencyMask, L"FSR2_TransparencyAndCompositionMap", FFX_RESOURCE_STATE_COMPUTE_READ);
-			}
-			else
-			{
-				dispatchParameters.transparencyAndComposition = (FfxResource)NULL;
-			}
+				if (inputBiasColorMask)
+				{
+					dispatchParameters.reactive = ffxGetResourceDX12(fsrContext, inputBiasColorMask, L"FSR2_InputReactiveMap", FFX_RESOURCE_STATE_UNORDERED_ACCESS);
+					//dispatchParameters.reactive.description.mipCount = 0;
+				}
+				else
+				{
+					dispatchParameters.reactive = (FfxResource)NULL;
+				}
 
-		}
-		else
-		{
-			dispatchParameters.reactive = ffxGetResourceDX12(fsrContext, inputBiasColorMask, L"FSR2_InputReactiveMap", FFX_RESOURCE_STATE_COMPUTE_READ);
-			//dispatchParameters.reactive = (FfxResource)NULL;
-			dispatchParameters.transparencyAndComposition = (FfxResource)NULL;
-			genReactive.commandList = ffxGetCommandListDX12(InCmdList);
-			genReactive.colorOpaqueOnly = dispatchParameters.depth;
-			genReactive.colorPreUpscale = dispatchParameters.color; //???
-			genReactive.outReactive = dispatchParameters.reactive;
-			genReactive.cutoffThreshold = 1.0;//???
-			genReactive.scale = 1.0;//???
-			//genReactive.binaryValue = 1.0;//???
-			genReactive.renderSize = dispatchParameters.renderSize;//???
-			//genReactive.flags = 0b0;//???
-			
-			
-			FfxErrorCode errorCode = ffxFsr2ContextGenerateReactiveMask(fsrContext, &genReactive);
+				if (transparencyMask)
+				{
+					dispatchParameters.transparencyAndComposition = ffxGetResourceDX12(fsrContext, transparencyMask, L"FSR2_TransparencyAndCompositionMap", FFX_RESOURCE_STATE_UNORDERED_ACCESS);
+				}
+				else
+				{
+					dispatchParameters.transparencyAndComposition = (FfxResource)NULL;
+				}
+
+			}
+			//else
+			//{
+			//	//dispatchParameters.reactive = ffxGetResourceDX12(fsrContext, inputBiasColorMask, L"FSR2_InputReactiveMap", FFX_RESOURCE_STATE_COMPUTE_READ);
+			//	//dispatchParameters.reactive = (FfxResource)NULL;
+			//	dispatchParameters.transparencyAndComposition = (FfxResource)NULL;
+			//	genReactive.commandList = ffxGetCommandListDX12(InCmdList);
+			//	genReactive.colorOpaqueOnly = dispatchParameters.depth;
+			//	genReactive.colorPreUpscale = dispatchParameters.color; //???
+			//	genReactive.outReactive = dispatchParameters.reactive;
+			//	genReactive.cutoffThreshold = 1.0;//???
+			//	genReactive.scale = 1.0;//???
+			//	//genReactive.binaryValue = 1.0;//???
+			//	genReactive.renderSize = dispatchParameters.renderSize;//???
+			//	//genReactive.flags = 0b0;//???
+			//	
+			//	
+			//	FfxErrorCode errorCode = ffxFsr2ContextGenerateReactiveMask(fsrContext, &genReactive);
+			//	CyberFSR::Util::FFXErrorCheck(errorCode);
+			//}
+
+			//if (!transparencyMask)
+			//{
+			//	//dispatchParameters.reactive = ffxGetResourceDX12(fsrContext, inputBiasColorMask, L"FSR2_InputReactiveMap", FFX_RESOURCE_STATE_COMPUTE_READ);
+			//	//dispatchParameters.reactive = (FfxResource)NULL;
+			//	//dispatchParameters.transparencyAndComposition = (FfxResource)NULL;
+			//	genReactive.commandList = ffxGetCommandListDX12(InCmdList);
+			//	genReactive.colorOpaqueOnly = dispatchParameters.reactive;
+			//	genReactive.colorPreUpscale = dispatchParameters.color; //???
+			//	genReactive.outReactive = dispatchParameters.reactive;
+			//	genReactive.cutoffThreshold = 1.0;//???
+			//	genReactive.scale = 1.0;//???
+			//	//genReactive.binaryValue = 1.0;//???
+			//	genReactive.renderSize = dispatchParameters.renderSize;//???
+			//	//genReactive.flags = 0b0;//???
+			//
+			//
+			//	FfxErrorCode errorCode = ffxFsr2ContextGenerateReactiveMask(fsrContext, &genReactive);
+			//	CyberFSR::Util::FFXErrorCheck(errorCode);
+			//}
+
+			if (InCallback != nullptr)
+				InCallback(10, shouldCancel);
+
+			dispatchParameters.output = ffxGetResourceDX12(fsrContext, output, L"FSR2_OutputUpscaledColor", FFX_RESOURCE_STATE_UNORDERED_ACCESS);
+
+
+			if (InCallback != nullptr)
+				InCallback(30, shouldCancel);
+
+			//Hax Zone
+			//dispatchParameters.cameraFar = deviceContext->ViewMatrix->GetFarPlane();
+			//dispatchParameters.cameraNear = deviceContext->ViewMatrix->GetNearPlane();
+			//dispatchParameters.cameraFovAngleVertical = DirectX::XMConvertToRadians(deviceContext->ViewMatrix->GetFov());
+			//dispatchParameters.cameraFar = InCmdList->QueryInterface();
+			//dispatchParameters.cameraNear = deviceContext->ViewMatrix->GetNearPlane();
+			//dispatchParameters.cameraFovAngleVertical = DirectX::XMConvertToRadians(deviceContext->ViewMatrix->GetFov());
+
+			if (InCallback != nullptr)
+				InCallback(50, shouldCancel);
+			FfxErrorCode errorCode = ffxFsr2ContextDispatch(fsrContext, &dispatchParameters);
 			CyberFSR::Util::FFXErrorCheck(errorCode);
+
+			InCmdList->SetComputeRootSignature(orgRootSig);
 		}
-
-		if (InCallback != nullptr)
-			InCallback(10, shouldCancel);
-
-		dispatchParameters.output = ffxGetResourceDX12(fsrContext, output, L"FSR2_OutputUpscaledColor", FFX_RESOURCE_STATE_UNORDERED_ACCESS);
-
-
-		if (InCallback != nullptr)
-			InCallback(30, shouldCancel);
-
-		//Hax Zone
-		dispatchParameters.cameraFar = deviceContext->ViewMatrix->GetFarPlane();
-		dispatchParameters.cameraNear = deviceContext->ViewMatrix->GetNearPlane();
-		dispatchParameters.cameraFovAngleVertical = DirectX::XMConvertToRadians(deviceContext->ViewMatrix->GetFov());
-
-		if (InCallback != nullptr)
-			InCallback(50, shouldCancel);
-		FfxErrorCode errorCode = ffxFsr2ContextDispatch(fsrContext, &dispatchParameters);
-		CyberFSR::Util::FFXErrorCheck(errorCode);
-
-		InCmdList->SetComputeRootSignature(orgRootSig);
-	}
 #ifdef DEBUG_FEATURES
-	deviceContext->DebugLayer->AddText(L"DLSS2FSR", DirectX::XMFLOAT2(1.0, 1.0));
-	deviceContext->DebugLayer->Render(InCmdList);
+		deviceContext->DebugLayer->AddText(L"DLSS2FSR", DirectX::XMFLOAT2(1.0, 1.0));
+		deviceContext->DebugLayer->Render(InCmdList);
 #endif
 
-	myCommandList = InCmdList;
+		myCommandList = InCmdList;
 
-	if (InCallback != nullptr)
-		InCallback(100, shouldCancel);
+		if (InCallback != nullptr)
+			InCallback(100, shouldCancel);
+	}
 
 	return NVSDK_NGX_Result_Success;
 }

@@ -32,7 +32,11 @@ namespace CyberFSR
 		static NvParameter* GetFreshCapabilityParameter();
 		static void RecycleParameter(NvParameter*);
 
+		void CalcRenderDimensions();
+
 		unsigned int Width{}, Height{}, OutWidth{}, OutHeight{}, Max_Render_Width{}, Max_Render_Height{}, Min_Render_Width{}, Min_Render_Height{}, Render_Subrect_Dimensions_Width{}, Render_Subrect_Dimensions_Height{}, DLSS_Input_Color_Subrect_Base_X{}, DLSS_Input_Color_Subrect_Base_Y{}, DLSS_Input_Depth_Subrect_Base_X{}, DLSS_Input_Depth_Subrect_Base_Y{}, DLSS_Input_MV_Subrect_Base_X{}, DLSS_Input_MV_Subrect_Base_Y{}, DLSS_Input_Translucency_Subrect_Base_X{}, DLSS_Input_Translucency_Subrect_Base_Y{}, DLSS_Output_Subrect_Base_X{}, DLSS_Output_Subrect_Base_Y{}, DLSS_Input_Bias_Current_Color_SubrectBase_X{}, DLSS_Input_Bias_Current_Color_SubrectBase_Y{};
+
+		std::pair<unsigned int, unsigned int> ResponseRenderDimensions{};
 
 		NVSDK_NGX_PerfQuality_Value PerfQualityValue = (NVSDK_NGX_PerfQuality_Value)-1;
 		int CreationNodeMask{}, VisibilityNodeMask{}, OptLevel = 0, IsDevSnippetBranch = 0;

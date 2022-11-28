@@ -31,35 +31,21 @@ namespace CyberFSR
 			Sharpness = readFloat("Sharpening", "Sharpness");
 			SharpnessRange = readSharpnessRange("Sharpening", "SharpnessRange");
 
-		//Upscale Ratio Override
-		UpscaleRatioOverrideEnabled = readBool("UpscaleRatio", "UpscaleRatioOverrideEnabled");
-		UpscaleRatioOverrideValue = readFloat("UpscaleRatio", "UpscaleRatioOverrideValue");
 
-		// Dynamic Scaler
-		DynamicScalerEnabled = readBool("DynamicResolution", "DynamicScalerEnabled");
-		FPSTarget = readFloat("DynamicResolution", "FPSTarget");
-		FPSTargetMin = readFloat("DynamicResolution", "FPSTargetMin");
-		FPSTargetMax = readFloat("DynamicResolution", "FPSTargetMax");
-		FPSTargetResolutionMin = readFloat("DynamicResolution", "FPSTargetResolutionMin");
-		FPSTargetResolutionMax = readFloat("DynamicResolution", "FPSTargetResolutionMax");
-		
-		// Quality Overrides
-		QualityRatioOverrideEnabled = readBool("QualityOverrides", "QualityRatioOverrideEnabled");
-		if (QualityRatioOverrideEnabled) {
-			QualityRatio_UltraQuality = readFloat("QualityOverrides", "QualityRatioUltraQuality");
-			QualityRatio_Quality = readFloat("QualityOverrides", "QualityRatioQuality");
-			QualityRatio_Balanced = readFloat("QualityOverrides", "QualityRatioBalanced");
-			QualityRatio_Performance = readFloat("QualityOverrides", "QualityRatioPerformance");
-			QualityRatio_UltraPerformance = readFloat("QualityOverrides", "QualityRatioUltraPerformance");
-		}
+			// Dynamic Scaler
+			DynamicScalerEnabled = readBool("DynamicResolution", "DynamicScalerEnabled");
+			FPSTarget = readFloat("DynamicResolution", "FPSTarget");
+			FPSTargetMin = readFloat("DynamicResolution", "FPSTargetMin");
+			FPSTargetMax = readFloat("DynamicResolution", "FPSTargetMax");
+			FPSTargetResolutionMin = readFloat("DynamicResolution", "FPSTargetResolutionMin");
+			FPSTargetResolutionMax = readFloat("DynamicResolution", "FPSTargetResolutionMax");
 
-
-		// View
-		ViewHookMethod = readViewMethod("View", "Method");
-		VerticalFOV = readFloat("View", "VerticalFOV");
-		NearPlane = readFloat("View", "NearPlane");
-		FarPlane = readFloat("View", "FarPlane");
-		InfiniteFarPlane = readBool("View", "InfiniteFarPlane");
+			// View
+			ViewHookMethod = readViewMethod("View", "Method");
+			VerticalFOV = readFloat("View", "VerticalFOV");
+			NearPlane = readFloat("View", "NearPlane");
+			FarPlane = readFloat("View", "FarPlane");
+			InfiniteFarPlane = readBool("View", "InfiniteFarPlane");
 
 			DisableReactiveMask = readBool("Hotfix", "DisableReactiveMask");
 
@@ -76,11 +62,11 @@ namespace CyberFSR
 
 			// Quality Overrides
 			Resolution_Auto = readScreenDimensions("StaticResolution", "Auto").value_or(std::pair{ 0,0 });
-			Resolution_UltraQuality = readScreenDimensions("StaticResolution", "UltraQuality").value_or(std::pair{ 1600,900 });
-			Resolution_Quality = readScreenDimensions("StaticResolution", "Quality").value_or(std::pair{ 1312,738 });
-			Resolution_Balanced = readScreenDimensions("StaticResolution", "Balanced").value_or(std::pair{ 1024,576 });
-			Resolution_Performance = readScreenDimensions("StaticResolution", "Performance").value_or(std::pair{ 736,495 });
-			Resolution_UltraPerformance = readScreenDimensions("StaticResolution", "UltraPerformance").value_or(std::pair{ 448,252 });
+			Resolution_UltraQuality = readScreenDimensions("StaticResolution", "UltraQuality").value_or(std::pair{ 1920,1080 });
+			Resolution_Quality = readScreenDimensions("StaticResolution", "Quality").value_or(std::pair{ 1600,900 });
+			Resolution_Balanced = readScreenDimensions("StaticResolution", "Balanced").value_or(std::pair{ 1120,630 });
+			Resolution_Performance = readScreenDimensions("StaticResolution", "Performance").value_or(std::pair{ 800,450 });
+			Resolution_UltraPerformance = readScreenDimensions("StaticResolution", "UltraPerformance").value_or(std::pair{ 640,360 });
 
 			// Quality Overrides
 			FPSTarget_Auto = readScreenDimensions("FPSTarget", "UltraQuality").value_or(std::pair{ 0,0 });
@@ -130,6 +116,10 @@ namespace CyberFSR
 		{
 			ViewHookMethod = ViewHookMethod.value_or(ViewMethod::RDR2);
 		}
+		else if (exeName == "HorizonZeroDawn.exe")
+		{
+			ViewHookMethod = ViewHookMethod.value_or(ViewMethod::HorizonZeroDawn);
+		}
 	}
 
 	std::optional<std::string> Config::readString(std::string section, std::string key, bool lowercase)
@@ -177,7 +167,7 @@ namespace CyberFSR
 				const auto& values = valueOpt.value();
 				const size_t delimiterLocation = values.find(delimiter);
 				auto width = values.substr(0, delimiterLocation);
-				auto height = values.substr(1, delimiterLocation);
+				auto height = values.substr(delimiterLocation+1, std::string::npos);
 				ScreenDimensions out;
 				out.second = std::stoi(height);
 				out.first = std::stoi(width);

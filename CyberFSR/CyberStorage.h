@@ -56,7 +56,7 @@ namespace CyberFSR
 
 	constexpr ModuleCode GetPrimaryId(ModuleCode);
 
-	class CyberStorage
+	static class CyberStorage
 	{
 	private:
 		typedef std::variant<

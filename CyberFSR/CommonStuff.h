@@ -44,7 +44,8 @@ namespace CyberFSR
 	{
 		Config,
 		Cyberpunk2077,
-		RDR2
+		RDR2,
+		HorizonZeroDawn
 	};
 
 	enum class UpscalingProfile

@@ -1,9 +1,12 @@
 #include "pch.h"
 #include "ViewMatrixHook.h"
 #include "scanner.h"
-std::unique_ptr<ViewMatrixHook> ViewMatrixHook::Create(const Config& config)
+
+namespace CyberFSR 
 {
-	std::unique_ptr<ViewMatrixHook> output;
+	std::unique_ptr<ViewMatrixHook> ViewMatrixHook::Create(const Config& config)
+	{
+		std::unique_ptr<ViewMatrixHook> output;
 
 		switch (config.ViewHookMethod.value_or(ViewMethod::Config))
 		{
@@ -12,6 +15,9 @@ std::unique_ptr<ViewMatrixHook> ViewMatrixHook::Create(const Config& config)
 			break;
 		case ViewMethod::RDR2:
 			output = std::make_unique<ViewMatrixHook::RDR2>();
+			break;		
+		case ViewMethod::HorizonZeroDawn:
+			output = std::make_unique<ViewMatrixHook::HorizonZeroDawn>();
 			break;
 		case ViewMethod::Config:
 		default:
@@ -57,7 +63,7 @@ std::unique_ptr<ViewMatrixHook> ViewMatrixHook::Create(const Config& config)
 
 	ViewMatrixHook::Cyberpunk2077::Cyberpunk2077()
 	{
-		if(!mod)
+		if (!mod)
 			mod = (uint64_t)GetModuleHandleW(L"Cyberpunk2077.exe");
 		//TODO check for different executable versions
 
@@ -65,9 +71,9 @@ std::unique_ptr<ViewMatrixHook> ViewMatrixHook::Create(const Config& config)
 		Protip for future self to get the offsets, search for the vertical FOV to get the structure, then look for references to that structure and afterwards look for static references
 		*/
 
-	auto loc = *(uintptr_t*)scanner::GetOffsetFromInstruction(L"Cyberpunk2077.exe", "F3 0F 7F 0D ? ? ? ? E8", 4);
-	camParams = ((CameraParams*)(loc + 0x60));
-}
+		auto loc = *(uintptr_t*)scanner::GetOffsetFromInstruction(L"Cyberpunk2077.exe", "F3 0F 7F 0D ? ? ? ? E8", 4);
+		camParams = ((CameraParams*)(loc + 0x60));
+	}
 
 	float ViewMatrixHook::Cyberpunk2077::GetFov()
 	{
@@ -88,11 +94,11 @@ std::unique_ptr<ViewMatrixHook> ViewMatrixHook::Create(const Config& config)
 
 #pragma region RDR2
 
-ViewMatrixHook::RDR2::RDR2()
-{
-	auto loc = scanner::GetOffsetFromInstruction(L"RDR2.exe", "4C 8D 2D ? ? ? ? 48 85 DB", 3);
-	camParams = (CameraParams*)loc;
-}
+	ViewMatrixHook::RDR2::RDR2()
+	{
+		auto loc = scanner::GetOffsetFromInstruction(L"RDR2.exe", "4C 8D 2D ? ? ? ? 48 85 DB", 3);
+		camParams = (CameraParams*)loc;
+	}
 
 	float ViewMatrixHook::RDR2::GetFov()
 	{
@@ -105,6 +111,31 @@ ViewMatrixHook::RDR2::RDR2()
 	}
 
 	float ViewMatrixHook::RDR2::GetNearPlane()
+	{
+		return camParams->NearPlane;
+	}
+
+#pragma endregion
+
+#pragma region HorizonZeroDawn
+
+	ViewMatrixHook::HorizonZeroDawn::HorizonZeroDawn()
+	{
+		auto loc = scanner::GetOffsetFromInstruction(L"HorizonZeroDawn.exe", "48 ? ? ? ? ? ? 48 ? ? 83 ? 78 01", 3);
+		camParams = (CameraParams*)loc;
+	}
+
+	float ViewMatrixHook::HorizonZeroDawn::GetFov()
+	{
+		return camParams->Fov;
+	}
+
+	float ViewMatrixHook::HorizonZeroDawn::GetFarPlane()
+	{
+		return camParams->FarPlane;
+	}
+
+	float ViewMatrixHook::HorizonZeroDawn::GetNearPlane()
 	{
 		return camParams->NearPlane;
 	}
