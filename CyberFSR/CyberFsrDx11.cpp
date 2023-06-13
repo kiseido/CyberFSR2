@@ -211,29 +211,35 @@ NVSDK_NGX_Result NVSDK_NGX_D3D11_EvaluateFeature(ID3D11Device* InDevice, ID3D11D
         printf("Cant find the RootSig\n");
     }
     rootSigMutex.unlock();
+    if (orgRootSig) {
+        //dispatchParameters.commandList = ffxGetCommandListDX12(InDeviceContext);
+        dispatchParameters.color = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->Color, (wchar_t*)L"FSR2_InputColor");
+        dispatchParameters.depth = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->Depth, (wchar_t*)L"FSR2_InputDepth");
+        dispatchParameters.motionVectors = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->MotionVectors, (wchar_t*)L"FSR2_InputMotionVectors");
+        if (!config->AutoExposure)
+            dispatchParameters.exposure = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->ExposureTexture, (wchar_t*)L"FSR2_InputExposure");
 
-    //dispatchParameters.commandList = ffxGetCommandListDX12(InDeviceContext);
-    dispatchParameters.color = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->Color, (wchar_t*)L"FSR2_InputColor");
-    dispatchParameters.depth = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->Depth, (wchar_t*)L"FSR2_InputDepth");
-    dispatchParameters.motionVectors = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->MotionVectors, (wchar_t*)L"FSR2_InputMotionVectors");
-    if (!config->AutoExposure)
-        dispatchParameters.exposure = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->ExposureTexture, (wchar_t*)L"FSR2_InputExposure");
+        // ... (rest of the dispatchParameters setup)
 
-    // ... (rest of the dispatchParameters setup)
+        // Retrieve the associated fence info
+        FenceInfo* fenceInfo = syncObjects[InFeatureHandle];
 
-    // Retrieve the associated fence info
-    FenceInfo* fenceInfo = syncObjects[InFeatureHandle];
+        // Issue the GPU command to evaluate the feature
+        ffxFsr2ContextDispatch(fsrContext, &dispatchParameters);
 
-    // Issue the GPU command to evaluate the feature
-    ffxFsr2ContextDispatch(fsrContext, &dispatchParameters);
+        // Signal the fence after the GPU command is completed
+        fenceInfo->fence->SetEventOnCompletion(1, fenceInfo->fenceEvent);
 
-    // Signal the fence after the GPU command is completed
-    fenceInfo->fence->SetEventOnCompletion(1, fenceInfo->fenceEvent);
+        // Pass the fence handle to the callback function for progress tracking
+        float progress = 0;
+        bool shouldcancel = false;
+        InCallback(progress, shouldcancel);
+    }
 
-    // Pass the fence handle to the callback function for progress tracking
-    float progress = 0;
-    bool shouldcancel = false;
-    InCallback(progress, shouldcancel);
+#ifdef DEBUG_FEATURES
+    deviceContext->DebugLayer->AddText(L"DLSS2FSR DX11", DirectX::XMFLOAT2(1.0, 1.0));
+    deviceContext->DebugLayer->Render(InCmdList);
+#endif
 
     return NVSDK_NGX_Result_Success;
 }
