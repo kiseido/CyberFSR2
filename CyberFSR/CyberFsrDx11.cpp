@@ -7,7 +7,21 @@ NVSDK_NGX_API NVSDK_NGX_Result NVSDK_NGX_D3D11_Init_Ext(unsigned long long InApp
 	ID3D11Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion,
 	unsigned long long unknown0)
 {
-	return NVSDK_NGX_Result_Success;
+    ID3D12Fence* fence;
+    HANDLE fenceEvent;
+};
+
+// Define the missing function and variable declarations
+void Fsr2MessageCallback(FfxFsr2MsgType type, const wchar_t* message)
+{
+    switch (type) {
+    case FFX_FSR2_MESSAGE_TYPE_ERROR:
+        printf("[ERROR] %ls\n", message);
+        break;
+    case FFX_FSR2_MESSAGE_TYPE_WARNING:
+        printf("[WARNING] %ls\n", message);
+        break;
+    }
 }
 
 NVSDK_NGX_Result NVSDK_NGX_D3D11_Init(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath, ID3D11Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion)
