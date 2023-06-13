@@ -72,7 +72,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D11_CreateFeature(ID3D11Device* InDevice, NVSDK_NGX
     auto deviceContext = instance->CreateContext();
     deviceContext->ViewMatrix = ViewMatrixHook::Create(*config);
 #ifdef DEBUG_FEATURES
-    deviceContext->DebugLayer = std::make_unique<DebugOverlay>(device, InCmdList);
+    deviceContext->DebugLayer = std::make_unique<DebugOverlay>(InDevice, InCmdList);
 #endif
 
     * OutHandle = &deviceContext->Handle;
@@ -83,10 +83,13 @@ NVSDK_NGX_Result NVSDK_NGX_D3D11_CreateFeature(ID3D11Device* InDevice, NVSDK_NGX
     deviceContext->ScratchBuffer = std::vector<unsigned char>(scratchBufferSize);
     auto scratchBuffer = deviceContext->ScratchBuffer.data();
 
-    FfxErrorCode errorCode = ffxFsr2GetInterfaceDX12(&initParams.callbacks, dx12InDevice, scratchBuffer, scratchBufferSize);
+    ID3D12Device* dx12Device;
+    //InDevice->QueryInterface(IID_PPV_ARGS(&dx12Device));
+
+    FfxErrorCode errorCode = ffxFsr2GetInterfaceDX12(&initParams.callbacks, dx12Device, scratchBuffer, scratchBufferSize);
     FFX_ASSERT(errorCode == FFX_OK);
 
-    initParams.device = ffxGetDeviceDX12(dx12InDevice);
+    initParams.device = ffxGetDeviceDX12(dx12Device);
     initParams.maxRenderSize.width = inParams->Width;
     initParams.maxRenderSize.height = inParams->Height;
     initParams.displaySize.width = inParams->OutWidth;
@@ -128,11 +131,14 @@ NVSDK_NGX_Result NVSDK_NGX_D3D11_CreateFeature(ID3D11Device* InDevice, NVSDK_NGX
 
     // Create a fence and event object for synchronization
     FenceInfo* fenceInfo = new FenceInfo();
-    InDevice->QueryInterface(IID_PPV_ARGS(&fenceInfo->fence));
+    dx12Device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fenceInfo->fence));
     fenceInfo->fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 
     // Associate the fence info with the feature handle
-    deviceContext->Handle.UserData = fenceInfo;
+    //deviceContext->Handle.Id = CyberFsrContext::instance()->AllocateHandleId();
+    //deviceContext->Handle.UserData = reinterpret_cast<void*>(fenceInfo);
+
+    dx12Device->Release();
 
     return NVSDK_NGX_Result_Success;
 }
@@ -142,16 +148,16 @@ NVSDK_NGX_Result NVSDK_NGX_D3D11_ReleaseFeature(NVSDK_NGX_Handle* InHandle)
     auto deviceContext = CyberFsrContext::instance()->Contexts[InHandle->Id].get();
 
     // Retrieve the associated fence info
-    FenceInfo* fenceInfo = static_cast<FenceInfo*>(deviceContext->Handle.UserData);
+    //FenceInfo* fenceInfo = reinterpret_cast<FenceInfo*>(deviceContext->Handle.UserData);
 
     // Wait for the GPU to complete all previous commands
-    fenceInfo->fence->SetEventOnCompletion(1, fenceInfo->fenceEvent);
-    WaitForSingleObject(fenceInfo->fenceEvent, INFINITE);
+    //fenceInfo->fence->SetEventOnCompletion(1, fenceInfo->fenceEvent);
+    //WaitForSingleObject(fenceInfo->fenceEvent, INFINITE);
 
     // Release the fence and event objects
-    fenceInfo->fence->Release();
-    CloseHandle(fenceInfo->fenceEvent);
-    delete fenceInfo;
+    //fenceInfo->fence->Release();
+    //CloseHandle(fenceInfo->fenceEvent);
+    //delete fenceInfo;
 
     FfxErrorCode errorCode = ffxFsr2ContextDestroy(&deviceContext->FsrContext);
     FFX_ASSERT(errorCode == FFX_OK);
@@ -169,31 +175,29 @@ NVSDK_NGX_Result NVSDK_NGX_D3D11_EvaluateFeature(ID3D11Device* InDevice, ID3D11D
     auto* fsrContext = &deviceContext->FsrContext;
 
     FfxFsr2DispatchDescription dispatchParameters = {};
-    dispatchParameters.commandList = ffxGetCommandListDX12(deviceContext->CommandList);
-    dispatchParameters.color = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->Color, "FSR2_InputColor");
-    dispatchParameters.depth = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->Depth, "FSR2_InputDepth");
-    dispatchParameters.motionVectors = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->MotionVectors, "FSR2_InputMotionVectors");
-    if (!config->AutoExposure)
-        dispatchParameters.exposure = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->ExposureTexture, "FSR2_InputExposure");
+    //dispatchParameters.commandList = ffxGetCommandListDX12(InDeviceContext);
+    //dispatchParameters.color = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->Color, "FSR2_InputColor");
+    //dispatchParameters.depth = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->Depth, "FSR2_InputDepth");
+    //dispatchParameters.motionVectors = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->MotionVectors, "FSR2_InputMotionVectors");
+    //if (!config->AutoExposure)
+    //    dispatchParameters.exposure = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->ExposureTexture, "FSR2_InputExposure");
 
     // ... (rest of the dispatchParameters setup)
 
     // Create a fence and event object for synchronization
-    FenceInfo* fenceInfo = new FenceInfo();
-    InDeviceContext->QueryInterface(IID_PPV_ARGS(&fenceInfo->fence));
-    fenceInfo->fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+
 
     // Associate the fence info with the feature handle
-    deviceContext->Handle.UserData = fenceInfo;
+
 
     // Issue the GPU command to evaluate the feature
     ffxFsr2ContextDispatch(fsrContext, &dispatchParameters);
 
     // Signal the fence after the GPU command is completed
-    fenceInfo->fence->SetEventOnCompletion(1, fenceInfo->fenceEvent);
+    //fenceInfo->fence->SetEventOnCompletion(1, fenceInfo->fenceEvent);
 
     // Pass the fence handle to the callback function for progress tracking
-    InCallback(InFeatureHandle->Id, fenceInfo->fenceEvent);
+    //InCallback(InFeatureHandle->Id, fenceInfo->fenceEvent);
 
     return NVSDK_NGX_Result_Success;
 }
