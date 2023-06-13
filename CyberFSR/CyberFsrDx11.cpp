@@ -11,8 +11,9 @@ NVSDK_NGX_API NVSDK_NGX_Result NVSDK_NGX_D3D11_Init_Ext(unsigned long long InApp
     HANDLE fenceEvent;
 };
 
-// Define the missing function and variable declarations
-void Fsr2MessageCallback(FfxFsr2MsgType type, const wchar_t* message)
+std::map<const NVSDK_NGX_Handle*, FenceInfo*> syncObjects;
+
+void dx11Fsr2MessageCallback(FfxFsr2MsgType type, const wchar_t* message)
 {
     switch (type) {
     case FFX_FSR2_MESSAGE_TYPE_ERROR:
