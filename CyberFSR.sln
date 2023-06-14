@@ -9,6 +9,8 @@ Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
+		DebugGodofWar|x64 = DebugGodofWar|x64
+		DebugGodofWar|x86 = DebugGodofWar|x86
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
@@ -17,6 +19,10 @@ Global
 		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.Debug|x64.Build.0 = Debug|x64
 		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.Debug|x86.ActiveCfg = Debug|Win32
 		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.Debug|x86.Build.0 = Debug|Win32
+		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.DebugGodofWar|x64.ActiveCfg = DebugGodofWar|x64
+		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.DebugGodofWar|x64.Build.0 = DebugGodofWar|x64
+		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.DebugGodofWar|x86.ActiveCfg = DebugGodofWar|Win32
+		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.DebugGodofWar|x86.Build.0 = DebugGodofWar|Win32
 		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.Release|x64.ActiveCfg = Release|x64
 		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.Release|x64.Build.0 = Release|x64
 		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.Release|x86.ActiveCfg = Release|Win32
