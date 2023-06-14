@@ -7,63 +7,52 @@ NVSDK_NGX_API NVSDK_NGX_Result NVSDK_NGX_D3D11_Init_Ext(unsigned long long InApp
 	ID3D11Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion,
 	unsigned long long unknown0)
 {
-	auto currentTime = std::chrono::high_resolution_clock::now();
-	return std::chrono::duration_cast<std::chrono::nanoseconds>(currentTime - startTime).count();
+    auto currentTime = std::chrono::high_resolution_clock::now();
+    return std::chrono::duration_cast<std::chrono::nanoseconds>(currentTime - startTime).count();
 }
 
 // Helper function to write the function name and CPU tick to the log file
 void logFunctionCall(const std::string& functionName)
 {
-	std::lock_guard<std::mutex> lock(logMutex); // Lock the mutex
+    std::lock_guard<std::mutex> lock(logMutex); // Lock the mutex
 
-	// Open the log file if it is not already open
-	if (!logFile.is_open())
-	{
-		logFile.open("debug.log", std::ios::app); // Open in append mode
-	}
+    // Open the log file if it is not already open
+    if (!logFile.is_open())
+    {
+        logFile.open("debug.log", std::ios::app); // Open in append mode
+    }
 
-	if (logFile.is_open())
-	{
-		logFile << functionName << " " << getTick() << std::endl;
-	}
+    // Write the function name and CPU tick relative to the starting time to the log file
+    if (logFile.is_open())
+    {
+        logFile << functionName << " " << getTick() << std::endl;
+    }
 }
 
 // Helper macro to simplify logging function calls
 #define LOG_FUNCTION_CALL() logFunctionCall(__func__)
 
-
 #endif // SaveToLog
 
-
-// dx 12 - > dx11 interop https://learn.microsoft.com/en-us/windows/win32/direct3d12/direct3d-12-with-direct3d-11--direct-2d-and-gdi
-
-// external\FidelityFX-FSR2\src\ffx-fsr2-api\ffx_fsr2_interface.h
-// external\nvngx_dlss_sdk\include\nvsdk_ngx_defs.h
-// external\nvngx_dlss_sdk\include\nvsdk_ngx_helpers.h
-
-NVSDK_NGX_API NVSDK_NGX_Result NVSDK_NGX_D3D11_Init_Ext(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath, ID3D11Device* InDevice, NVSDK_NGX_Version InSDKVersion, const NVSDK_NGX_FeatureCommonInfo* APointer, const unsigned long long unknown)
+struct FenceInfo
 {
-#ifdef SaveToLog
-	LOG_FUNCTION_CALL();
-#endif // SaveToLog
-	auto output = NVSDK_NGX_Result_Success;
+    ID3D12Fence* fence;
+    HANDLE fenceEvent;
+};
 
-	//CyberFSR::FeatureCommonInfo.LoggingInfo.LoggingCallback("Hello!", NVSDK_NGX_LOGGING_LEVEL_OFF, NVSDK_NGX_Feature_SuperSampling);
+std::map<const NVSDK_NGX_Handle*, FenceInfo*> syncObjects;
 
-	return output;
+void dx11Fsr2MessageCallback(FfxFsr2MsgType type, const wchar_t* message)
+{
+    switch (type) {
+    case FFX_FSR2_MESSAGE_TYPE_ERROR:
+        printf("[ERROR] %ls\n", message);
+        break;
+    case FFX_FSR2_MESSAGE_TYPE_WARNING:
+        printf("[WARNING] %ls\n", message);
+        break;
+    }
 }
-
-//NVSDK_NGX_API NVSDK_NGX_Result NVSDK_NGX_D3D11_Init_Ext(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath, ID3D11Device* InDevice, NVSDK_NGX_Version InSDKVersion, const char* Apointer1, const char* Apointer2)
-//{
-//	// cyberpunk enters here
-//	// cyberpunk id == 0x0000000005f83393
-//
-//	auto output = NVSDK_NGX_Result_Success;
-//
-//	//CyberFSR::FeatureCommonInfo.LoggingInfo.LoggingCallback("Hello!", NVSDK_NGX_LOGGING_LEVEL_OFF, NVSDK_NGX_Feature_SuperSampling);
-//
-//	return output;
-//}
 
 NVSDK_NGX_Result NVSDK_NGX_D3D11_Init(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath, ID3D11Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion)
 {
@@ -80,7 +69,8 @@ NVSDK_NGX_Result NVSDK_NGX_D3D11_Init_with_ProjectID(const char* InProjectId, NV
 	return NVSDK_NGX_D3D11_Init_Ext(0x1337, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion, 0);
 }
 
-NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_Shutdown(void)
+
+NVSDK_NGX_Result NVSDK_NGX_D3D11_Shutdown(void)
 {
 	CyberFsrContext::instance()->NvParameterInstance->Params.clear();
 	CyberFsrContext::instance()->Contexts.clear();
@@ -224,8 +214,9 @@ NVSDK_NGX_Result NVSDK_NGX_D3D11_CreateFeature(ID3D11DeviceContext* InDevCtx, NV
 	errorCode = ffxFsr2ContextCreate(&deviceContext->FsrContext, &initParams);
 	FFX_ASSERT(errorCode == FFX_OK);
 
-	return NVSDK_NGX_Result_Success;
-}
+    const size_t scratchBufferSize = ffxFsr2GetScratchMemorySizeDX12();
+    deviceContext->ScratchBuffer = std::vector<unsigned char>(scratchBufferSize);
+    auto scratchBuffer = deviceContext->ScratchBuffer.data();
 
 NVSDK_NGX_Result NVSDK_NGX_D3D11_ReleaseFeature(NVSDK_NGX_Handle* InHandle)
 {
@@ -246,7 +237,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D11_GetFeatureRequirements(IDXGIAdapter* Adapter, c
 	return NVSDK_NGX_Result_Success;
 }
 
-NVSDK_NGX_Result NVSDK_NGX_D3D11_EvaluateFeature(ID3D11DeviceContext* InDevCtx, const NVSDK_NGX_Handle* InFeatureHandle, const NVSDK_NGX_Parameter* InParameters, PFN_NVSDK_NGX_ProgressCallback InCallback)
+NVSDK_NGX_Result NVSDK_NGX_D3D11_EvaluateFeature(ID3D11Device* InDevice, ID3D11DeviceContext* InDeviceContext, const NVSDK_NGX_Handle* InFeatureHandle, const NVSDK_NGX_Parameter* InParameters, PFN_NVSDK_NGX_ProgressCallback InCallback)
 {
 	ID3D11Device* device;
 	InDevCtx->GetDevice(&device);
@@ -312,5 +303,63 @@ NVSDK_NGX_Result NVSDK_NGX_D3D11_EvaluateFeature(ID3D11DeviceContext* InDevCtx, 
 	deviceContext->DebugLayer->Render(InCmdList);
 #endif
 
-	return NVSDK_NGX_Result_Success;
+    ID3D11DeviceChild* orgRootSig = nullptr;
+
+    auto device = InDevice;
+    auto deviceContext = CyberFsrContext::instance()->Contexts[InFeatureHandle->Id].get();
+
+    auto instance = CyberFsrContext::instance();
+    auto& config = instance->MyConfig;
+
+    const auto inParams = static_cast<const NvParameter*>(InParameters);
+    auto* fsrContext = &deviceContext->FsrContext;
+
+    FfxFsr2DispatchDescription dispatchParameters = {};
+    ID3D11DeviceContext* dx11DeviceContext = static_cast<ID3D11DeviceContext*>(InDeviceContext);
+    ID3D11CommandList* commandList = nullptr;
+    dx11DeviceContext->FinishCommandList(FALSE, &commandList);
+
+    dispatchParameters.commandList = commandList;
+
+    rootSigMutex.lock();
+    if (commandListVector.contains((ID3D12GraphicsCommandList*)commandList))
+    {
+        orgRootSig = (ID3D11DeviceChild*)commandListVector[(ID3D12GraphicsCommandList*)commandList];
+    }
+    else
+    {
+        printf("Can't find the RootSig\n");
+    }
+    rootSigMutex.unlock();
+    if (orgRootSig) {
+        //dispatchParameters.commandList = ffxGetCommandListDX12(InDeviceContext);
+        dispatchParameters.color = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->Color, (wchar_t*)L"FSR2_InputColor");
+        dispatchParameters.depth = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->Depth, (wchar_t*)L"FSR2_InputDepth");
+        dispatchParameters.motionVectors = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->MotionVectors, (wchar_t*)L"FSR2_InputMotionVectors");
+        if (!config->AutoExposure)
+            dispatchParameters.exposure = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->ExposureTexture, (wchar_t*)L"FSR2_InputExposure");
+
+        // ... (rest of the dispatchParameters setup)
+
+        // Retrieve the associated fence info
+        FenceInfo* fenceInfo = syncObjects[InFeatureHandle];
+
+        // Issue the GPU command to evaluate the feature
+        ffxFsr2ContextDispatch(fsrContext, &dispatchParameters);
+
+        // Signal the fence after the GPU command is completed
+        fenceInfo->fence->SetEventOnCompletion(1, fenceInfo->fenceEvent);
+
+        // Pass the fence handle to the callback function for progress tracking
+        float progress = 0;
+        bool shouldcancel = false;
+        InCallback(progress, shouldcancel);
+    }
+
+#ifdef DEBUG_FEATURES
+    deviceContext->DebugLayer->AddText(L"DLSS2FSR DX11", DirectX::XMFLOAT2(1.0, 1.0));
+    deviceContext->DebugLayer->Render(InCmdList);
+#endif
+
+    return NVSDK_NGX_Result_Success;
 }
