@@ -246,7 +246,10 @@
     <ClInclude Include="CyberFsr.h" />
     <ClInclude Include="DebugOverlay.h" />
     <ClInclude Include="DirectXHooks.h" />
+    <ClInclude Include="ecc_bool.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="Logger.h" />
+    <ClInclude Include="LogManager.h" />
     <ClInclude Include="NvParameter.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="scanner.h" />
@@ -262,6 +265,8 @@
     <ClCompile Include="DebugOverlay.cpp" />
     <ClCompile Include="DirectXHooks.cpp" />
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="ecc_bool.cpp" />
+    <ClCompile Include="logger.cpp" />
     <ClCompile Include="NvParameter.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
