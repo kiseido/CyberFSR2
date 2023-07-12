@@ -8,6 +8,7 @@ extern HMODULE dllModule;
 
 fs::path Util::DllPath()
 {
+	CyberLOG();
 	static fs::path dll;
 	if (dll.empty())
 	{
@@ -20,6 +21,7 @@ fs::path Util::DllPath()
 
 fs::path Util::ExePath()
 {
+	CyberLOG();
 	static fs::path exe;
 	if (exe.empty())
 	{
@@ -32,6 +34,7 @@ fs::path Util::ExePath()
 
 double Util::MillisecondsNow()
 {
+	CyberLOG();
 	static LARGE_INTEGER s_frequency;
 	static BOOL s_use_qpc = QueryPerformanceFrequency(&s_frequency);
 	double milliseconds = 0;
@@ -52,6 +55,7 @@ double Util::MillisecondsNow()
 
 float Util::ConvertSharpness(float sharpness, std::optional<SharpnessRangeModifier> range)
 {
+	CyberLOG();
 	if (range == SharpnessRangeModifier::Extended)
 	{
 		// normalize sharpness value to [0, 1] range
@@ -77,6 +81,7 @@ float Util::ConvertSharpness(float sharpness, std::optional<SharpnessRangeModifi
 
 Util::NvParameter Util::NvParameterToEnum(const char* name)
 {
+	CyberLOG();
 	static ankerl::unordered_dense::map<std::string, NvParameter> NvParamTranslation = {
 		{"SuperSampling.ScaleFactor", NvParameter::SuperSampling_ScaleFactor},
 		{"SuperSampling.Available", NvParameter::SuperSampling_Available},

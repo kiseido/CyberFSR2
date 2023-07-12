@@ -9,6 +9,8 @@ Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
+		DebugCyberPunk|x64 = DebugCyberPunk|x64
+		DebugCyberPunk|x86 = DebugCyberPunk|x86
 		DebugGodofWar|x64 = DebugGodofWar|x64
 		DebugGodofWar|x86 = DebugGodofWar|x86
 		MinSizeRel|x64 = MinSizeRel|x64
@@ -23,6 +25,10 @@ Global
 		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.Debug|x64.Build.0 = Debug|x64
 		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.Debug|x86.ActiveCfg = Debug|Win32
 		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.Debug|x86.Build.0 = Debug|Win32
+		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.DebugCyberPunk|x64.ActiveCfg = DebugCyberPunk|x64
+		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.DebugCyberPunk|x64.Build.0 = DebugCyberPunk|x64
+		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.DebugCyberPunk|x86.ActiveCfg = DebugCyberPunk|Win32
+		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.DebugCyberPunk|x86.Build.0 = DebugCyberPunk|Win32
 		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.DebugGodofWar|x64.ActiveCfg = DebugGodofWar|x64
 		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.DebugGodofWar|x64.Build.0 = DebugGodofWar|x64
 		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.DebugGodofWar|x86.ActiveCfg = DebugGodofWar|Win32

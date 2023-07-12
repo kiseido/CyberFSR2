@@ -3,7 +3,6 @@
 #include "CyberFsr.h"
 #include "DirectXHooks.h"
 #include "Util.h"
-#include "Logger.h"
 
 #include <d3d11.h>
 #include <d3dcompiler.h>
