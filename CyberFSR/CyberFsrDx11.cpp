@@ -2,7 +2,6 @@
 #include "Config.h"
 #include "CyberFsr.h"
 #include "Util.h"
-#include "Logger.h"
 
 NVSDK_NGX_API NVSDK_NGX_Result NVSDK_NGX_D3D11_Init_Ext(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath,
 	ID3D11Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion,

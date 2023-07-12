@@ -8,6 +8,7 @@ NVSDK_NGX_API NVSDK_NGX_Result NVSDK_NGX_D3D12_Init_Ext(unsigned long long InApp
 	ID3D12Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion,
 	unsigned long long unknown0)
 {
+	CyberLOG();
 #ifdef _DEBUG
 	AllocConsole();
 	FILE* fDummy;
@@ -22,21 +23,25 @@ NVSDK_NGX_API NVSDK_NGX_Result NVSDK_NGX_D3D12_Init_Ext(unsigned long long InApp
 
 NVSDK_NGX_Result NVSDK_NGX_D3D12_Init(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath, ID3D12Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion)
 {
+	CyberLOG();
 	return NVSDK_NGX_D3D12_Init_Ext(InApplicationId, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion, 0);
 }
 
 NVSDK_NGX_API NVSDK_NGX_Result NVSDK_NGX_D3D12_Init_ProjectID(const char* InProjectId, NVSDK_NGX_EngineType InEngineType, const char* InEngineVersion, const wchar_t* InApplicationDataPath, ID3D12Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion)
 {
+	CyberLOG();
 	return NVSDK_NGX_D3D12_Init_Ext(0x1337, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion, 0);
 }
 
 NVSDK_NGX_Result NVSDK_NGX_D3D12_Init_with_ProjectID(const char* InProjectId, NVSDK_NGX_EngineType InEngineType, const char* InEngineVersion, const wchar_t* InApplicationDataPath, ID3D12Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion)
 {
+	CyberLOG();
 	return NVSDK_NGX_D3D12_Init_Ext(0x1337, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion, 0);
 }
 
 NVSDK_NGX_Result NVSDK_NGX_D3D12_Shutdown(void)
 {
+	CyberLOG();
 	CyberFsrContext::instance()->NvParameterInstance->Params.clear();
 	CyberFsrContext::instance()->Contexts.clear();
 	return NVSDK_NGX_Result_Success;
@@ -44,6 +49,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_Shutdown(void)
 
 NVSDK_NGX_Result NVSDK_NGX_D3D12_Shutdown1(ID3D12Device* InDevice)
 {
+	CyberLOG();
 	CyberFsrContext::instance()->NvParameterInstance->Params.clear();
 	CyberFsrContext::instance()->Contexts.clear();
 	return NVSDK_NGX_Result_Success;
@@ -52,6 +58,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_Shutdown1(ID3D12Device* InDevice)
 //currently it's kind of hack but better than what it was previously -- External Memory Tracking
 NVSDK_NGX_Result NVSDK_NGX_D3D12_GetParameters(NVSDK_NGX_Parameter** OutParameters)
 {
+	CyberLOG();
 	*OutParameters = CyberFsrContext::instance()->NvParameterInstance->AllocateParameters();
 	return NVSDK_NGX_Result_Success;
 }
@@ -59,6 +66,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_GetParameters(NVSDK_NGX_Parameter** OutParamete
 //currently it's kind of hack still needs a proper implementation 
 NVSDK_NGX_Result NVSDK_NGX_D3D12_GetCapabilityParameters(NVSDK_NGX_Parameter** OutParameters)
 {
+	CyberLOG();
 	*OutParameters = NvParameter::instance()->AllocateParameters();
 	return NVSDK_NGX_Result_Success;
 }
@@ -66,6 +74,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_GetCapabilityParameters(NVSDK_NGX_Parameter** O
 //currently it's kind of hack still needs a proper implementation
 NVSDK_NGX_Result NVSDK_NGX_D3D12_AllocateParameters(NVSDK_NGX_Parameter** OutParameters)
 {
+	CyberLOG();
 	*OutParameters = NvParameter::instance()->AllocateParameters();
 	return NVSDK_NGX_Result_Success;
 }
@@ -73,6 +82,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_AllocateParameters(NVSDK_NGX_Parameter** OutPar
 //currently it's kind of hack still needs a proper implementation
 NVSDK_NGX_Result NVSDK_NGX_D3D12_DestroyParameters(NVSDK_NGX_Parameter* InParameters)
 {
+	CyberLOG();
 	NvParameter::instance()->DeleteParameters((NvParameter*)InParameters);
 	return NVSDK_NGX_Result_Success;
 }
@@ -80,12 +90,14 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_DestroyParameters(NVSDK_NGX_Parameter* InParame
 NVSDK_NGX_Result NVSDK_NGX_D3D12_GetScratchBufferSize(NVSDK_NGX_Feature InFeatureId,
 	const NVSDK_NGX_Parameter* InParameters, size_t* OutSizeInBytes)
 {
+	CyberLOG();
 	*OutSizeInBytes = ffxFsr2GetScratchMemorySizeDX12();
 	return NVSDK_NGX_Result_Success;
 }
 
 void Fsr2MessageCallback(FfxFsr2MsgType type, const wchar_t* message)
 {
+	CyberLOG();
 	switch (type) {
 	case FFX_FSR2_MESSAGE_TYPE_ERROR:
 		printf("[ERROR] %ls\n", message);
@@ -100,6 +112,7 @@ void Fsr2MessageCallback(FfxFsr2MsgType type, const wchar_t* message)
 NVSDK_NGX_Result NVSDK_NGX_D3D12_CreateFeature(ID3D12GraphicsCommandList* InCmdList, NVSDK_NGX_Feature InFeatureID,
 	NVSDK_NGX_Parameter* InParameters, NVSDK_NGX_Handle** OutHandle)
 {
+	CyberLOG();
 	const auto inParams = static_cast<const NvParameter*>(InParameters);
 
 	ID3D12Device* device;
@@ -171,6 +184,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_CreateFeature(ID3D12GraphicsCommandList* InCmdL
 
 NVSDK_NGX_Result NVSDK_NGX_D3D12_ReleaseFeature(NVSDK_NGX_Handle* InHandle)
 {
+	CyberLOG();
 	auto deviceContext = CyberFsrContext::instance()->Contexts[InHandle->Id].get();
 	FfxErrorCode errorCode = ffxFsr2ContextDestroy(&deviceContext->FsrContext);
 	FFX_ASSERT(errorCode == FFX_OK);
@@ -180,6 +194,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_ReleaseFeature(NVSDK_NGX_Handle* InHandle)
 
 NVSDK_NGX_Result NVSDK_NGX_D3D12_GetFeatureRequirements(IDXGIAdapter *Adapter, const NVSDK_NGX_FeatureDiscoveryInfo *FeatureDiscoveryInfo, NVSDK_NGX_FeatureRequirement *OutSupported)
 {
+	CyberLOG();
 	*OutSupported = NVSDK_NGX_FeatureRequirement();
 	OutSupported->FeatureSupported = NVSDK_NGX_FeatureSupportResult_Supported;
 	OutSupported->MinHWArchitecture = 0;
@@ -190,6 +205,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_GetFeatureRequirements(IDXGIAdapter *Adapter, c
 
 NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCmdList, const NVSDK_NGX_Handle* InFeatureHandle, const NVSDK_NGX_Parameter* InParameters, PFN_NVSDK_NGX_ProgressCallback InCallback)
 {
+	CyberLOG();
 	ID3D12RootSignature* orgRootSig = nullptr;
 
 	rootSigMutex.lock();
@@ -276,5 +292,6 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCm
 
 NVSDK_NGX_Result NVSDK_NGX_UpdateFeature(const NVSDK_NGX_Application_Identifier *ApplicationId, const NVSDK_NGX_Feature FeatureID)
 {
+	CyberLOG();
 	return NVSDK_NGX_Result_Success;
 }

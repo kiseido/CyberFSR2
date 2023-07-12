@@ -3,6 +3,7 @@
 #include "scanner.h"
 std::unique_ptr<ViewMatrixHook> ViewMatrixHook::Create(const Config& config)
 {
+	CyberLOG();
 	switch (config.Method.value_or(ViewMethod::Config))
 	{
 		case ViewMethod::Cyberpunk2077:
@@ -30,20 +31,24 @@ ViewMatrixHook::Configured::Configured(float fov, float nearPlane, float farPlan
 	, NearPlane(nearPlane)
 	, FarPlane(farPlane)
 {
+	CyberLOG();
 }
 
 float ViewMatrixHook::Configured::GetFov()
 {
+	CyberLOG();
 	return Fov;
 }
 
 float ViewMatrixHook::Configured::GetFarPlane()
 {
+	CyberLOG();
 	return FarPlane;
 }
 
 float ViewMatrixHook::Configured::GetNearPlane()
 {
+	CyberLOG();
 	return NearPlane;
 }
 
@@ -53,6 +58,7 @@ float ViewMatrixHook::Configured::GetNearPlane()
 
 ViewMatrixHook::Cyberpunk2077::Cyberpunk2077()
 {
+	CyberLOG();
 	//TODO check for different executable versions
 
 	/*
@@ -65,16 +71,19 @@ ViewMatrixHook::Cyberpunk2077::Cyberpunk2077()
 
 float ViewMatrixHook::Cyberpunk2077::GetFov()
 {
+	CyberLOG();
 	return camParams->Fov;
 }
 
 float ViewMatrixHook::Cyberpunk2077::GetFarPlane()
 {
+	CyberLOG();
 	return camParams->FarPlane;
 }
 
 float ViewMatrixHook::Cyberpunk2077::GetNearPlane()
 {
+	CyberLOG();
 	return camParams->NearPlane;
 }
 
@@ -84,22 +93,26 @@ float ViewMatrixHook::Cyberpunk2077::GetNearPlane()
 
 ViewMatrixHook::RDR2::RDR2()
 {
+	CyberLOG();
 	auto loc = scanner::GetOffsetFromInstruction(L"RDR2.exe", "4C 8D 2D ? ? ? ? 48 85 DB", 3);
 	camParams = ((CameraParams*)(loc + 0x60));
 }
 
 float ViewMatrixHook::RDR2::GetFov()
 {
+	CyberLOG();
 	return camParams->Fov;
 }
 
 float ViewMatrixHook::RDR2::GetFarPlane()
 {
+	CyberLOG();
 	return camParams->FarPlane;
 }
 
 float ViewMatrixHook::RDR2::GetNearPlane()
 {
+	CyberLOG();
 	return camParams->NearPlane;
 }
 
@@ -109,6 +122,7 @@ float ViewMatrixHook::RDR2::GetNearPlane()
 
 ViewMatrixHook::DL2::DL2()
 {
+	CyberLOG();
 	// the real fov value is found in "gamedll_ph_x64_rwdi.dll" but a some pointers from "engine_x64_rwdi.dll" has access to it 
 	// in DL2 the CameraDefaultFOV is 57
 	// the game keeps 57 fov as default and there is another fov value called extraFOV which users can change as part of game settings
@@ -125,6 +139,7 @@ ViewMatrixHook::DL2::DL2()
 
 float ViewMatrixHook::DL2::GetFov()
 {
+	CyberLOG();
 	auto param1 = camParams->Fov;
 	auto param2 = extracamParams->Fov;
 
@@ -133,11 +148,13 @@ float ViewMatrixHook::DL2::GetFov()
 
 float ViewMatrixHook::DL2::GetFarPlane()
 {
+	CyberLOG();
 	return camParams->FarPlane;
 }
 
 float ViewMatrixHook::DL2::GetNearPlane()
 {
+	CyberLOG();
 	return camParams->NearPlane;
 }
 

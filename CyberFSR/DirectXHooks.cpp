@@ -35,6 +35,7 @@ typedef struct _FROZEN_THREADS
 
 static BOOL EnumerateThreads(PFROZEN_THREADS pThreads)
 {
+	CyberLOG();
 	BOOL succeeded = FALSE;
 
 	HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
@@ -98,7 +99,7 @@ static BOOL EnumerateThreads(PFROZEN_THREADS pThreads)
 
 static bool Freeze(PFROZEN_THREADS pThreads)
 {
-
+	CyberLOG();
 	pThreads->pItems = NULL;
 	pThreads->capacity = 0;
 	pThreads->size = 0;
@@ -125,6 +126,7 @@ static bool Freeze(PFROZEN_THREADS pThreads)
 
 static VOID Unfreeze(PFROZEN_THREADS pThreads)
 {
+	CyberLOG();
 	if (pThreads->pItems != NULL)
 	{
 		UINT i;
@@ -145,6 +147,7 @@ static VOID Unfreeze(PFROZEN_THREADS pThreads)
 
 void hSetComputeRootSignature(ID3D12GraphicsCommandList* commandList, ID3D12RootSignature* pRootSignature)
 {
+	CyberLOG();
 	rootSigMutex.lock();
 	commandListVector[commandList] = pRootSignature;
 	rootSigMutex.unlock();
@@ -154,6 +157,7 @@ void hSetComputeRootSignature(ID3D12GraphicsCommandList* commandList, ID3D12Root
 
 void HookSetComputeRootSignature(ID3D12GraphicsCommandList* InCmdList)
 {
+	CyberLOG();
 	constexpr int offset = 0xE8 / sizeof(void*);
 
 	void** cmdListVTable = *reinterpret_cast<void***>(InCmdList);
