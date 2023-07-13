@@ -2,10 +2,8 @@
 #include "Interposer.h"
 #include "Logger.h"
 
-using namespace Interposer;
-
 // Function that loads the dependent DLL and retrieves function pointers
-bool Interposer::LoadDependentDLL(LPCWSTR inputFileName)
+bool CyberInterposer::DLSS2_Function_Table::LoadDependentDLL(LPCWSTR inputFileName)
 {
     CyberLOGy(CyberLogger::convertLPCWSTRToString(inputFileName));
     HMODULE hModule = LoadLibraryW(inputFileName);
@@ -65,24 +63,6 @@ bool Interposer::LoadDependentDLL(LPCWSTR inputFileName)
     }
 
     return false;
-}
-
-
-NVSDK_NGX_API NVSDK_NGX_Result NVSDK_NGX_D3D12_Init_Ext(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath,
-	ID3D12Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion,
-	unsigned long long unknown0)
-{
-	CyberLOG();
-#ifdef _DEBUG
-	AllocConsole();
-	FILE* fDummy;
-	freopen_s(&fDummy, "CONIN$", "r", stdin);
-	freopen_s(&fDummy, "CONOUT$", "w", stderr);
-	freopen_s(&fDummy, "CONOUT$", "w", stdout);
-#endif // _DEBUG
-
-	// is pointer good? cast pointer and call it and return any results!
-	return NVSDK_NGX_Result_Success;
 }
 
 NVSDK_NGX_Result NVSDK_NGX_UpdateFeature(const NVSDK_NGX_Application_Identifier* ApplicationId, const NVSDK_NGX_Feature FeatureID)

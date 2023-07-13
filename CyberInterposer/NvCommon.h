@@ -1,4 +1,6 @@
 #include "pch.h"
+#ifndef NVCOMMON
+#define NVCOMMON
 
 struct NvParameter : NVSDK_NGX_Parameter
 {
@@ -20,3 +22,5 @@ struct NvParameter : NVSDK_NGX_Parameter
 	virtual NVSDK_NGX_Result Get(const char* InName, void** OutValue) const override;
 	virtual void Reset() override;
 };
+
+#endif
