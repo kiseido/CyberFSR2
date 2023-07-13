@@ -86,14 +86,12 @@ std::mutex queueMutex;
 std::condition_variable queueCondVar;
 std::thread writingThread;
 
-std::ofstream logFile("./CyberFSR.log", std::ios::app);
-
-void WriteLogToFile(const LogEntry& logEntry) {
-    logFile << logEntry.hardwareInfo << " ::: " << logEntry.message << "\n";
-}
-
+std::ofstream logFile;
 
 void WritingThreadFunction() {
+    if (! logFile.is_open())
+      logFile.open("./CyberInterposer.log", std::ios::app);
+
     while (!stopWritingThread) {
         std::unique_lock<std::mutex> lock(queueMutex);
         queueCondVar.wait(lock, [] { return !logQueue.empty() || stopWritingThread; });
@@ -103,11 +101,13 @@ void WritingThreadFunction() {
             logQueue.pop();
             lock.unlock();
 
-            WriteLogToFile(entry);
+            logFile << entry.hardwareInfo << " ::: " << entry.message << "\n";
 
             lock.lock();
         }
     }
+
+    logFile.close();
 }
 
 void Logger::init() {
@@ -136,6 +136,7 @@ void Logger::cleanup() {
     }
 
     queueCondVar.notify_one();
+    stopWritingThread.store(true);
 }
 
 void Logger::log(const LogType& logType, const std::string_view& functionName, const std::string_view& staticInfo, const std::string& dynamicInfo, const uint64_t& errorInfo) {

@@ -1,11 +1,6 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
-#include <iostream>
-#include <string>
-#include <numeric>
-#include <vector>
-
 
 #define CyberLOG() CyberFSR::Logger::log(CyberFSR::Logger::LogType::INFO_t, __func__, "");
 
@@ -16,10 +11,6 @@
         std::string_view stream_sv = CyberFSR::convertToStringView(__VA_ARGS__);; \
         CyberFSR::Logger::log(CyberFSR::Logger::LogType::INFO_t, __func__, stream_sv); \
     } while (false)
-
-
-
-
 
 namespace CyberFSR {
 
@@ -40,8 +31,8 @@ namespace CyberFSR {
         static void log(const LogType& logType, const std::string_view& functionName, const std::string_view& staticInfo);
         static void log(const LogType& logType, const std::string_view& functionName, const uint64_t& errorInfo);
         static void log(const LogType& logType, const std::string_view& functionName);
-        
-        
+
+
     };
 
     template<typename... Args>
@@ -52,3 +43,4 @@ namespace CyberFSR {
     }
 }
 #endif
+ 
