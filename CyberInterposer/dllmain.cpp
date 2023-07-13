@@ -14,7 +14,7 @@ BOOL APIENTRY DllMain( HMODULE hModule,
     case DLL_PROCESS_ATTACH:
         CyberLogger::init();
         CyberLOGy("DLL_PROCESS_ATTACH");
-        if (!CyberInterposer::function_table.LoadDependentDLL(L"nvngx.dll"))
+        if (!CyberInterposer::function_table.LoadDependentDLL(L"nvngx.dll", true))
         {
             CyberLOGy("Loading NVNGX.dll failed");
             // Handle the error if the dependent DLL cannot be loaded

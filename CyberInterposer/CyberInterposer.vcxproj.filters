@@ -30,6 +30,15 @@
     <ClInclude Include="NvCommon.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="NvCuda.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NvDX11.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PFN_Definitions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -54,6 +63,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="NvVk.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NvCuda.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

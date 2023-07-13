@@ -43,15 +43,15 @@ void NvParameter::Set(const char* InName, int InValue)
 void NvParameter::Set(const char* InName, ID3D11Resource* InValue)
 {
     CyberLOG();
-    if (function_table.pfn_SetD3d11Resource != nullptr)
-        reinterpret_cast<void(*)(const char*, ID3D11Resource*)>(function_table.pfn_SetD3d11Resource)(InName, InValue);
+    if (function_table.PFN_DX11.pfn_SetD3d11Resource != nullptr)
+        reinterpret_cast<void(*)(const char*, ID3D11Resource*)>(function_table.PFN_DX11.pfn_SetD3d11Resource)(InName, InValue);
 }
 
 void NvParameter::Set(const char* InName, ID3D12Resource* InValue)
 {
     CyberLOG();
-    if (function_table.pfn_SetD3d12Resource != nullptr)
-        reinterpret_cast<void(*)(const char*, ID3D12Resource*)>(function_table.pfn_SetD3d12Resource)(InName, InValue);
+    if (function_table.PFN_DX12.pfn_SetD3d12Resource != nullptr)
+        reinterpret_cast<void(*)(const char*, ID3D12Resource*)>(function_table.PFN_DX12.pfn_SetD3d12Resource)(InName, InValue);
 }
 
 void NvParameter::Set(const char* InName, void* InValue)
@@ -109,8 +109,8 @@ NVSDK_NGX_Result NvParameter::Get(const char* InName, int* OutValue) const
 NVSDK_NGX_Result NvParameter::Get(const char* InName, ID3D11Resource** OutValue) const
 {
     CyberLOG();
-    if (function_table.pfn_GetD3d11Resource != nullptr)
-        return reinterpret_cast<NVSDK_NGX_Result(*)(const char*, ID3D11Resource**)>(function_table.pfn_GetD3d11Resource)(InName, OutValue);
+    if (function_table.PFN_DX11.pfn_GetD3d11Resource != nullptr)
+        return reinterpret_cast<NVSDK_NGX_Result(*)(const char*, ID3D11Resource**)>(function_table.PFN_DX11.pfn_GetD3d11Resource)(InName, OutValue);
 
     return NVSDK_NGX_Result_Fail;
 }
@@ -118,8 +118,8 @@ NVSDK_NGX_Result NvParameter::Get(const char* InName, ID3D11Resource** OutValue)
 NVSDK_NGX_Result NvParameter::Get(const char* InName, ID3D12Resource** OutValue) const
 {
     CyberLOG();
-    if (function_table.pfn_GetD3d12Resource != nullptr)
-        return reinterpret_cast<NVSDK_NGX_Result(*)(const char*, ID3D12Resource**)>(function_table.pfn_GetD3d12Resource)(InName, OutValue);
+    if (function_table.PFN_DX12.pfn_GetD3d12Resource != nullptr)
+        return reinterpret_cast<NVSDK_NGX_Result(*)(const char*, ID3D12Resource**)>(function_table.PFN_DX12.pfn_GetD3d12Resource)(InName, OutValue);
 
     return NVSDK_NGX_Result_Fail;
 }
