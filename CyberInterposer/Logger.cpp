@@ -12,8 +12,6 @@
 #include <ctime>
 #include <windows.h>
 
-using namespace CyberFSR;
-
 bool UseLogWindow = true;
 
 struct HighPerformanceCounterInfo {
@@ -110,7 +108,7 @@ void WritingThreadFunction() {
     logFile.close();
 }
 
-void Logger::init() {
+void CyberLogger::init() {
     std::stringstream logStream;
     logStream << "CyberLogger init" << '\n';
 
@@ -126,7 +124,7 @@ void Logger::init() {
     }
 }
 
-void Logger::cleanup() {
+void CyberLogger::cleanup() {
     std::stringstream logStream;
     logStream << "CyberLogger cleanup" << '\n';
 
@@ -139,7 +137,7 @@ void Logger::cleanup() {
     stopWritingThread.store(true);
 }
 
-void Logger::log(const LogType& logType, const std::string_view& functionName, const std::string_view& staticInfo, const std::string& dynamicInfo, const uint64_t& errorInfo) {
+void CyberLogger::log(const LogType& logType, const std::string_view& functionName, const std::string_view& staticInfo, const std::string& dynamicInfo, const uint64_t& errorInfo) {
     std::stringstream logStream;
     logStream << functionName << " - " << staticInfo << " - " << dynamicInfo << " - " << errorInfo << '\n';
 
@@ -151,7 +149,7 @@ void Logger::log(const LogType& logType, const std::string_view& functionName, c
     queueCondVar.notify_one();
 }
 
-void Logger::log(const LogType& logType, const std::string_view& functionName, const std::string_view& staticInfo, const uint64_t& errorInfo) {
+void CyberLogger::log(const LogType& logType, const std::string_view& functionName, const std::string_view& staticInfo, const uint64_t& errorInfo) {
     std::stringstream logStream;
     logStream << functionName << " - " << staticInfo << " - " << errorInfo << '\n';
 
@@ -163,7 +161,7 @@ void Logger::log(const LogType& logType, const std::string_view& functionName, c
     queueCondVar.notify_one();
 }
 
-void Logger::log(const LogType& logType, const std::string_view& functionName, const std::string_view& staticInfo) {
+void CyberLogger::log(const LogType& logType, const std::string_view& functionName, const std::string_view& staticInfo) {
     std::stringstream logStream;
     logStream << functionName << " - " << staticInfo << '\n';
 
@@ -175,7 +173,7 @@ void Logger::log(const LogType& logType, const std::string_view& functionName, c
     queueCondVar.notify_one();
 }
 
-void Logger::log(const LogType& logType, const std::string_view& functionName, const uint64_t& errorInfo) {
+void CyberLogger::log(const LogType& logType, const std::string_view& functionName, const uint64_t& errorInfo) {
     std::stringstream logStream;
     logStream << functionName << " - " << errorInfo << '\n';
 
@@ -187,7 +185,7 @@ void Logger::log(const LogType& logType, const std::string_view& functionName, c
     queueCondVar.notify_one();
 }
 
-void Logger::log(const LogType& logType, const std::string_view& functionName) {
+void CyberLogger::log(const LogType& logType, const std::string_view& functionName) {
     std::stringstream logStream;
     logStream << functionName << '\n';
 

@@ -12,9 +12,9 @@ BOOL APIENTRY DllMain( HMODULE hModule,
     switch (ul_reason_for_call)
     {
     case DLL_PROCESS_ATTACH:
-        CyberFSR::Logger::init();
+        CyberLogger::init();
         CyberLOGy("DLL_PROCESS_ATTACH");
-        if (!LoadDependentDLL())
+        if (!Interposer::LoadDependentDLL(L"nvngx.dll"))
         {
             CyberLOGy("Loading NVNGX.dll failed");
             // Handle the error if the dependent DLL cannot be loaded
@@ -29,7 +29,7 @@ BOOL APIENTRY DllMain( HMODULE hModule,
         break;
     case DLL_PROCESS_DETACH:
         CyberLOGy("DLL_PROCESS_DETACH");
-        CyberFSR::Logger::cleanup();
+        CyberLogger::cleanup();
         break;
     }
     return TRUE;
