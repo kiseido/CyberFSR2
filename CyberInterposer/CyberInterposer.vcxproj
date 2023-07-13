@@ -151,13 +151,17 @@
     <ClInclude Include="Interposer.h" />
     <ClInclude Include="Logger.h" />
     <ClInclude Include="NvCommon.h" />
+    <ClInclude Include="NvCuda.h" />
+    <ClInclude Include="NvDX11.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="PFN_Definitions.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="Interposer.cpp" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="NvCommon.cpp" />
+    <ClCompile Include="NvCuda.cpp" />
     <ClCompile Include="NvDX11.cpp" />
     <ClCompile Include="NvDX12.cpp" />
     <ClCompile Include="NvVk.cpp" />
