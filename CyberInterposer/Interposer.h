@@ -3,6 +3,7 @@
 
 namespace CyberInterposer
 {
+    // DX11
     typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_D3D11_Init)(unsigned long long, const wchar_t*, ID3D11Device*, const NVSDK_NGX_FeatureCommonInfo*, NVSDK_NGX_Version);
     typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_D3D11_Init_Ext)(unsigned long long, const wchar_t*, ID3D11Device*, const NVSDK_NGX_FeatureCommonInfo*, NVSDK_NGX_Version, unsigned long long);
     typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_D3D11_Shutdown)(void);
@@ -10,11 +11,14 @@ namespace CyberInterposer
     typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_D3D11_GetScratchBufferSize)(NVSDK_NGX_Feature, const NVSDK_NGX_Parameter*, size_t*);
     typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_D3D11_CreateFeature)(ID3D11Device*, NVSDK_NGX_Feature, NVSDK_NGX_Parameter*, NVSDK_NGX_Handle**);
     typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_D3D11_ReleaseFeature)(NVSDK_NGX_Handle*);
-    typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_D3D11_EvaluateFeature)(ID3D11Device*, const NVSDK_NGX_Handle*, const NVSDK_NGX_Parameter*, PFN_NVSDK_NGX_ProgressCallback);
+    typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_D3D11_EvaluateFeature)(ID3D11DeviceContext*, const NVSDK_NGX_Handle*, const NVSDK_NGX_Parameter*, PFN_NVSDK_NGX_ProgressCallback);
     typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_D3D11_GetCapabilityParameters)(NVSDK_NGX_Parameter**);
     typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_D3D11_AllocateParameters)(NVSDK_NGX_Parameter**);
     typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_D3D11_DestroyParameters)(NVSDK_NGX_Parameter*);
+    typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_D3D11_Init_ProjectID)(const char*, NVSDK_NGX_EngineType, const char*, const wchar_t*, ID3D11Device*, const NVSDK_NGX_FeatureCommonInfo*, NVSDK_NGX_Version);
 
+
+    // DX12
     typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_D3D12_Init_Ext)(unsigned long long, const wchar_t*, ID3D12Device*, const NVSDK_NGX_FeatureCommonInfo*, NVSDK_NGX_Version, unsigned long long);
     typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_D3D12_Init)(unsigned long long, const wchar_t*, ID3D12Device*, const NVSDK_NGX_FeatureCommonInfo*, NVSDK_NGX_Version);
     typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_D3D12_Init_ProjectID)(const char*, NVSDK_NGX_EngineType, const char*, const wchar_t*, ID3D12Device*, const NVSDK_NGX_FeatureCommonInfo*, NVSDK_NGX_Version);
@@ -32,6 +36,7 @@ namespace CyberInterposer
 
     typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_UpdateFeature)(const NVSDK_NGX_Application_Identifier*, const NVSDK_NGX_Feature);
 
+    // Vulkan
     typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_VULKAN_Init)(unsigned long long, const wchar_t*, VkInstance, VkPhysicalDevice, VkDevice, PFN_vkGetInstanceProcAddr, PFN_vkGetDeviceProcAddr, const NVSDK_NGX_FeatureCommonInfo*, NVSDK_NGX_Version);
     typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_VULKAN_Init_ProjectID)(const char*, NVSDK_NGX_EngineType, const char*, const wchar_t*, VkInstance, VkPhysicalDevice, VkDevice, PFN_vkGetInstanceProcAddr, PFN_vkGetDeviceProcAddr, const NVSDK_NGX_FeatureCommonInfo*, NVSDK_NGX_Version);
     typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_VULKAN_Shutdown)(void);
@@ -43,6 +48,8 @@ namespace CyberInterposer
     typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_VULKAN_CreateFeature)(VkCommandBuffer, NVSDK_NGX_Feature, NVSDK_NGX_Parameter*, NVSDK_NGX_Handle**);
     typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_VULKAN_ReleaseFeature)(NVSDK_NGX_Handle*);
     typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_VULKAN_EvaluateFeature)(VkCommandBuffer, const NVSDK_NGX_Handle*, const NVSDK_NGX_Parameter*, PFN_NVSDK_NGX_ProgressCallback);
+
+    // CUDA
 
     struct DLSS2_Function_Table
     {
@@ -63,8 +70,9 @@ namespace CyberInterposer
         PFN_NVSDK_NGX_Parameter_GetD3d12Resource pfn_GetD3d12Resource = nullptr;
         PFN_NVSDK_NGX_Parameter_GetVoidPointer pfn_GetVoidPointer = nullptr;
 
-        PFN_NVSDK_NGX_D3D11_Init pfn_D3D11_Init = nullptr;
         PFN_NVSDK_NGX_D3D11_Init_Ext pfn_D3D11_Init_Ext = nullptr;
+        PFN_NVSDK_NGX_D3D11_Init pfn_D3D11_Init = nullptr;
+        PFN_NVSDK_NGX_D3D11_Init_ProjectID pfn_D3D11_Init_ProjectID = nullptr;
         PFN_NVSDK_NGX_D3D11_Shutdown pfn_D3D11_Shutdown = nullptr;
         PFN_NVSDK_NGX_D3D11_GetParameters pfn_D3D11_GetParameters = nullptr;
         PFN_NVSDK_NGX_D3D11_GetScratchBufferSize pfn_D3D11_GetScratchBufferSize = nullptr;
