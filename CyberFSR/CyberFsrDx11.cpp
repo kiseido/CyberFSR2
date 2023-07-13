@@ -43,26 +43,26 @@ NVSDK_NGX_API NVSDK_NGX_Result NVSDK_NGX_D3D11_Init_Ext(unsigned long long InApp
     ID3D11Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion,
     unsigned long long unknown0)
 {
-    CyberLOG();
+    CyberFSR::Logger::log(CyberFSR::Logger::LogType::INFO_t, __func__, "");;
 
     // Perform input validation
     if (InDevice == nullptr || InFeatureInfo == nullptr)
     {
+        CyberLogLots("InDevice == nullptr || InFeatureInfo == nullptr");
         return NVSDK_NGX_Result_FAIL_InvalidParameter;
     }
 
     // Check the compatibility of the NGX SDK version
     if (InSDKVersion < NVSDK_NGX_Version_API)
     {
+        CyberLogLots("NVSDK_NGX_Result_FAIL_OutOfDate", (int) InSDKVersion, " was less than ", (int)NVSDK_NGX_Version_API);
         return NVSDK_NGX_Result_FAIL_OutOfDate;
     }
 
-    // Perform any additional initialization steps specific to your application
-    // ...
 
     // Initialize NGX for D3D11
     NVSDK_NGX_Result result = NVSDK_NGX_Result_Success;
-    bool initializationSuccess = false;
+    bool initializationSuccess = true;
 
     // TODO: Add your NGX initialization code here
     // ...
@@ -70,13 +70,13 @@ NVSDK_NGX_API NVSDK_NGX_Result NVSDK_NGX_D3D11_Init_Ext(unsigned long long InApp
     if (initializationSuccess)
     {
         // Print a success message to the console or log
-        CyberLOGy("NVSDK_NGX_D3D11_Init_Ext: Initialization successful!");
+        CyberLOGy("Initialization successful!");
 
     }
     else
     {
         // Print an error message to the console or log
-        CyberLOGy("NVSDK_NGX_D3D11_Init_Ext: Initialization failed!");
+        CyberLOGy("Initialization failed!");
 
         // Set the appropriate error code based on the initialization failure reason
         result = NVSDK_NGX_Result_Fail;

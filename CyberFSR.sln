@@ -5,6 +5,8 @@ VisualStudioVersion = 17.2.32602.215
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CyberFSR", "CyberFSR\CyberFSR.vcxproj", "{8D2B73FB-EECD-45CE-B8E5-335610462F58}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CyberInterposer", "CyberInterposer\CyberInterposer.vcxproj", "{66688C84-ECBD-4E74-8EB0-1A9CA7EC2D47}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -13,6 +15,8 @@ Global
 		DebugCyberPunk|x86 = DebugCyberPunk|x86
 		DebugGodofWar|x64 = DebugGodofWar|x64
 		DebugGodofWar|x86 = DebugGodofWar|x86
+		DebugRiseofTombRaider|x64 = DebugRiseofTombRaider|x64
+		DebugRiseofTombRaider|x86 = DebugRiseofTombRaider|x86
 		MinSizeRel|x64 = MinSizeRel|x64
 		MinSizeRel|x86 = MinSizeRel|x86
 		Release|x64 = Release|x64
@@ -33,6 +37,10 @@ Global
 		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.DebugGodofWar|x64.Build.0 = DebugGodofWar|x64
 		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.DebugGodofWar|x86.ActiveCfg = DebugGodofWar|Win32
 		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.DebugGodofWar|x86.Build.0 = DebugGodofWar|Win32
+		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.DebugRiseofTombRaider|x64.ActiveCfg = DebugRiseofTombRaider|x64
+		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.DebugRiseofTombRaider|x64.Build.0 = DebugRiseofTombRaider|x64
+		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.DebugRiseofTombRaider|x86.ActiveCfg = DebugRiseofTombRaider|Win32
+		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.DebugRiseofTombRaider|x86.Build.0 = DebugRiseofTombRaider|Win32
 		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.MinSizeRel|x64.ActiveCfg = Release|x64
 		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.MinSizeRel|x64.Build.0 = Release|x64
 		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.MinSizeRel|x86.ActiveCfg = Release|Win32
@@ -45,6 +53,34 @@ Global
 		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.RelWithDebInfo|x64.Build.0 = Release|x64
 		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.RelWithDebInfo|x86.ActiveCfg = Release|Win32
 		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.RelWithDebInfo|x86.Build.0 = Release|Win32
+		{66688C84-ECBD-4E74-8EB0-1A9CA7EC2D47}.Debug|x64.ActiveCfg = Debug|x64
+		{66688C84-ECBD-4E74-8EB0-1A9CA7EC2D47}.Debug|x64.Build.0 = Debug|x64
+		{66688C84-ECBD-4E74-8EB0-1A9CA7EC2D47}.Debug|x86.ActiveCfg = Debug|Win32
+		{66688C84-ECBD-4E74-8EB0-1A9CA7EC2D47}.Debug|x86.Build.0 = Debug|Win32
+		{66688C84-ECBD-4E74-8EB0-1A9CA7EC2D47}.DebugCyberPunk|x64.ActiveCfg = Debug|x64
+		{66688C84-ECBD-4E74-8EB0-1A9CA7EC2D47}.DebugCyberPunk|x64.Build.0 = Debug|x64
+		{66688C84-ECBD-4E74-8EB0-1A9CA7EC2D47}.DebugCyberPunk|x86.ActiveCfg = Debug|Win32
+		{66688C84-ECBD-4E74-8EB0-1A9CA7EC2D47}.DebugCyberPunk|x86.Build.0 = Debug|Win32
+		{66688C84-ECBD-4E74-8EB0-1A9CA7EC2D47}.DebugGodofWar|x64.ActiveCfg = Debug|x64
+		{66688C84-ECBD-4E74-8EB0-1A9CA7EC2D47}.DebugGodofWar|x64.Build.0 = Debug|x64
+		{66688C84-ECBD-4E74-8EB0-1A9CA7EC2D47}.DebugGodofWar|x86.ActiveCfg = Debug|Win32
+		{66688C84-ECBD-4E74-8EB0-1A9CA7EC2D47}.DebugGodofWar|x86.Build.0 = Debug|Win32
+		{66688C84-ECBD-4E74-8EB0-1A9CA7EC2D47}.DebugRiseofTombRaider|x64.ActiveCfg = Debug|x64
+		{66688C84-ECBD-4E74-8EB0-1A9CA7EC2D47}.DebugRiseofTombRaider|x64.Build.0 = Debug|x64
+		{66688C84-ECBD-4E74-8EB0-1A9CA7EC2D47}.DebugRiseofTombRaider|x86.ActiveCfg = Debug|Win32
+		{66688C84-ECBD-4E74-8EB0-1A9CA7EC2D47}.DebugRiseofTombRaider|x86.Build.0 = Debug|Win32
+		{66688C84-ECBD-4E74-8EB0-1A9CA7EC2D47}.MinSizeRel|x64.ActiveCfg = Debug|x64
+		{66688C84-ECBD-4E74-8EB0-1A9CA7EC2D47}.MinSizeRel|x64.Build.0 = Debug|x64
+		{66688C84-ECBD-4E74-8EB0-1A9CA7EC2D47}.MinSizeRel|x86.ActiveCfg = Debug|Win32
+		{66688C84-ECBD-4E74-8EB0-1A9CA7EC2D47}.MinSizeRel|x86.Build.0 = Debug|Win32
+		{66688C84-ECBD-4E74-8EB0-1A9CA7EC2D47}.Release|x64.ActiveCfg = Release|x64
+		{66688C84-ECBD-4E74-8EB0-1A9CA7EC2D47}.Release|x64.Build.0 = Release|x64
+		{66688C84-ECBD-4E74-8EB0-1A9CA7EC2D47}.Release|x86.ActiveCfg = Release|Win32
+		{66688C84-ECBD-4E74-8EB0-1A9CA7EC2D47}.Release|x86.Build.0 = Release|Win32
+		{66688C84-ECBD-4E74-8EB0-1A9CA7EC2D47}.RelWithDebInfo|x64.ActiveCfg = Release|x64
+		{66688C84-ECBD-4E74-8EB0-1A9CA7EC2D47}.RelWithDebInfo|x64.Build.0 = Release|x64
+		{66688C84-ECBD-4E74-8EB0-1A9CA7EC2D47}.RelWithDebInfo|x86.ActiveCfg = Release|Win32
+		{66688C84-ECBD-4E74-8EB0-1A9CA7EC2D47}.RelWithDebInfo|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
