@@ -86,6 +86,17 @@ std::thread writingThread;
 
 std::ofstream logFile;
 
+std::string convertLPCWSTRToString(LPCWSTR lpcwstr) {
+    int size = WideCharToMultiByte(CP_UTF8, 0, lpcwstr, -1, nullptr, 0, nullptr, nullptr);
+    if (size == 0)
+        return ""; // Error occurred
+
+    std::string str(size, '\0');
+    WideCharToMultiByte(CP_UTF8, 0, lpcwstr, -1, str.data(), size, nullptr, nullptr);
+
+    return str;
+}
+
 void WritingThreadFunction() {
     if (! logFile.is_open())
       logFile.open("./CyberInterposer.log", std::ios::app);

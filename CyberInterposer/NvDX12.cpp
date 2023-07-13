@@ -3,7 +3,7 @@
 #include "Interposer.h"
 #include "Logger.h"
 
-using namespace Interposer;
+using namespace CyberInterposer;
 
 NVSDK_NGX_API NVSDK_NGX_Result NVSDK_NGX_D3D12_Init_Ext(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath,
     ID3D12Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion,
