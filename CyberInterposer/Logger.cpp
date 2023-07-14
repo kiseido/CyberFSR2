@@ -106,13 +106,12 @@ void WritingThreadFunction() {
         queueCondVar.wait(lock, [] { return !logQueue.empty() || stopWritingThread; });
 
         while (!logQueue.empty()) {
+            lock.unlock();
             LogEntry entry = std::move(logQueue.front());
             logQueue.pop();
-            lock.unlock();
+            lock.lock();
 
             logFile << entry.hardwareInfo << " ::: " << entry.message << "\n";
-
-            lock.lock();
         }
     }
 
@@ -123,9 +122,11 @@ void CyberLogger::init() {
     std::stringstream logStream;
     logStream << "CyberLogger init" << '\n';
 
+    auto string = logStream.str();
+
     {
         std::lock_guard<std::mutex> lock(queueMutex);
-        logQueue.push({ SystemInfo(), logStream.str() });
+        logQueue.push({ SystemInfo(), string });
     }
 
 
@@ -138,10 +139,11 @@ void CyberLogger::init() {
 void CyberLogger::cleanup() {
     std::stringstream logStream;
     logStream << "CyberLogger cleanup" << '\n';
+    auto string = logStream.str();
 
     {
         std::lock_guard<std::mutex> lock(queueMutex);
-        logQueue.push({ SystemInfo(), logStream.str() });
+        logQueue.push({ SystemInfo(), string });
     }
 
     queueCondVar.notify_one();
@@ -152,9 +154,11 @@ void CyberLogger::log(const LogType& logType, const std::string_view& functionNa
     std::stringstream logStream;
     logStream << functionName << " - " << staticInfo << " - " << dynamicInfo << " - " << errorInfo << '\n';
 
+    auto string = logStream.str();
+
     {
         std::lock_guard<std::mutex> lock(queueMutex);
-        logQueue.push({ SystemInfo(), logStream.str() });
+        logQueue.push({ SystemInfo(), string });
     }
 
     queueCondVar.notify_one();
@@ -164,9 +168,11 @@ void CyberLogger::log(const LogType& logType, const std::string_view& functionNa
     std::stringstream logStream;
     logStream << functionName << " - " << staticInfo << " - " << errorInfo << '\n';
 
+    auto string = logStream.str();
+
     {
         std::lock_guard<std::mutex> lock(queueMutex);
-        logQueue.push({ SystemInfo(), logStream.str() });
+        logQueue.push({ SystemInfo(), string });
     }
 
     queueCondVar.notify_one();
@@ -176,9 +182,11 @@ void CyberLogger::log(const LogType& logType, const std::string_view& functionNa
     std::stringstream logStream;
     logStream << functionName << " - " << staticInfo << '\n';
 
+    auto string = logStream.str();
+
     {
         std::lock_guard<std::mutex> lock(queueMutex);
-        logQueue.push({ SystemInfo(), logStream.str() });
+        logQueue.push({ SystemInfo(), string });
     }
 
     queueCondVar.notify_one();
@@ -188,9 +196,11 @@ void CyberLogger::log(const LogType& logType, const std::string_view& functionNa
     std::stringstream logStream;
     logStream << functionName << " - " << errorInfo << '\n';
 
+    auto string = logStream.str();
+
     {
         std::lock_guard<std::mutex> lock(queueMutex);
-        logQueue.push({ SystemInfo(), logStream.str() });
+        logQueue.push({ SystemInfo(), string });
     }
 
     queueCondVar.notify_one();
@@ -200,9 +210,11 @@ void CyberLogger::log(const LogType& logType, const std::string_view& functionNa
     std::stringstream logStream;
     logStream << functionName << '\n';
 
+    auto string = logStream.str();
+
     {
         std::lock_guard<std::mutex> lock(queueMutex);
-        logQueue.push({ SystemInfo(), logStream.str() });
+        logQueue.push({ SystemInfo(), string });
     }
 
     queueCondVar.notify_one();
