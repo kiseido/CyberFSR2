@@ -86,7 +86,7 @@ std::thread writingThread;
 
 std::ofstream logFile;
 
-std::string convertLPCWSTRToString(LPCWSTR lpcwstr) {
+std::string CyberLogger::convertLPCWSTRToString(LPCWSTR lpcwstr) {
     int size = WideCharToMultiByte(CP_UTF8, 0, lpcwstr, -1, nullptr, 0, nullptr, nullptr);
     if (size == 0)
         return ""; // Error occurred

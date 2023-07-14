@@ -12,7 +12,7 @@ bool CyberInterposer::Top_Interposer::LoadDependentDLL(LPCWSTR inputFileName, bo
 {
     CyberLOGy(CyberLogger::convertLPCWSTRToString(inputFileName));
     HMODULE hModule = LoadLibraryW(inputFileName);
-    LoadDependentDLL(hModule, populateChildren);
+    return LoadDependentDLL(hModule, populateChildren);
 }
 
 bool CyberInterposer::Top_Interposer::LoadDependentDLL(HMODULE hModule, bool populateChildren)
