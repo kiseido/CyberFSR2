@@ -3,6 +3,8 @@
 #include "DirectXHooks.h"
 #include <tlhelp32.h>
 
+#include "Logging.h"
+
 /*
 Cyberpunk doesn't reset the ComputeRootSignature after running DLSS.
 This is fine for DLSS itself because they only use CUDA stuff but breaks everything for implementations that use compute shaders

@@ -32,4 +32,5 @@
 
 #include <ankerl/unordered_dense.h>
 #include <SimpleIni.h>
-#include "Logger.h"
+
+#include "CyberLogger.h"

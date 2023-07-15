@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "NvCommon.h"
 #include "Interposer.h"
-#include "Logger.h"
+#include "Logging.h"
 
 using namespace CyberInterposer;
 

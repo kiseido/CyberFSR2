@@ -33,6 +33,8 @@ void logFunctionCall(const std::string& functionName)
 
 #endif // SaveToLog
 
+#include "Logging.h"
+
 
 struct FenceInfo
 {

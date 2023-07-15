@@ -3,6 +3,7 @@
 #include "ViewMatrixHook.h"
 #include "NvParameter.h"
 #include "DebugOverlay.h"
+#include "logging.h"
 
 class FeatureContext;
 
