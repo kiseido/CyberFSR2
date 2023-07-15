@@ -7,6 +7,8 @@
 #include <d3d11.h>
 #include <d3dcompiler.h>
 
+#include "Logging.h"
+
 
 struct FenceInfo
 {
@@ -43,7 +45,7 @@ NVSDK_NGX_API NVSDK_NGX_Result NVSDK_NGX_D3D11_Init_Ext(unsigned long long InApp
     ID3D11Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion,
     unsigned long long unknown0)
 {
-    CyberFSR::Logger::log(CyberFSR::Logger::LogType::INFO_t, __func__, "");;
+    CyberLOG();
 
     // Perform input validation
     if (InDevice == nullptr || InFeatureInfo == nullptr)

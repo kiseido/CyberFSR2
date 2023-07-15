@@ -1,7 +1,7 @@
 // dllmain.cpp : Defines the entry point for the DLL application.
 #include "pch.h"
 #include "Interposer.h"
-#include "Logger.h"
+#include "Logging.h"
 
 
 BOOL APIENTRY DllMain( HMODULE hModule,
@@ -12,7 +12,8 @@ BOOL APIENTRY DllMain( HMODULE hModule,
     switch (ul_reason_for_call)
     {
     case DLL_PROCESS_ATTACH:
-        CyberLogger::init();
+        CyberInterposer::logger.start(L"CyberInterposer.log", true, true, true);
+
         CyberLOGy("DLL_PROCESS_ATTACH");
         if (!CyberInterposer::function_table.LoadDependentDLL(L"nvngx.dll", true))
         {
@@ -29,7 +30,7 @@ BOOL APIENTRY DllMain( HMODULE hModule,
         break;
     case DLL_PROCESS_DETACH:
         CyberLOGy("DLL_PROCESS_DETACH");
-        CyberLogger::cleanup();
+        CyberInterposer::logger.stop();
         break;
     }
     return TRUE;
