@@ -18,39 +18,67 @@ bool CyberInterposer::Top_Interposer::LoadDependentDLL(LPCWSTR inputFileName, bo
     return LoadDependentDLL(hModule, populateChildren);
 }
 
-bool CyberInterposer::Top_Interposer::LoadDependentDLL(HMODULE hModule, bool populateChildren)
+bool GetFunctionAddress(HMODULE hModule, const char* functionName, FARPROC* functionAddress)
 {
-    CyberLOG();
+    *functionAddress = GetProcAddress(hModule, functionName);
 
-    if (hModule == nullptr)
+    if (*functionAddress == nullptr)
     {
+        CyberLogLots("Failed to retrieve function address: " + std::string(functionName));
         return false;
     }
 
-    // common
-    pfn_GetULL = reinterpret_cast<PFN_NVSDK_NGX_Parameter_GetULL>(GetProcAddress(hModule, "NVSDK_NGX_Parameter_GetULL"));
-    pfn_SetULL = reinterpret_cast<PFN_NVSDK_NGX_Parameter_SetULL>(GetProcAddress(hModule, "NVSDK_NGX_Parameter_SetULL"));
-    pfn_GetD = reinterpret_cast<PFN_NVSDK_NGX_Parameter_GetD>(GetProcAddress(hModule, "NVSDK_NGX_Parameter_GetD"));
-    pfn_SetD = reinterpret_cast<PFN_NVSDK_NGX_Parameter_SetD>(GetProcAddress(hModule, "NVSDK_NGX_Parameter_SetD"));
-    pfn_GetI = reinterpret_cast<PFN_NVSDK_NGX_Parameter_GetI>(GetProcAddress(hModule, "NVSDK_NGX_Parameter_GetI"));
-    pfn_SetI = reinterpret_cast<PFN_NVSDK_NGX_Parameter_SetI>(GetProcAddress(hModule, "NVSDK_NGX_Parameter_SetI"));
-    pfn_SetVoidPointer = reinterpret_cast<PFN_NVSDK_NGX_Parameter_SetVoidPointer>(GetProcAddress(hModule, "NVSDK_NGX_Parameter_SetVoidPointer"));
-    pfn_GetVoidPointer = reinterpret_cast<PFN_NVSDK_NGX_Parameter_GetVoidPointer>(GetProcAddress(hModule, "NVSDK_NGX_Parameter_GetVoidPointer"));
-    pfn_GetF = reinterpret_cast<PFN_NVSDK_NGX_Parameter_GetF>(GetProcAddress(hModule, "NVSDK_NGX_Parameter_GetF"));
-    pfn_SetF = reinterpret_cast<PFN_NVSDK_NGX_Parameter_SetF>(GetProcAddress(hModule, "NVSDK_NGX_Parameter_SetF"));
-    pfn_GetUI = reinterpret_cast<PFN_NVSDK_NGX_Parameter_GetUI>(GetProcAddress(hModule, "NVSDK_NGX_Parameter_GetUI"));
-    pfn_SetUI = reinterpret_cast<PFN_NVSDK_NGX_Parameter_SetUI>(GetProcAddress(hModule, "NVSDK_NGX_Parameter_SetUI"));
-
-    if (!populateChildren) return true;
-
-    PFN_DX11.LoadDependentDLL(hModule);
-    PFN_DX12.LoadDependentDLL(hModule);
-    PFN_CUDA.LoadDependentDLL(hModule);
-    PFN_Vulkan.LoadDependentDLL(hModule);
-
-    // Vulkan
-
     return true;
+}
+
+bool CyberInterposer::Top_Interposer::LoadDependentDLL(HMODULE hModule, bool populateChildren)
+{
+    CyberLOG();
+    if (hModule == nullptr)
+    {
+        CyberLOGy("LoadDependentDLL failed: Invalid module handle");
+        return false;
+    }
+
+    bool success = true; // Flag to track overall success or failure
+
+    // common
+    success &= GetFunctionAddress(hModule, "NVSDK_NGX_Parameter_GetULL", reinterpret_cast<FARPROC*>(&pfn_GetULL));
+    success &= GetFunctionAddress(hModule, "NVSDK_NGX_Parameter_SetULL", reinterpret_cast<FARPROC*>(&pfn_SetULL));
+    success &= GetFunctionAddress(hModule, "NVSDK_NGX_Parameter_GetD", reinterpret_cast<FARPROC*>(&pfn_GetD));
+    success &= GetFunctionAddress(hModule, "NVSDK_NGX_Parameter_SetD", reinterpret_cast<FARPROC*>(&pfn_SetD));
+    success &= GetFunctionAddress(hModule, "NVSDK_NGX_Parameter_GetI", reinterpret_cast<FARPROC*>(&pfn_GetI));
+    success &= GetFunctionAddress(hModule, "NVSDK_NGX_Parameter_SetI", reinterpret_cast<FARPROC*>(&pfn_SetI));
+    success &= GetFunctionAddress(hModule, "NVSDK_NGX_Parameter_SetVoidPointer", reinterpret_cast<FARPROC*>(&pfn_SetVoidPointer));
+    success &= GetFunctionAddress(hModule, "NVSDK_NGX_Parameter_GetVoidPointer", reinterpret_cast<FARPROC*>(&pfn_GetVoidPointer));
+    success &= GetFunctionAddress(hModule, "NVSDK_NGX_Parameter_GetF", reinterpret_cast<FARPROC*>(&pfn_GetF));
+    success &= GetFunctionAddress(hModule, "NVSDK_NGX_Parameter_SetF", reinterpret_cast<FARPROC*>(&pfn_SetF));
+    success &= GetFunctionAddress(hModule, "NVSDK_NGX_Parameter_GetUI", reinterpret_cast<FARPROC*>(&pfn_GetUI));
+    success &= GetFunctionAddress(hModule, "NVSDK_NGX_Parameter_SetUI", reinterpret_cast<FARPROC*>(&pfn_SetUI));
+
+    if (!populateChildren)
+    {
+        if (success)
+            CyberLOGy("LoadDependentDLL success");
+        else
+            CyberLOGy("LoadDependentDLL failed: Unable to retrieve function addresses");
+
+        return success;
+    }
+
+    // Load dependent DLLs for children modules
+    success &= PFN_DX11.LoadDependentDLL(hModule);
+    success &= PFN_DX12.LoadDependentDLL(hModule);
+    success &= PFN_CUDA.LoadDependentDLL(hModule);
+    success &= PFN_Vulkan.LoadDependentDLL(hModule);
+
+    if (success)
+    CyberLOGy("LoadDependentDLL success");
+    else
+    CyberLOGy("LoadDependentDLL failed: Unable to load dependent DLLs for children modules");
+
+    return success;
+
 }
 
 
