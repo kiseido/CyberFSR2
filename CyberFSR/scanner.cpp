@@ -62,6 +62,8 @@ uintptr_t scanner::GetAddress(const std::wstring_view moduleName, const std::str
 
 		return (address + offset);
 	}
+	else
+		return (uintptr_t) nullptr;
 }
 
 uintptr_t scanner::GetOffsetFromInstruction(const std::wstring_view moduleName, const std::string_view pattern, ptrdiff_t offset)

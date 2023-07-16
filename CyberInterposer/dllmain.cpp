@@ -9,19 +9,24 @@ BOOL APIENTRY DllMain( HMODULE hModule,
                        LPVOID lpReserved
                      )
 {
+    CyberInterposer::logger.start(L"CyberInterposer.log", true, true, true);
+ 
     switch (ul_reason_for_call)
     {
     case DLL_PROCESS_ATTACH:
-        CyberInterposer::logger.start(L"CyberInterposer.log", true, true, true);
+    {
 
         CyberLOGy("DLL_PROCESS_ATTACH");
-        if (!CyberInterposer::function_table.LoadDependentDLL(L"nvngx.dll", true))
+        bool dllLoadStatus = CyberInterposer::function_table.LoadDependentDLL(L"nvngx.dll", true);
+
+        if (!dllLoadStatus)
         {
             CyberLOGy("Loading NVNGX.dll failed");
             // Handle the error if the dependent DLL cannot be loaded
             return FALSE;
         }
         break;
+    }
     case DLL_THREAD_ATTACH:
         CyberLOGy("DLL_THREAD_ATTACH");
         break;
