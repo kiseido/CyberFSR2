@@ -24,7 +24,7 @@ bool GetFunctionAddress(HMODULE hModule, const char* functionName, FARPROC* func
 
     if (*functionAddress == nullptr)
     {
-        CyberLogLots("Failed to retrieve function address: " + std::string(functionName));
+        CyberLogLots("Failed to retrieve function address: ", std::string(functionName));
         return false;
     }
 
