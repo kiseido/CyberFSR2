@@ -250,10 +250,10 @@ namespace CyberLogger {
             queueCondVar.wait(lock, [this] { return !logQueue.empty() || stopWritingThread; });
 
             while (!logQueue.empty()) {
-                lock.unlock();
+                lock.lock();
                 LogEntry entry = std::move(logQueue.front());
                 logQueue.pop();
-                lock.lock();
+                lock.unlock();
 
                 logFile << entry.hardwareInfo << " ::: " << entry.message << "\n";
             }

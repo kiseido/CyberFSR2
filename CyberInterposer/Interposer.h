@@ -4,6 +4,11 @@
 #ifndef INTERPOSER
 #define INTERPOSER
 
+NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_GetVersion(NVSDK_NGX_Version* version);
+
+
+
+
 namespace CyberInterposer
 {
     struct PFN_Table_T {
@@ -160,11 +165,9 @@ namespace CyberInterposer
 
 
 
+    CyberLogger::Logger logger;
 
-
-    static Top_Interposer function_table;
-
-    
+    Top_Interposer function_table;
 };
 
 #endif

@@ -4,88 +4,96 @@
 
 bool CyberInterposer::Top_Interposer::LoadDependentDLL(HMODULE hModule)
 {
-    CyberLOG();
+    CyberLogArgs(hModule);
     return LoadDependentDLL(hModule, false);
 }
 
 // Function that loads the dependent DLL and retrieves function pointers
 bool CyberInterposer::Top_Interposer::LoadDependentDLL(LPCWSTR inputFileName, bool populateChildren)
 {
-    CyberLOGy(CyberLogger::LPCWSTRToString(inputFileName));
+    CyberLogArgs(inputFileName, populateChildren);
+    //CyberLOGy(CyberLogger::LPCWSTRToString(inputFileName));
 
     HMODULE hModule = LoadLibraryW(inputFileName);
 
     return LoadDependentDLL(hModule, populateChildren);
 }
 
-bool GetFunctionAddress(HMODULE hModule, const char* functionName, FARPROC* functionAddress)
+bool CyberInterposer::Top_Interposer::LoadDependentDLL(HMODULE hModule, bool populateChildren)
 {
-    *functionAddress = GetProcAddress(hModule, functionName);
+    CyberLogArgs(hModule, populateChildren);
 
-    if (*functionAddress == nullptr)
-    {
-        CyberLogLots("Failed to retrieve function address: ", std::string(functionName));
+    if (hModule == nullptr || hModule == 0) {
+        CyberLOGy("hModule is bad");
         return false;
+    }
+
+    // common
+    pfn_GetULL = reinterpret_cast<PFN_NVSDK_NGX_Parameter_GetULL>(GetProcAddress(hModule, "NVSDK_NGX_Parameter_GetULL"));
+    pfn_SetULL = reinterpret_cast<PFN_NVSDK_NGX_Parameter_SetULL>(GetProcAddress(hModule, "NVSDK_NGX_Parameter_SetULL"));
+    pfn_GetD = reinterpret_cast<PFN_NVSDK_NGX_Parameter_GetD>(GetProcAddress(hModule, "NVSDK_NGX_Parameter_GetD"));
+    pfn_SetD = reinterpret_cast<PFN_NVSDK_NGX_Parameter_SetD>(GetProcAddress(hModule, "NVSDK_NGX_Parameter_SetD"));
+    pfn_GetI = reinterpret_cast<PFN_NVSDK_NGX_Parameter_GetI>(GetProcAddress(hModule, "NVSDK_NGX_Parameter_GetI"));
+    pfn_SetI = reinterpret_cast<PFN_NVSDK_NGX_Parameter_SetI>(GetProcAddress(hModule, "NVSDK_NGX_Parameter_SetI"));
+    pfn_SetVoidPointer = reinterpret_cast<PFN_NVSDK_NGX_Parameter_SetVoidPointer>(GetProcAddress(hModule, "NVSDK_NGX_Parameter_SetVoidPointer"));
+    pfn_GetVoidPointer = reinterpret_cast<PFN_NVSDK_NGX_Parameter_GetVoidPointer>(GetProcAddress(hModule, "NVSDK_NGX_Parameter_GetVoidPointer"));
+    pfn_GetF = reinterpret_cast<PFN_NVSDK_NGX_Parameter_GetF>(GetProcAddress(hModule, "NVSDK_NGX_Parameter_GetF"));
+    pfn_SetF = reinterpret_cast<PFN_NVSDK_NGX_Parameter_SetF>(GetProcAddress(hModule, "NVSDK_NGX_Parameter_SetF"));
+    pfn_GetUI = reinterpret_cast<PFN_NVSDK_NGX_Parameter_GetUI>(GetProcAddress(hModule, "NVSDK_NGX_Parameter_GetUI"));
+    pfn_SetUI = reinterpret_cast<PFN_NVSDK_NGX_Parameter_SetUI>(GetProcAddress(hModule, "NVSDK_NGX_Parameter_SetUI"));
+
+    const bool foundCommonFunctions =
+        (pfn_GetULL != nullptr) &&
+        (pfn_SetULL != nullptr) &&
+        (pfn_GetD != nullptr) &&
+        (pfn_SetD != nullptr) &&
+        (pfn_GetI != nullptr) &&
+        (pfn_SetI != nullptr) &&
+        (pfn_SetVoidPointer != nullptr) &&
+        (pfn_GetVoidPointer != nullptr) &&
+        (pfn_GetF != nullptr) &&
+        (pfn_SetF != nullptr) &&
+        (pfn_GetUI != nullptr) &&
+        (pfn_SetUI != nullptr);
+
+    if (foundCommonFunctions == false) {
+        CyberLOGy("NVNGX common functions not found");
+        return false;
+    }
+
+    if (populateChildren) {
+        const bool foundDx11 = PFN_DX11.LoadDependentDLL(hModule);
+        const bool foundDx12 = PFN_DX12.LoadDependentDLL(hModule);
+        const bool foundCuda = PFN_CUDA.LoadDependentDLL(hModule);
+        const bool foundVulkan = PFN_Vulkan.LoadDependentDLL(hModule);
+
+        if (foundDx11)
+            CyberLOGy("DX11 functions loaded");
+        else 
+            CyberLOGy("DX11 functions not found");
+
+        if (foundDx12)
+            CyberLOGy("DX12 functions loaded");
+        else 
+            CyberLOGy("DX12 functions not found");
+
+        if (foundDx12)
+            CyberLOGy("CUDA functions loaded");
+        else 
+            CyberLOGy("CUDA functions not found");
+
+        if (foundDx12)
+            CyberLOGy("Vulkan functions loaded");
+        else 
+            CyberLOGy("Vulkan functions not found");
     }
 
     return true;
 }
 
-bool CyberInterposer::Top_Interposer::LoadDependentDLL(HMODULE hModule, bool populateChildren)
-{
-    CyberLOG();
-    if (hModule == nullptr)
-    {
-        CyberLOGy("LoadDependentDLL failed: Invalid module handle");
-        return false;
-    }
-
-    bool success = true; // Flag to track overall success or failure
-
-    // common
-    success &= GetFunctionAddress(hModule, "NVSDK_NGX_Parameter_GetULL", reinterpret_cast<FARPROC*>(&pfn_GetULL));
-    success &= GetFunctionAddress(hModule, "NVSDK_NGX_Parameter_SetULL", reinterpret_cast<FARPROC*>(&pfn_SetULL));
-    success &= GetFunctionAddress(hModule, "NVSDK_NGX_Parameter_GetD", reinterpret_cast<FARPROC*>(&pfn_GetD));
-    success &= GetFunctionAddress(hModule, "NVSDK_NGX_Parameter_SetD", reinterpret_cast<FARPROC*>(&pfn_SetD));
-    success &= GetFunctionAddress(hModule, "NVSDK_NGX_Parameter_GetI", reinterpret_cast<FARPROC*>(&pfn_GetI));
-    success &= GetFunctionAddress(hModule, "NVSDK_NGX_Parameter_SetI", reinterpret_cast<FARPROC*>(&pfn_SetI));
-    success &= GetFunctionAddress(hModule, "NVSDK_NGX_Parameter_SetVoidPointer", reinterpret_cast<FARPROC*>(&pfn_SetVoidPointer));
-    success &= GetFunctionAddress(hModule, "NVSDK_NGX_Parameter_GetVoidPointer", reinterpret_cast<FARPROC*>(&pfn_GetVoidPointer));
-    success &= GetFunctionAddress(hModule, "NVSDK_NGX_Parameter_GetF", reinterpret_cast<FARPROC*>(&pfn_GetF));
-    success &= GetFunctionAddress(hModule, "NVSDK_NGX_Parameter_SetF", reinterpret_cast<FARPROC*>(&pfn_SetF));
-    success &= GetFunctionAddress(hModule, "NVSDK_NGX_Parameter_GetUI", reinterpret_cast<FARPROC*>(&pfn_GetUI));
-    success &= GetFunctionAddress(hModule, "NVSDK_NGX_Parameter_SetUI", reinterpret_cast<FARPROC*>(&pfn_SetUI));
-
-    if (!populateChildren)
-    {
-        if (success)
-            CyberLOGy("LoadDependentDLL success");
-        else
-            CyberLOGy("LoadDependentDLL failed: Unable to retrieve function addresses");
-
-        return success;
-    }
-
-    // Load dependent DLLs for children modules
-    success &= PFN_DX11.LoadDependentDLL(hModule);
-    success &= PFN_DX12.LoadDependentDLL(hModule);
-    success &= PFN_CUDA.LoadDependentDLL(hModule);
-    success &= PFN_Vulkan.LoadDependentDLL(hModule);
-
-    if (success)
-    CyberLOGy("LoadDependentDLL success");
-    else
-    CyberLOGy("LoadDependentDLL failed: Unable to load dependent DLLs for children modules");
-
-    return success;
-
-}
-
-
-
 NVSDK_NGX_Result NVSDK_NGX_UpdateFeature(const NVSDK_NGX_Application_Identifier* ApplicationId, const NVSDK_NGX_Feature FeatureID)
 {
-	CyberLOG();
+    CyberLogArgs(ApplicationId, FeatureID);
 
 	
 	return NVSDK_NGX_Result_Fail;
@@ -93,142 +101,17 @@ NVSDK_NGX_Result NVSDK_NGX_UpdateFeature(const NVSDK_NGX_Application_Identifier*
 
 inline HMODULE CyberInterposer::PFN_Table_T::GetHModule(LPCWSTR inputFileName)
 {
-    CyberLOGy(CyberLogger::LPCWSTRToString(inputFileName));
+    CyberLogArgs(inputFileName);
 
     HMODULE hModule = LoadLibraryW(inputFileName);
 
     return hModule;
 }
 
-bool CyberInterposer::PFN_Table_DX11::LoadDependentDLL(HMODULE hModule)
+
+
+NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_GetVersion(NVSDK_NGX_Version* version)
 {
-    CyberLOG();
-
-    if (hModule == nullptr) 
-    {
-        return false;
-    }
-
-    pfn_SetD3d11Resource = reinterpret_cast<PFN_NVSDK_NGX_Parameter_SetD3d11Resource>(GetProcAddress(hModule, "NVSDK_NGX_Parameter_SetD3d12Resource"));
-    pfn_GetD3d11Resource = reinterpret_cast<PFN_NVSDK_NGX_Parameter_GetD3d11Resource>(GetProcAddress(hModule, "NVSDK_NGX_Parameter_GetD3d12Resource"));
-
-    pfn_D3D11_Init = reinterpret_cast<PFN_NVSDK_NGX_D3D11_Init>(GetProcAddress(hModule, "NVSDK_NGX_D3D11_Init"));
-    pfn_D3D11_Init_Ext = reinterpret_cast<PFN_NVSDK_NGX_D3D11_Init_Ext>(GetProcAddress(hModule, "NVSDK_NGX_D3D11_Init_Ext"));
-    pfn_D3D11_Init_ProjectID = reinterpret_cast<PFN_NVSDK_NGX_D3D11_Init_ProjectID>(GetProcAddress(hModule, "NVSDK_NGX_D3D11_Init_ProjectID"));
-
-    pfn_D3D11_Shutdown = reinterpret_cast<PFN_NVSDK_NGX_D3D11_Shutdown>(GetProcAddress(hModule, "NVSDK_NGX_D3D11_Shutdown"));
-    pfn_D3D11_Shutdown1 = reinterpret_cast<PFN_NVSDK_NGX_D3D11_Shutdown1>(GetProcAddress(hModule, "NVSDK_NGX_D3D11_Shutdown1"));
-
-    pfn_D3D11_GetCapabilityParameters = reinterpret_cast<PFN_NVSDK_NGX_D3D11_GetCapabilityParameters>(GetProcAddress(hModule, "NVSDK_NGX_D3D11_GetCapabilityParameters"));
-    pfn_D3D11_GetParameters = reinterpret_cast<PFN_NVSDK_NGX_D3D11_GetParameters>(GetProcAddress(hModule, "NVSDK_NGX_D3D11_GetParameters"));
-
-    pfn_D3D11_GetScratchBufferSize = reinterpret_cast<PFN_NVSDK_NGX_D3D11_GetScratchBufferSize>(GetProcAddress(hModule, "NVSDK_NGX_D3D11_GetScratchBufferSize"));
-
-    pfn_D3D11_CreateFeature = reinterpret_cast<PFN_NVSDK_NGX_D3D11_CreateFeature>(GetProcAddress(hModule, "NVSDK_NGX_D3D11_CreateFeature"));
-    pfn_D3D11_ReleaseFeature = reinterpret_cast<PFN_NVSDK_NGX_D3D11_ReleaseFeature>(GetProcAddress(hModule, "NVSDK_NGX_D3D11_ReleaseFeature"));
-    pfn_D3D11_EvaluateFeature = reinterpret_cast<PFN_NVSDK_NGX_D3D11_EvaluateFeature>(GetProcAddress(hModule, "NVSDK_NGX_D3D11_EvaluateFeature"));
-    pfn_D3D11_EvaluateFeature_C = reinterpret_cast<PFN_NVSDK_NGX_D3D11_EvaluateFeature_C>(GetProcAddress(hModule, "NVSDK_NGX_D3D11_EvaluateFeature_C"));
-
-    pfn_D3D11_AllocateParameters = reinterpret_cast<PFN_NVSDK_NGX_D3D11_AllocateParameters>(GetProcAddress(hModule, "NVSDK_NGX_D3D11_AllocateParameters"));
-    pfn_D3D11_DestroyParameters = reinterpret_cast<PFN_NVSDK_NGX_D3D11_DestroyParameters>(GetProcAddress(hModule, "NVSDK_NGX_D3D11_DestroyParameters"));
-
-    return true;
+    CyberLogArgs(version);
+    return NVSDK_NGX_Result_Fail;
 }
-
-bool CyberInterposer::PFN_Table_DX12::LoadDependentDLL(HMODULE hModule)
-{
-    CyberLOG();
-
-    if (hModule == nullptr) 
-    {
-        return false;
-    }
-
-    pfn_SetD3d12Resource = reinterpret_cast<PFN_NVSDK_NGX_Parameter_SetD3d12Resource>(GetProcAddress(hModule, "NVSDK_NGX_Parameter_SetD3d12Resource"));
-    pfn_GetD3d12Resource = reinterpret_cast<PFN_NVSDK_NGX_Parameter_GetD3d12Resource>(GetProcAddress(hModule, "NVSDK_NGX_Parameter_GetD3d12Resource"));
-
-    pfn_D3D12_Init = reinterpret_cast<PFN_NVSDK_NGX_D3D12_Init>(GetProcAddress(hModule, "NVSDK_NGX_D3D12_Init"));
-    pfn_D3D12_Init_Ext = reinterpret_cast<PFN_NVSDK_NGX_D3D12_Init_Ext>(GetProcAddress(hModule, "NVSDK_NGX_D3D12_Init_Ext"));
-    pfn_D3D12_Init_ProjectID = reinterpret_cast<PFN_NVSDK_NGX_D3D12_Init_ProjectID>(GetProcAddress(hModule, "NVSDK_NGX_D3D12_Init_ProjectID"));
-
-    pfn_D3D12_Shutdown = reinterpret_cast<PFN_NVSDK_NGX_D3D12_Shutdown>(GetProcAddress(hModule, "NVSDK_NGX_D3D12_Shutdown"));
-    pfn_D3D12_Shutdown1 = reinterpret_cast<PFN_NVSDK_NGX_D3D12_Shutdown1>(GetProcAddress(hModule, "NVSDK_NGX_D3D12_Shutdown1"));
-
-    pfn_D3D12_GetCapabilityParameters = reinterpret_cast<PFN_NVSDK_NGX_D3D12_GetCapabilityParameters>(GetProcAddress(hModule, "NVSDK_NGX_D3D12_GetCapabilityParameters"));
-    pfn_D3D12_GetParameters = reinterpret_cast<PFN_NVSDK_NGX_D3D12_GetParameters>(GetProcAddress(hModule, "NVSDK_NGX_D3D12_GetParameters"));
-
-    pfn_D3D12_AllocateParameters = reinterpret_cast<PFN_NVSDK_NGX_D3D12_AllocateParameters>(GetProcAddress(hModule, "NVSDK_NGX_D3D12_AllocateParameters"));
-    pfn_D3D12_DestroyParameters = reinterpret_cast<PFN_NVSDK_NGX_D3D12_DestroyParameters>(GetProcAddress(hModule, "NVSDK_NGX_D3D12_DestroyParameters"));
-    pfn_D3D12_GetScratchBufferSize = reinterpret_cast<PFN_NVSDK_NGX_D3D12_GetScratchBufferSize>(GetProcAddress(hModule, "NVSDK_NGX_D3D12_GetScratchBufferSize"));
-
-    pfn_D3D12_CreateFeature = reinterpret_cast<PFN_NVSDK_NGX_D3D12_CreateFeature>(GetProcAddress(hModule, "NVSDK_NGX_D3D12_CreateFeature"));
-    pfn_D3D12_ReleaseFeature = reinterpret_cast<PFN_NVSDK_NGX_D3D12_ReleaseFeature>(GetProcAddress(hModule, "NVSDK_NGX_D3D12_ReleaseFeature"));
-
-    pfn_D3D12_GetFeatureRequirements = reinterpret_cast<PFN_NVSDK_NGX_D3D12_GetFeatureRequirements>(GetProcAddress(hModule, "NVSDK_NGX_D3D12_GetFeatureRequirements"));
-
-    pfn_D3D12_EvaluateFeature = reinterpret_cast<PFN_NVSDK_NGX_D3D12_EvaluateFeature>(GetProcAddress(hModule, "NVSDK_NGX_D3D12_EvaluateFeature"));
-    pfn_D3D12_EvaluateFeature_C = reinterpret_cast<PFN_NVSDK_NGX_D3D12_EvaluateFeature_C>(GetProcAddress(hModule, "NVSDK_NGX_D3D12_EvaluateFeature_C"));
-
-    return true;
-}
-
-bool CyberInterposer::PFN_Table_CUDA::LoadDependentDLL(HMODULE hModule)
-{
-    CyberLOG();
-
-    if (hModule == nullptr) 
-    {
-        return false;
-    }
-
-    pfn_cuInit = reinterpret_cast<PFN_NVSDK_NGX_CUDA_Init>(GetProcAddress(hModule, "cuInit"));
-    pfn_cuInit_Ext = reinterpret_cast<PFN_NVSDK_NGX_CUDA_Init_Ext>(GetProcAddress(hModule, "cuInit_Ext"));
-    pfn_cuInit_with_ProjectID = reinterpret_cast<PFN_NVSDK_NGX_CUDA_Init_with_ProjectID>(GetProcAddress(hModule, "cuInit_with_ProjectID"));
-
-    pfn_cuShutdown = reinterpret_cast<PFN_NVSDK_NGX_CUDA_Shutdown>(GetProcAddress(hModule, "cuShutdown"));
-
-    pfn_cuGetCapabilityParameters = reinterpret_cast<PFN_NVSDK_NGX_CUDA_GetCapabilityParameters>(GetProcAddress(hModule, "cuGetCapabilityParameters"));
-
-    pfn_cuAllocateParameters = reinterpret_cast<PFN_NVSDK_NGX_CUDA_AllocateParameters>(GetProcAddress(hModule, "cuAllocateParameters"));
-    pfn_cuDestroyParameters = reinterpret_cast<PFN_NVSDK_NGX_CUDA_DestroyParameters>(GetProcAddress(hModule, "cuDestroyParameters"));
-
-    pfn_cuGetScratchBufferSize = reinterpret_cast<PFN_NVSDK_NGX_CUDA_GetScratchBufferSize>(GetProcAddress(hModule, "cuGetScratchBufferSize"));
-
-    pfn_cuCreateFeature = reinterpret_cast<PFN_NVSDK_NGX_CUDA_CreateFeature>(GetProcAddress(hModule, "cuCreateFeature"));
-    pfn_cuReleaseFeature = reinterpret_cast<PFN_NVSDK_NGX_CUDA_ReleaseFeature>(GetProcAddress(hModule, "cuReleaseFeature"));
-    pfn_cuEvaluateFeature = reinterpret_cast<PFN_NVSDK_NGX_CUDA_EvaluateFeature>(GetProcAddress(hModule, "cuEvaluateFeature"));
-    pfn_cuEvaluateFeature_C = reinterpret_cast<PFN_NVSDK_NGX_CUDA_EvaluateFeature_C>(GetProcAddress(hModule, "cuEvaluateFeature_C"));
-
-    return true;
-}
-
-bool CyberInterposer::PFN_Table_Vulkan::LoadDependentDLL(HMODULE hModule)
-{
-    CyberLOG();
-
-    if (hModule == nullptr) {
-        return false;
-    }
-    pfn_VULKAN_Init = reinterpret_cast<PFN_NVSDK_NGX_VULKAN_Init>(GetProcAddress(hModule, "NVSDK_NGX_VULKAN_Init"));
-    pfn_VULKAN_Init_Ext = reinterpret_cast<PFN_NVSDK_NGX_VULKAN_Init_Ext>(GetProcAddress(hModule, "NVSDK_NGX_VULKAN_Init_Ext"));
-    pfn_VULKAN_Init_ProjectID = reinterpret_cast<PFN_NVSDK_NGX_VULKAN_Init_ProjectID>(GetProcAddress(hModule, "NVSDK_NGX_VULKAN_Init_ProjectID"));
-
-    pfn_VULKAN_Shutdown = reinterpret_cast<PFN_NVSDK_NGX_VULKAN_Shutdown>(GetProcAddress(hModule, "NVSDK_NGX_VULKAN_Shutdown"));
-    pfn_VULKAN_Shutdown1 = reinterpret_cast<PFN_NVSDK_NGX_VULKAN_Shutdown1>(GetProcAddress(hModule, "NVSDK_NGX_VULKAN_Shutdown1"));
-
-    pfn_VULKAN_GetCapabilityParameters = reinterpret_cast<PFN_NVSDK_NGX_VULKAN_GetCapabilityParameters>(GetProcAddress(hModule, "NVSDK_NGX_VULKAN_GetCapabilityParameters"));
-    pfn_VULKAN_GetParameters = reinterpret_cast<PFN_NVSDK_NGX_VULKAN_GetParameters>(GetProcAddress(hModule, "NVSDK_NGX_VULKAN_GetParameters"));
-
-    pfn_VULKAN_AllocateParameters = reinterpret_cast<PFN_NVSDK_NGX_VULKAN_AllocateParameters>(GetProcAddress(hModule, "NVSDK_NGX_VULKAN_AllocateParameters"));
-    pfn_VULKAN_DestroyParameters = reinterpret_cast<PFN_NVSDK_NGX_VULKAN_DestroyParameters>(GetProcAddress(hModule, "NVSDK_NGX_VULKAN_DestroyParameters"));
-
-    pfn_VULKAN_GetScratchBufferSize = reinterpret_cast<PFN_NVSDK_NGX_VULKAN_GetScratchBufferSize>(GetProcAddress(hModule, "NVSDK_NGX_VULKAN_GetScratchBufferSize"));
-
-    pfn_VULKAN_CreateFeature = reinterpret_cast<PFN_NVSDK_NGX_VULKAN_CreateFeature>(GetProcAddress(hModule, "NVSDK_NGX_VULKAN_CreateFeature"));
-    pfn_VULKAN_ReleaseFeature = reinterpret_cast<PFN_NVSDK_NGX_VULKAN_ReleaseFeature>(GetProcAddress(hModule, "NVSDK_NGX_VULKAN_ReleaseFeature"));
-    pfn_VULKAN_EvaluateFeature = reinterpret_cast<PFN_NVSDK_NGX_VULKAN_EvaluateFeature>(GetProcAddress(hModule, "NVSDK_NGX_VULKAN_EvaluateFeature"));
-    pfn_VULKAN_EvaluateFeature_C = reinterpret_cast<PFN_NVSDK_NGX_VULKAN_EvaluateFeature_C>(GetProcAddress(hModule, "NVSDK_NGX_VULKAN_EvaluateFeature_C"));
-
-    return true;
-}
-
