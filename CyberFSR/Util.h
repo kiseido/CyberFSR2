@@ -1,6 +1,8 @@
 #pragma once
 #include "Config.h"
 
+
+
 namespace Util
 {
 	std::filesystem::path ExePath();
@@ -73,6 +75,7 @@ namespace Util
 	};
 
 	NvParameter NvParameterToEnum(const char* name);
+
 };
 
 inline void ThrowIfFailed(HRESULT hr)

@@ -4,15 +4,15 @@
 #define CyberFSRLogging
 
 
-
-namespace CyberInterposer {
-    static CyberLogger::Logger logger;
-}
-
-
 #define CyberLOG() CyberInterposer::logger.log(CyberLogger::LogType::INFO_t, __func__, "")
 
-#define CyberLOGy(stringy) CyberInterposer::logger.log(CyberLogger::LogType::INFO_t, __func__, std::string(stringy))
+#define CyberLOGy(stringy) \
+    do { \
+        std::stringstream logStream;\
+        logStream << stringy;\
+        auto string = logStream.str();\
+        CyberInterposer::logger.log(CyberLogger::LogType::INFO_t, __func__, string); \
+    } while (false)
 
 #define CyberLogLots(...) \
     do { \
@@ -21,3 +21,11 @@ namespace CyberInterposer {
     } while (false)
 
 #endif
+
+#define CyberLogArgs(stringy) \
+    do { \
+        std::stringstream logStream;\
+        logStream << stringy;\
+        auto string = logStream.str();\
+        CyberInterposer::logger.log(CyberLogger::LogType::INFO_t, __func__, string); \
+    } while (false)
