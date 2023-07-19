@@ -1,0 +1,89 @@
+#include "pch.h"
+
+#ifndef CyInt_INTERPOSER
+#define CyInt_INTERPOSER
+
+#include "Common.h"
+
+#include "NGX_Cuda.h"
+#include "NGX_DX11.h"
+#include "NGX_DX12.h"
+#include "NGX_Vk.h"
+#include "NGX_Parameter.h"
+
+NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_GetVersion(NVSDK_NGX_Version* version);
+
+namespace CyberInterposer
+{
+    struct PFN_Table_NVNGX_Top_Interposer : public  PFN_Table_T {
+
+        PFN_NVSDK_NGX_UpdateFeature pfn_UpdateFeature = nullptr;
+
+        PFN_Table_NVNGX_DX11 PFN_DX11;
+        PFN_Table_NVNGX_DX12 PFN_DX12;
+        PFN_Table_NVNGX_Vulkan PFN_Vulkan;
+        PFN_Table_NVNGX_CUDA PFN_CUDA;
+        PFN_Table_NVNGX_Parameter PFN_Parameter;
+
+        bool LoadDLL(HMODULE inputFile, bool populateChildren) override;
+    };
+
+    typedef struct NVNGX_NvDLL {
+        HMODULE hmodule = 0;
+
+        time_t load_time = 0;
+
+        File_Details file_details = 0;
+
+        std::string file_name;
+        std::string file_path;
+
+        PFN_Table_NVNGX_Top_Interposer pointer_tables;
+    } NvDLL;
+
+    class DLLRepo : PFN_Table_T {
+    public:
+        static constexpr size_t RepoMaxLoadedDLLs = 128;
+    private:
+        struct Connection {
+            HMODULE hmodule;
+            size_t dll_index_to_use;
+            time_t connected_since;
+        };
+
+        struct ProcessConnection : Connection {
+            DWORD process_id;
+        };
+        struct ThreadConnection : Connection {
+            std::thread::id thread_id;
+        };
+
+        std::unordered_map<HMODULE,ProcessConnection> connected_processes;
+        std::unordered_map<HMODULE,ThreadConnection> connected_threads;
+
+        std::array<NvDLL, RepoMaxLoadedDLLs> dlls;
+        size_t index_in_use = -1;
+        size_t next_index = -1;
+
+        std::mutex indexlock;
+
+    public:
+        bool LoadDLL(HMODULE hModule, bool populateChildren) override;
+
+        bool UseLoadedDLL(size_t index);
+        const std::vector<const NvDLL>& GetLoadedDLLs();
+        const NvDLL& GetLoadedDLL();
+
+        void ThreadConnect(HMODULE hModule);
+        void ThreadDisconnect(HMODULE hModule);
+
+        void ProcessConnect(HMODULE hModule);
+        void ProcessDisconnect(HMODULE hModule);
+    };
+
+    static DLLRepo DLLs;
+
+    static CyberLogger::Logger logger;
+};
+
+#endif

@@ -1,10 +1,7 @@
 #include "pch.h"
-#include "NvCuda.h"
-#include "NvCommon.h"
-#include "Interposer.h"
-#include "Logging.h"
+#include "NGX_Interposer.h"
 
-bool CyberInterposer::PFN_Table_CUDA::LoadDependentDLL(HMODULE hModule)
+bool CyberInterposer::PFN_Table_NVNGX_CUDA::LoadDLL(HMODULE hModule, bool populateChildren)
 {
     CyberLOG();
 

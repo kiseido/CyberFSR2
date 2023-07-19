@@ -1,4 +1,5 @@
 #include "pch.h"
+
 #ifndef PFN_DEFINITIONS
 #define PFN_DEFINITIONS
 
@@ -82,6 +83,7 @@ typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_CUDA_Init_Ext)(unsigned long 
 typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_CUDA_Init_with_ProjectID)(const char*, NVSDK_NGX_EngineType, const char*, const wchar_t*, const NVSDK_NGX_FeatureCommonInfo*, NVSDK_NGX_Version);
 
 typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_CUDA_Shutdown)(void);
+//typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_CUDA_Shutdown1)(void);
 
 typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_CUDA_GetCapabilityParameters)(NVSDK_NGX_Parameter**);
 typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_CUDA_AllocateParameters)(NVSDK_NGX_Parameter**);
@@ -95,5 +97,7 @@ typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_CUDA_ReleaseFeature)(NVSDK_NG
 
 typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_CUDA_EvaluateFeature)(const NVSDK_NGX_Handle*, const NVSDK_NGX_Parameter*, PFN_NVSDK_NGX_ProgressCallback);
 typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_CUDA_EvaluateFeature_C)(const NVSDK_NGX_Handle*, const NVSDK_NGX_Parameter*, PFN_NVSDK_NGX_ProgressCallback_C);
+
+typedef void(NVSDK_CONV* PFN_NVSDK_NGX_Reset)(NVSDK_NGX_Parameter*);
 
 #endif

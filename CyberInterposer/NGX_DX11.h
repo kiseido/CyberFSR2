@@ -1,9 +1,9 @@
 #include "pch.h"
-#ifndef DX11_INTERPOSER_H
-#define DX11_INTERPOSER_H
 
-#include "Interposer.h"
+#ifndef CyInt_DX11_INTERPOSER_H
+#define CyInt_DX11_INTERPOSER_H
 
+#include "Common.h"
 
 //#include "Config.h"
 //#include "DirectXHooks.h"
@@ -14,11 +14,40 @@
 
 #include "Logging.h"
 
+namespace CyberInterposer
+{
+    struct PFN_Table_NVNGX_DX11 : public  PFN_Table_T {
+        PFN_NVSDK_NGX_Parameter_GetD3d11Resource pfn_GetD3d11Resource = nullptr;
+        PFN_NVSDK_NGX_Parameter_SetD3d11Resource pfn_SetD3d11Resource = nullptr;
+
+        PFN_NVSDK_NGX_D3D11_Init pfn_D3D11_Init = nullptr;
+        PFN_NVSDK_NGX_D3D11_Init_Ext pfn_D3D11_Init_Ext = nullptr;
+        PFN_NVSDK_NGX_D3D11_Init_ProjectID pfn_D3D11_Init_ProjectID = nullptr;
+
+        PFN_NVSDK_NGX_D3D11_Shutdown pfn_D3D11_Shutdown = nullptr;
+        PFN_NVSDK_NGX_D3D11_Shutdown1 pfn_D3D11_Shutdown1 = nullptr;
+
+        PFN_NVSDK_NGX_D3D11_GetCapabilityParameters pfn_D3D11_GetCapabilityParameters = nullptr;
+        PFN_NVSDK_NGX_D3D11_GetParameters pfn_D3D11_GetParameters = nullptr;
+
+        PFN_NVSDK_NGX_D3D11_GetScratchBufferSize pfn_D3D11_GetScratchBufferSize = nullptr;
+
+        PFN_NVSDK_NGX_D3D11_CreateFeature pfn_D3D11_CreateFeature = nullptr;
+        PFN_NVSDK_NGX_D3D11_ReleaseFeature pfn_D3D11_ReleaseFeature = nullptr;
+        PFN_NVSDK_NGX_D3D11_EvaluateFeature pfn_D3D11_EvaluateFeature = nullptr;
+        PFN_NVSDK_NGX_D3D11_EvaluateFeature_C pfn_D3D11_EvaluateFeature_C = nullptr;
+
+        PFN_NVSDK_NGX_D3D11_AllocateParameters pfn_D3D11_AllocateParameters = nullptr;
+        PFN_NVSDK_NGX_D3D11_DestroyParameters pfn_D3D11_DestroyParameters = nullptr;
+
+        bool LoadDLL(HMODULE inputFile, bool populateChildren) override;
+    };
+}
+
 NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_Init(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath, ID3D11Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion);
 
 
-NVSDK_NGX_API NVSDK_NGX_Result NVSDK_NGX_D3D11_Init_Ext(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath, ID3D11Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion,
-    unsigned long long InFlags);
+NVSDK_NGX_Result NVSDK_NGX_D3D11_Init_Ext(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath, ID3D11Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion, unsigned long long InFlags);
 
 NVSDK_NGX_API NVSDK_NGX_Result NVSDK_NGX_D3D11_Init_Ext(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath, ID3D11Device* InDevice, NVSDK_NGX_Version InSDKVersion, const char* Apointer1, const char* Apointer2);
 
@@ -51,38 +80,5 @@ NVSDK_NGX_Result NVSDK_NGX_D3D11_DestroyParameters(NVSDK_NGX_Parameter* InParame
 NVSDK_NGX_API void NVSDK_CONV NVSDK_NGX_Parameter_SetD3d11Resource(NVSDK_NGX_Parameter* InParameter, const char* InName, ID3D11Resource* InValue);
 NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_Parameter_GetD3d11Resource(NVSDK_NGX_Parameter* InParameter, const char* InName, ID3D11Resource** OutValue);
 
-
-namespace CyberInterposer
-{
-
-    struct PFN_Table_DX11 : public  PFN_Table_T {
-        PFN_NVSDK_NGX_Parameter_GetD3d11Resource pfn_GetD3d11Resource = nullptr;
-        PFN_NVSDK_NGX_Parameter_SetD3d11Resource pfn_SetD3d11Resource = nullptr;
-
-        PFN_NVSDK_NGX_D3D11_Init pfn_D3D11_Init = nullptr;
-        PFN_NVSDK_NGX_D3D11_Init_Ext pfn_D3D11_Init_Ext = nullptr;
-        PFN_NVSDK_NGX_D3D11_Init_ProjectID pfn_D3D11_Init_ProjectID = nullptr;
-
-        PFN_NVSDK_NGX_D3D11_Shutdown pfn_D3D11_Shutdown = nullptr;
-        PFN_NVSDK_NGX_D3D11_Shutdown1 pfn_D3D11_Shutdown1 = nullptr;
-
-        PFN_NVSDK_NGX_D3D11_GetCapabilityParameters pfn_D3D11_GetCapabilityParameters = nullptr;
-        PFN_NVSDK_NGX_D3D11_GetParameters pfn_D3D11_GetParameters = nullptr;
-
-        PFN_NVSDK_NGX_D3D11_GetScratchBufferSize pfn_D3D11_GetScratchBufferSize = nullptr;
-
-        PFN_NVSDK_NGX_D3D11_CreateFeature pfn_D3D11_CreateFeature = nullptr;
-        PFN_NVSDK_NGX_D3D11_ReleaseFeature pfn_D3D11_ReleaseFeature = nullptr;
-        PFN_NVSDK_NGX_D3D11_EvaluateFeature pfn_D3D11_EvaluateFeature = nullptr;
-        PFN_NVSDK_NGX_D3D11_EvaluateFeature_C pfn_D3D11_EvaluateFeature_C = nullptr;
-
-        PFN_NVSDK_NGX_D3D11_AllocateParameters pfn_D3D11_AllocateParameters = nullptr;
-        PFN_NVSDK_NGX_D3D11_DestroyParameters pfn_D3D11_DestroyParameters = nullptr;
-
-        // Function that loads the dependent DLL and retrieves function pointers
-        bool LoadDependentDLL(HMODULE input) override;
-    };
-
-} // namespace CyberInterposer
 
 #endif

@@ -1,6 +1,44 @@
 #include "pch.h"
-#ifndef NVCOMMON
-#define NVCOMMON
+
+#ifndef CyInt_NGX_Parameter
+#define CyInt_NGX_Parameter
+
+#include "Common.h"
+
+namespace CyberInterposer
+{
+    struct PFN_Table_NVNGX_Parameter : public  PFN_Table_T {
+
+		PFN_NVSDK_NGX_Parameter_SetD3d11Resource pfn_SetD3d11Resource = nullptr;
+		PFN_NVSDK_NGX_Parameter_GetD3d11Resource pfn_GetD3d11Resource = nullptr;
+
+		PFN_NVSDK_NGX_Parameter_SetD3d12Resource pfn_SetD3d12Resource = nullptr;
+		PFN_NVSDK_NGX_Parameter_GetD3d12Resource pfn_GetD3d12Resource = nullptr;
+
+		PFN_NVSDK_NGX_Parameter_SetULL pfn_SetULL = nullptr;
+		PFN_NVSDK_NGX_Parameter_GetULL pfn_GetULL = nullptr;
+
+		PFN_NVSDK_NGX_Parameter_SetD pfn_SetD = nullptr;
+		PFN_NVSDK_NGX_Parameter_GetD pfn_GetD = nullptr;
+
+		PFN_NVSDK_NGX_Parameter_SetI pfn_SetI = nullptr;
+		PFN_NVSDK_NGX_Parameter_GetI pfn_GetI = nullptr;
+
+
+		PFN_NVSDK_NGX_Parameter_SetF pfn_SetF = nullptr;
+		PFN_NVSDK_NGX_Parameter_GetF pfn_GetF = nullptr;
+
+		PFN_NVSDK_NGX_Parameter_SetUI pfn_SetUI = nullptr;
+		PFN_NVSDK_NGX_Parameter_GetUI pfn_GetUI = nullptr;
+
+		PFN_NVSDK_NGX_Parameter_SetVoidPointer pfn_SetVoidPointer = nullptr;
+		PFN_NVSDK_NGX_Parameter_GetVoidPointer pfn_GetVoidPointer = nullptr;
+
+		PFN_NVSDK_NGX_Reset pfn_Reset = nullptr;
+
+        bool LoadDLL(HMODULE inputFile, bool populateChildren) override;
+    };
+}
 
 struct NvParameter : NVSDK_NGX_Parameter
 {

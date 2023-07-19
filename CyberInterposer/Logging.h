@@ -1,7 +1,7 @@
 #include "pch.h"
 
-#ifndef CyberFSRLogging
-#define CyberFSRLogging
+#ifndef CyInt_CyberFSRLogging
+#define CyInt_CyberFSRLogging
 
 
 #define CyberLOG() CyberInterposer::logger.log(CyberLogger::LogType::INFO_t, __func__, "")
@@ -20,12 +20,10 @@
         CyberInterposer::logger.log(CyberLogger::LogType::INFO_t, __func__, stream_sv); \
     } while (false)
 
-#endif
 
-#define CyberLogArgs(stringy) \
+#define CyberLogArgs(...) \
     do { \
-        std::stringstream logStream;\
-        logStream << stringy;\
-        auto string = logStream.str();\
-        CyberInterposer::logger.log(CyberLogger::LogType::INFO_t, __func__, string); \
+        CyberInterposer::logger.log(CyberLogger::LogType::INFO_t, __func__, ""); \
     } while (false)
+
+#endif
