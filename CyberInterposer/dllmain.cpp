@@ -1,6 +1,6 @@
 // dllmain.cpp : Defines the entry point for the DLL application.
 #include "pch.h"
-#include "Interposer.h"
+#include "NGX_Interposer.h"
 #include "Logging.h"
 
 
@@ -18,14 +18,7 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 
         CyberLOGy("DLL_PROCESS_ATTACH");
 
-        const bool dllLoadStatus = CyberInterposer::function_table.LoadDependentDLL(L"nvngx.dll", true);
 
-        if (!dllLoadStatus)
-        {
-            CyberLOGy("Loading NVNGX.dll failed");
-            // Handle the error if the dependent DLL cannot be loaded
-            //return FALSE;
-        }
         break;
     }
     case DLL_THREAD_ATTACH:

@@ -1,11 +1,9 @@
 #include "pch.h"
-#include "NvCommon.h"
-#include "Interposer.h"
-#include "Logging.h"
+#include "NGX_Interposer.h"
 
 using namespace CyberInterposer;
 
-bool CyberInterposer::PFN_Table_Vulkan::LoadDependentDLL(HMODULE hModule)
+bool CyberInterposer::PFN_Table_NVNGX_Vulkan::LoadDLL(HMODULE hModule, bool populateChildren)
 {
 	CyberLOG();
 

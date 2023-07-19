@@ -21,22 +21,31 @@
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Interposer.h">
+    <ClInclude Include="NGX_Interposer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="NvCommon.h">
+    <ClInclude Include="Common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="NvCuda.h">
+    <ClInclude Include="NGX_Cuda.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="NvDX11.h">
+    <ClInclude Include="NGX_DX11.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PFN_Definitions.h">
+    <ClInclude Include="NGX_PFN_Definitions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Logging.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NGX_DX12.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NGX_Vk.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NGX_Parameter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -47,25 +56,28 @@
     <ClCompile Include="pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Interposer.cpp">
+    <ClCompile Include="NGX_Interposer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NvCommon.cpp">
+    <ClCompile Include="Common.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NvDX11.cpp">
+    <ClCompile Include="NGX_DX11.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NvDX12.cpp">
+    <ClCompile Include="NGX_DX12.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NvVk.cpp">
+    <ClCompile Include="NGX_Vk.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NvCuda.cpp">
+    <ClCompile Include="NGX_Cuda.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Logging.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NGX_Parameter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

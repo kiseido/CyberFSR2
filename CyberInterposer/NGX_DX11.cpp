@@ -1,11 +1,9 @@
 #include "pch.h"
-#include "NvCommon.h"
-#include "Interposer.h"
-#include "Logging.h"
+#include "NGX_Interposer.h"
 
 using namespace CyberInterposer;
 
-bool CyberInterposer::PFN_Table_DX11::LoadDependentDLL(HMODULE hModule)
+bool CyberInterposer::PFN_Table_NVNGX_DX11::LoadDLL(HMODULE hModule, bool populateChildren)
 {
 	CyberLOG();
 
@@ -44,8 +42,10 @@ NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_Init(unsigned long long InApplicatio
 {
 	CyberLOG();
 
-	if (function_table.PFN_DX11.pfn_D3D11_Init != nullptr)
-		return function_table.PFN_DX11.pfn_D3D11_Init(InApplicationId, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion);
+	auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX11.pfn_D3D11_Init;
+
+	if (ptr != nullptr)
+		return ptr(InApplicationId, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion);
 
 	return NVSDK_NGX_Result_Fail;
 }
@@ -57,9 +57,11 @@ NVSDK_NGX_Result NVSDK_NGX_D3D11_Init_Ext(unsigned long long InApplicationId, co
 {
 	CyberLOG();
 
-	if (function_table.PFN_DX11.pfn_D3D11_Init_Ext != nullptr)
+	auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX11.pfn_D3D11_Init_Ext;
+
+	if (ptr != nullptr)
 	{
-		return function_table.PFN_DX11.pfn_D3D11_Init_Ext(InApplicationId, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion, unknown0);
+		return ptr(InApplicationId, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion, unknown0);
 	}
 
 	return NVSDK_NGX_Result_Fail;
@@ -71,9 +73,11 @@ NVSDK_NGX_Result NVSDK_NGX_D3D11_Shutdown(void)
 {
 	CyberLOG();
 
-	if (function_table.PFN_DX11.pfn_D3D11_Shutdown != nullptr)
+	auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX11.pfn_D3D11_Shutdown;
+
+	if (ptr != nullptr)
 	{
-		return function_table.PFN_DX11.pfn_D3D11_Shutdown();
+		return ptr();
 	}
 
 	return NVSDK_NGX_Result_Fail;
@@ -83,9 +87,11 @@ NVSDK_NGX_Result NVSDK_NGX_D3D11_GetParameters(NVSDK_NGX_Parameter** OutParamete
 {
 	CyberLOG();
 
-	if (function_table.PFN_DX11.pfn_D3D11_GetParameters != nullptr)
+	auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX11.pfn_D3D11_GetParameters;
+
+	if (ptr != nullptr)
 	{
-		return function_table.PFN_DX11.pfn_D3D11_GetParameters(OutParameters);
+		return ptr(OutParameters);
 	}
 
 	return NVSDK_NGX_Result_Fail;
@@ -95,9 +101,11 @@ NVSDK_NGX_Result NVSDK_NGX_D3D11_GetScratchBufferSize(NVSDK_NGX_Feature InFeatur
 {
 	CyberLOG();
 
-	if (function_table.PFN_DX11.pfn_D3D11_GetScratchBufferSize != nullptr)
+	auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX11.pfn_D3D11_GetScratchBufferSize;
+
+	if (ptr != nullptr)
 	{
-		return function_table.PFN_DX11.pfn_D3D11_GetScratchBufferSize(InFeatureId, InParameters, OutSizeInBytes);
+		return ptr(InFeatureId, InParameters, OutSizeInBytes);
 	}
 
 	return NVSDK_NGX_Result_Fail;
@@ -107,9 +115,11 @@ NVSDK_NGX_Result NVSDK_NGX_D3D11_CreateFeature(ID3D11Device* InDevice, NVSDK_NGX
 {
 	CyberLOG();
 
-	if (function_table.PFN_DX11.pfn_D3D11_CreateFeature != nullptr)
+	auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX11.pfn_D3D11_CreateFeature;
+
+	if (ptr != nullptr)
 	{
-		return function_table.PFN_DX11.pfn_D3D11_CreateFeature(InDevice, InFeatureID, InParameters, OutHandle);
+		return ptr(InDevice, InFeatureID, InParameters, OutHandle);
 	}
 
 	return NVSDK_NGX_Result_Fail;
@@ -119,9 +129,11 @@ NVSDK_NGX_Result NVSDK_NGX_D3D11_ReleaseFeature(NVSDK_NGX_Handle* InHandle)
 {
 	CyberLOG();
 
-	if (function_table.PFN_DX11.pfn_D3D11_ReleaseFeature != nullptr)
+	auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX11.pfn_D3D11_ReleaseFeature;
+
+	if (ptr != nullptr)
 	{
-		return function_table.PFN_DX11.pfn_D3D11_ReleaseFeature(InHandle);
+		return ptr(InHandle);
 	}
 
 	return NVSDK_NGX_Result_Fail;
@@ -131,9 +143,11 @@ NVSDK_NGX_Result NVSDK_NGX_D3D11_EvaluateFeature(ID3D11DeviceContext* InDevCtx, 
 {
 	CyberLOG();
 
-	if (function_table.PFN_DX11.pfn_D3D11_EvaluateFeature != nullptr)
+	auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX11.pfn_D3D11_EvaluateFeature;
+
+	if (ptr != nullptr)
 	{
-		return function_table.PFN_DX11.pfn_D3D11_EvaluateFeature(InDevCtx, InFeatureHandle, InParameters, InCallback);
+		return ptr(InDevCtx, InFeatureHandle, InParameters, InCallback);
 	}
 
 	return NVSDK_NGX_Result_Fail;
@@ -144,9 +158,11 @@ NVSDK_NGX_API NVSDK_NGX_Result NVSDK_NGX_D3D11_Init_ProjectID(const char* InProj
 {
 	CyberLOG();
 
-	if (function_table.PFN_DX11.pfn_D3D11_Init_ProjectID != nullptr)
+	auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX11.pfn_D3D11_Init_ProjectID;
+
+	if (ptr != nullptr)
 	{
-		return function_table.PFN_DX11.pfn_D3D11_Init_ProjectID(InProjectId, InEngineType, InEngineVersion, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion);
+		return ptr(InProjectId, InEngineType, InEngineVersion, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion);
 	}
 	return NVSDK_NGX_Result_Fail;
 }
@@ -155,7 +171,12 @@ NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_Shutdown1(ID3D11Device* InDevice)
 {
 	CyberLOG();
 
-	// is pointer good? cast pointer and call it and return any results!
+	auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX11.pfn_D3D11_Shutdown1;
+
+	if (ptr != nullptr)
+	{
+		return ptr(InDevice);
+	}
 	return NVSDK_NGX_Result_Fail;
 }
 
@@ -164,9 +185,11 @@ NVSDK_NGX_Result NVSDK_NGX_D3D11_GetCapabilityParameters(NVSDK_NGX_Parameter** O
 {
 	CyberLOG();
 
-	if (function_table.PFN_DX11.pfn_D3D11_GetCapabilityParameters != nullptr)
+	auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX11.pfn_D3D11_GetCapabilityParameters;
+
+	if (ptr != nullptr)
 	{
-		return function_table.PFN_DX11.pfn_D3D11_GetCapabilityParameters(OutParameters);
+		return ptr(OutParameters);
 	}
 
 	return NVSDK_NGX_Result_Fail;
@@ -176,9 +199,11 @@ NVSDK_NGX_Result NVSDK_NGX_D3D11_AllocateParameters(NVSDK_NGX_Parameter** OutPar
 {
 	CyberLOG();
 
-	if (function_table.PFN_DX11.pfn_D3D11_AllocateParameters != nullptr)
+	auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX11.pfn_D3D11_AllocateParameters;
+
+	if (ptr != nullptr)
 	{
-		return function_table.PFN_DX11.pfn_D3D11_AllocateParameters(OutParameters);
+		return ptr(OutParameters);
 	}
 
 	return NVSDK_NGX_Result_Fail;
@@ -188,9 +213,11 @@ NVSDK_NGX_Result NVSDK_NGX_D3D11_DestroyParameters(NVSDK_NGX_Parameter* InParame
 {
 	CyberLOG();
 
-	if (function_table.PFN_DX11.pfn_D3D11_DestroyParameters != nullptr)
+	auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX11.pfn_D3D11_DestroyParameters;
+
+	if (ptr != nullptr)
 	{
-		return function_table.PFN_DX11.pfn_D3D11_DestroyParameters(InParameters);
+		return ptr(InParameters);
 	}
 
 	return NVSDK_NGX_Result_Fail;
