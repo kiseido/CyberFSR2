@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "scanner.h"
-#include "Logging.h"
+#include "CFSR_Logging.h"
 
 std::pair<uintptr_t, uintptr_t> GetModule(const std::wstring_view moduleName)
 {

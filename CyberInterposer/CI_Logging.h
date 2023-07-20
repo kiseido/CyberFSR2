@@ -16,14 +16,14 @@
 
 #define CyberLogLots(...) \
     do { \
-        std::string_view stream_sv = CyberLogger::convertToStringView(__VA_ARGS__); \
+        std::string stream_sv = CyberLogger::convertToString(__VA_ARGS__); \
         CyberInterposer::logger.log(CyberLogger::LogType::INFO_t, __func__, stream_sv); \
     } while (false)
 
 
 #define CyberLogArgs(...) \
     do { \
-        CyberInterposer::logger.log(CyberLogger::LogType::INFO_t, __func__, ""); \
+        CyberInterposer::logger.log(CyberLogger::LogType::INFO_t, __func__, "CyberLogArgs TODO "); \
     } while (false)
 
 #endif

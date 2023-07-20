@@ -487,7 +487,7 @@
     <ClInclude Include="DebugOverlay.h" />
     <ClInclude Include="DirectXHooks.h" />
     <ClInclude Include="framework.h" />
-    <ClInclude Include="Logging.h" />
+    <ClInclude Include="CFSR_Logging.h" />
     <ClInclude Include="NvParameter.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="scanner.h" />
@@ -503,7 +503,7 @@
     <ClCompile Include="DebugOverlay.cpp" />
     <ClCompile Include="DirectXHooks.cpp" />
     <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="Logging.cpp" />
+    <ClCompile Include="CFSR_Logging.cpp" />
     <ClCompile Include="NvParameter.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

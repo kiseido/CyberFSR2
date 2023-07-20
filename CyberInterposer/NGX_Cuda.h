@@ -14,7 +14,7 @@ namespace CyberInterposer
         PFN_NVSDK_NGX_CUDA_Init_with_ProjectID pfn_cuInit_with_ProjectID = nullptr;
 
         PFN_NVSDK_NGX_CUDA_Shutdown pfn_cuShutdown = nullptr;
-        //PFN_NVSDK_NGX_CUDA_Shutdown1 pfn_cuShutdown1 = nullptr;
+        PFN_NVSDK_NGX_CUDA_Shutdown1 pfn_cuShutdown1 = nullptr;
 
         PFN_NVSDK_NGX_CUDA_GetCapabilityParameters pfn_cuGetCapabilityParameters = nullptr;
 

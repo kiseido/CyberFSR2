@@ -86,17 +86,14 @@ namespace CyberLogger {
     }
 
     void Logger::start(const LPCWSTR fileName, const bool doPerformanceInfo, const bool doCoreInfo, const bool doRTC) {
+        std::lock_guard<std::mutex> loglock(queueMutex);
 
         SystemInfo perfInfo(DoCoreInfo, DoPerformanceInfo, DoRTC);
 
         bool doStart = false;
-        {
-            std::lock_guard<std::mutex> lock(LoggerStatus.statusLock);
-
-            if (LoggerStatus.status == Fresh || LoggerStatus.status == Stopped) {
-                doStart = true;
-                LoggerStatus.status = Starting;
-            }
+        if (LoggerStatus.status == Fresh || LoggerStatus.status == Stopped) {
+            doStart = true;
+            LoggerStatus.status = Starting;
         }
 
         if (!doStart) return;
@@ -111,28 +108,24 @@ namespace CyberLogger {
 
         auto string = logStream.str();
 
-        {
-            std::lock_guard<std::mutex> lock(queueMutex);
-            logQueue.push({ perfInfo, string });
-        }
+        logQueue.push({ perfInfo, string });
 
         if (!writingThread.joinable()) {
             stopWritingThread = false;
             writingThread = std::thread(&Logger::WritingThreadFunction, this);
+            writingThread.detach();
         }
     }
 
     void Logger::stop() {
+        std::lock_guard<std::mutex> loglock(queueMutex);
+
         SystemInfo perfInfo(DoCoreInfo, DoPerformanceInfo, DoRTC);
 
         bool doStop = false;
-        {
-            std::lock_guard<std::mutex> lock(LoggerStatus.statusLock);
-
-            if (LoggerStatus.status == Starting || LoggerStatus.status == Running) {
-                doStop = true;
-                LoggerStatus.status = Stopping;
-            }
+        if (LoggerStatus.status == Starting || LoggerStatus.status == Running) {
+            doStop = true;
+            LoggerStatus.status = Stopping;
         }
         if (!doStop) return;
 
@@ -140,19 +133,13 @@ namespace CyberLogger {
         logStream << "CyberLogger Stop" << '\n';
         auto string = logStream.str();
 
-        {
-            std::lock_guard<std::mutex> lock(queueMutex);
-            logQueue.push({ perfInfo, string });
-        }
+        logQueue.push({ perfInfo, string });
 
         queueCondVar.notify_one();
         stopWritingThread.store(true);
 
         writingThread.join();
-        {
-            std::lock_guard<std::mutex> lock(LoggerStatus.statusLock);
-            LoggerStatus.status = Stopped;
-        }
+        LoggerStatus.status = Stopped;
     }
 
     void Logger::log(const LogType& logType, const std::string_view& functionName, const std::string_view& staticInfo, const std::string& dynamicInfo, const uint64_t& errorInfo, bool doPerfInfo) {
@@ -236,31 +223,33 @@ namespace CyberLogger {
         queueCondVar.notify_one();
     }
 
-    void Logger::WritingThreadFunction() {
-        if (!logFile.is_open())
-            logFile.open("./CyberInterposer.log", std::ios::app);
+void Logger::WritingThreadFunction() {
+    if (!logFile.is_open())
+        logFile.open("./CyberInterposer.log", std::ios::app);
 
-        {
-            std::lock_guard<std::mutex> lock(LoggerStatus.statusLock);
-            LoggerStatus.status = Running;
-        }
-
-        while (!stopWritingThread) {
-            std::unique_lock<std::mutex> lock(queueMutex);
-            queueCondVar.wait(lock, [this] { return !logQueue.empty() || stopWritingThread; });
-
-            while (!logQueue.empty()) {
-                lock.lock();
-                LogEntry entry = std::move(logQueue.front());
-                logQueue.pop();
-                lock.unlock();
-
-                logFile << entry.hardwareInfo << " ::: " << entry.message << "\n";
-            }
-        }
-
-        logFile.close();
+    {
+        std::lock_guard<std::mutex> lock(LoggerStatus.statusLock);
+        LoggerStatus.status = Running;
     }
+
+    while (!stopWritingThread) {
+        std::unique_lock<std::mutex> lock(queueMutex);
+        queueCondVar.wait(lock, [this] { return !logQueue.empty() || stopWritingThread; });
+
+        while (!logQueue.empty()) {
+            LogEntry entry = std::move(logQueue.front());
+            logQueue.pop();
+            lock.unlock();
+
+            logFile << entry.hardwareInfo << " ::: " << entry.message << "\n";
+
+            lock.lock();
+        }
+    }
+
+    logFile.close();
+}
+
 
     std::string LPCWSTRToString(LPCWSTR lpcwstr) {
         int size = WideCharToMultiByte(CP_UTF8, 0, lpcwstr, -1, nullptr, 0, nullptr, nullptr);

@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "ViewMatrixHook.h"
 #include "scanner.h"
-#include "Logging.h"
+#include "CFSR_Logging.h"
 
 
 std::unique_ptr<ViewMatrixHook> ViewMatrixHook::Create(const Config& config)

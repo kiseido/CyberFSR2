@@ -223,7 +223,7 @@
   <ItemGroup>
     <ClInclude Include="framework.h" />
     <ClInclude Include="NGX_Interposer.h" />
-    <ClInclude Include="Logging.h" />
+    <ClInclude Include="CI_Logging.h" />
     <ClInclude Include="NGX_Parameter.h" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="NGX_Cuda.h" />
@@ -236,7 +236,7 @@
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="NGX_Interposer.cpp" />
-    <ClCompile Include="Logging.cpp" />
+    <ClCompile Include="CI_Logging.cpp" />
     <ClCompile Include="Common.cpp" />
     <ClCompile Include="NGX_Cuda.cpp" />
     <ClCompile Include="NGX_DX11.cpp" />

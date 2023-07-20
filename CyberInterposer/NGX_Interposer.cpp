@@ -1,8 +1,9 @@
 #include "pch.h"
 #include "NGX_Interposer.h"
 
+using namespace CyberInterposer;
 
-bool CyberInterposer::PFN_Table_NVNGX_Top_Interposer::LoadDLL(HMODULE hModule, bool populateChildren)
+bool PFN_Table_NVNGX_Top_Interposer::LoadDLL(HMODULE hModule, bool populateChildren)
 {
     CyberLogArgs(hModule, populateChildren);
 
@@ -62,5 +63,60 @@ inline HMODULE CyberInterposer::PFN_Table_T::GetHModule(LPCWSTR inputFileName)
 NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_GetVersion(NVSDK_NGX_Version* version)
 {
     CyberLogArgs(version);
+
     return NVSDK_NGX_Result_Fail;
+}
+
+bool CyberInterposer::DLLRepo::LoadDLL(HMODULE hModule, bool populateChildren)
+{
+    CyberLogArgs(hModule, populateChildren);
+
+    if (index_in_use == -1) index_in_use = 0;
+
+    return dlls[index_in_use].LoadDLL(hModule, populateChildren);
+}
+
+bool CyberInterposer::DLLRepo::UseLoadedDLL(size_t index)
+{
+    CyberLogArgs(index);
+    return false;
+}
+
+const std::array<NVNGX_NvDLL, DLLRepo::RepoMaxLoadedDLLs>* CyberInterposer::DLLRepo::GetLoadedDLLs()
+{
+    CyberLogArgs();
+
+    return &dlls;
+}
+
+const NVNGX_NvDLL& CyberInterposer::DLLRepo::GetLoadedDLL()
+{
+    CyberLogArgs();
+
+    return dlls[0];
+}
+
+void CyberInterposer::DLLRepo::ThreadConnect(HMODULE hModule)
+{
+    CyberLogArgs(hModule);
+}
+
+void CyberInterposer::DLLRepo::ThreadDisconnect(HMODULE hModule)
+{
+    CyberLogArgs(hModule);
+}
+
+void CyberInterposer::DLLRepo::ProcessConnect(HMODULE hModule)
+{
+    CyberLogArgs(hModule);
+}
+
+void CyberInterposer::DLLRepo::ProcessDisconnect(HMODULE hModule)
+{
+    CyberLogArgs(hModule);
+}
+
+bool CyberInterposer::NVNGX_NvDLL::LoadDLL(HMODULE inputFile, bool populateChildren)
+{
+    return pointer_tables.LoadDLL(inputFile, populateChildren);
 }

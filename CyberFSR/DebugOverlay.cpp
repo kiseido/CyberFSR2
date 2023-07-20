@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "DebugOverlay.h"
-#include "Logging.h"
+#include "CFSR_Logging.h"
 
 DebugOverlay::DebugOverlay(ID3D12Device* device, ID3D12GraphicsCommandList* cmdList)
 {
