@@ -119,7 +119,7 @@ namespace CyberLogger {
 
 
     template<typename... Args>
-    std::string_view convertToStringView(const std::string& str, Args&&... args) {
+    std::string convertToString(const std::string& str, Args&&... args) {
         std::stringstream ss;
         (ss << ... << std::forward<Args>(args));
         return ss.str();

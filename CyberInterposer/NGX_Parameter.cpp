@@ -4,7 +4,7 @@
 using namespace CyberInterposer;
 
 
-void NvParameter::Set(const char* InName, unsigned long long InValue)
+void NVSDK_CONV NvParameter::Set(const char* InName, unsigned long long InValue)
 {
     CyberLOG();
 
@@ -14,7 +14,7 @@ void NvParameter::Set(const char* InName, unsigned long long InValue)
         ptr(this, InName, InValue);
 }
 
-void NvParameter::Set(const char* InName, float InValue)
+void NVSDK_CONV NvParameter::Set(const char* InName, float InValue)
 {
     CyberLOG();
 
@@ -24,7 +24,7 @@ void NvParameter::Set(const char* InName, float InValue)
         ptr(this, InName, InValue);
 }
 
-void NvParameter::Set(const char* InName, double InValue)
+void NVSDK_CONV NvParameter::Set(const char* InName, double InValue)
 {
     CyberLOG();
 
@@ -34,7 +34,7 @@ void NvParameter::Set(const char* InName, double InValue)
         ptr(this, InName, InValue);
 }
 
-void NvParameter::Set(const char* InName, unsigned int InValue)
+void NVSDK_CONV NvParameter::Set(const char* InName, unsigned int InValue)
 {
     CyberLOG();
 
@@ -44,7 +44,7 @@ void NvParameter::Set(const char* InName, unsigned int InValue)
         ptr(this, InName, InValue);
 }
 
-void NvParameter::Set(const char* InName, int InValue)
+void NVSDK_CONV NvParameter::Set(const char* InName, int InValue)
 {
     CyberLOG();
 
@@ -54,7 +54,7 @@ void NvParameter::Set(const char* InName, int InValue)
         ptr(this, InName, InValue);
 }
 
-void NvParameter::Set(const char* InName, ID3D11Resource* InValue)
+void NVSDK_CONV NvParameter::Set(const char* InName, ID3D11Resource* InValue)
 {
     CyberLOG();
 
@@ -64,7 +64,7 @@ void NvParameter::Set(const char* InName, ID3D11Resource* InValue)
         ptr(this, InName, InValue);
 }
 
-void NvParameter::Set(const char* InName, ID3D12Resource* InValue)
+void NVSDK_CONV NvParameter::Set(const char* InName, ID3D12Resource* InValue)
 {
     CyberLOG();
 
@@ -74,7 +74,7 @@ void NvParameter::Set(const char* InName, ID3D12Resource* InValue)
         ptr(this, InName, InValue);
 }
 
-void NvParameter::Set(const char* InName, void* InValue)
+void NVSDK_CONV NvParameter::Set(const char* InName, void* InValue)
 {
     CyberLOG();
 
@@ -84,7 +84,7 @@ void NvParameter::Set(const char* InName, void* InValue)
         ptr(this, InName, InValue);
 }
 
-NVSDK_NGX_Result NvParameter::Get(const char* InName, unsigned long long* OutValue) const
+NVSDK_NGX_Result NVSDK_CONV NvParameter::Get(const char* InName, unsigned long long* OutValue) const
 {
     CyberLOG();
 
@@ -96,7 +96,7 @@ NVSDK_NGX_Result NvParameter::Get(const char* InName, unsigned long long* OutVal
     return NVSDK_NGX_Result_Fail;
 }
 
-NVSDK_NGX_Result NvParameter::Get(const char* InName, float* OutValue) const
+NVSDK_NGX_Result NVSDK_CONV NvParameter::Get(const char* InName, float* OutValue) const
 {
     CyberLOG();
 
@@ -108,7 +108,7 @@ NVSDK_NGX_Result NvParameter::Get(const char* InName, float* OutValue) const
     return NVSDK_NGX_Result_Fail;
 }
 
-NVSDK_NGX_Result NvParameter::Get(const char* InName, double* OutValue) const
+NVSDK_NGX_Result NVSDK_CONV NvParameter::Get(const char* InName, double* OutValue) const
 {
     CyberLOG();
 
@@ -120,7 +120,7 @@ NVSDK_NGX_Result NvParameter::Get(const char* InName, double* OutValue) const
     return NVSDK_NGX_Result_Fail;
 }
 
-NVSDK_NGX_Result NvParameter::Get(const char* InName, unsigned int* OutValue) const
+NVSDK_NGX_Result NVSDK_CONV NvParameter::Get(const char* InName, unsigned int* OutValue) const
 {
     CyberLOG();
 
@@ -132,7 +132,7 @@ NVSDK_NGX_Result NvParameter::Get(const char* InName, unsigned int* OutValue) co
     return NVSDK_NGX_Result_Fail;
 }
 
-NVSDK_NGX_Result NvParameter::Get(const char* InName, int* OutValue) const
+NVSDK_NGX_Result NVSDK_CONV NvParameter::Get(const char* InName, int* OutValue) const
 {
     CyberLOG();
 
@@ -144,7 +144,7 @@ NVSDK_NGX_Result NvParameter::Get(const char* InName, int* OutValue) const
     return NVSDK_NGX_Result_Fail;
 }
 
-NVSDK_NGX_Result NvParameter::Get(const char* InName, ID3D11Resource** OutValue) const
+NVSDK_NGX_Result NVSDK_CONV NvParameter::Get(const char* InName, ID3D11Resource** OutValue) const
 {
     CyberLOG();
 
@@ -156,7 +156,7 @@ NVSDK_NGX_Result NvParameter::Get(const char* InName, ID3D11Resource** OutValue)
     return NVSDK_NGX_Result_Fail;
 }
 
-NVSDK_NGX_Result NvParameter::Get(const char* InName, ID3D12Resource** OutValue) const
+NVSDK_NGX_Result NVSDK_CONV NvParameter::Get(const char* InName, ID3D12Resource** OutValue) const
 {
     CyberLOG();
 
@@ -168,7 +168,7 @@ NVSDK_NGX_Result NvParameter::Get(const char* InName, ID3D12Resource** OutValue)
     return NVSDK_NGX_Result_Fail;
 }
 
-NVSDK_NGX_Result NvParameter::Get(const char* InName, void** OutValue) const
+NVSDK_NGX_Result NVSDK_CONV NvParameter::Get(const char* InName, void** OutValue) const
 {
     CyberLOG();
 

@@ -3,7 +3,7 @@
 #include "DirectXHooks.h"
 #include <tlhelp32.h>
 
-#include "Logging.h"
+#include "CFSR_Logging.h"
 
 /*
 Cyberpunk doesn't reset the ComputeRootSignature after running DLSS.

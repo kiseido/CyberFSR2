@@ -36,7 +36,7 @@
     <ClInclude Include="NGX_PFN_Definitions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Logging.h">
+    <ClInclude Include="CI_Logging.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="NGX_DX12.h">
@@ -74,7 +74,7 @@
     <ClCompile Include="NGX_Cuda.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Logging.cpp">
+    <ClCompile Include="CI_Logging.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="NGX_Parameter.cpp">

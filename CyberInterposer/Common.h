@@ -19,7 +19,7 @@ namespace CyberInterposer
 
         static HMODULE GetHModule(LPCWSTR inputFileName);
 
-        bool LoadDLL(LPCWSTR inputFileName, bool populateChildren);
+        virtual bool LoadDLL(LPCWSTR inputFileName, bool populateChildren);
 
         virtual bool LoadDLL(HMODULE inputFile, bool populateChildren) = 0;
     };

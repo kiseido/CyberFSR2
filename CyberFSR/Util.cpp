@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Config.h"
 #include "Util.h"
-#include "Logging.h"
+#include "CFSR_Logging.h"
 
 namespace fs = std::filesystem;
 

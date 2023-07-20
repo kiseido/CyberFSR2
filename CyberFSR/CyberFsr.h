@@ -3,7 +3,7 @@
 #include "ViewMatrixHook.h"
 #include "NvParameter.h"
 #include "DebugOverlay.h"
-#include "logging.h"
+#include "CFSR_logging.h"
 
 class FeatureContext;
 

@@ -28,7 +28,7 @@ namespace CyberInterposer
         bool LoadDLL(HMODULE inputFile, bool populateChildren) override;
     };
 
-    typedef struct NVNGX_NvDLL {
+    struct NVNGX_NvDLL : PFN_Table_T {
         HMODULE hmodule = 0;
 
         time_t load_time = 0;
@@ -39,9 +39,11 @@ namespace CyberInterposer
         std::string file_path;
 
         PFN_Table_NVNGX_Top_Interposer pointer_tables;
-    } NvDLL;
 
-    class DLLRepo : PFN_Table_T {
+        bool LoadDLL(HMODULE inputFile, bool populateChildren) override;
+    };
+
+    struct DLLRepo : PFN_Table_T {
     public:
         static constexpr size_t RepoMaxLoadedDLLs = 128;
     private:
@@ -61,7 +63,7 @@ namespace CyberInterposer
         std::unordered_map<HMODULE,ProcessConnection> connected_processes;
         std::unordered_map<HMODULE,ThreadConnection> connected_threads;
 
-        std::array<NvDLL, RepoMaxLoadedDLLs> dlls;
+        std::array<NVNGX_NvDLL, RepoMaxLoadedDLLs> dlls;
         size_t index_in_use = -1;
         size_t next_index = -1;
 
@@ -71,8 +73,8 @@ namespace CyberInterposer
         bool LoadDLL(HMODULE hModule, bool populateChildren) override;
 
         bool UseLoadedDLL(size_t index);
-        const std::vector<const NvDLL>& GetLoadedDLLs();
-        const NvDLL& GetLoadedDLL();
+        const std::array<NVNGX_NvDLL, RepoMaxLoadedDLLs>* GetLoadedDLLs();
+        const NVNGX_NvDLL& GetLoadedDLL();
 
         void ThreadConnect(HMODULE hModule);
         void ThreadDisconnect(HMODULE hModule);
