@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "CI_Logging.h"
 
 #ifndef CyInt_INTERPOSER
 #define CyInt_INTERPOSER
@@ -83,9 +84,7 @@ namespace CyberInterposer
         void ProcessDisconnect(HMODULE hModule);
     };
 
-    static DLLRepo DLLs;
-
-    static CyberLogger::Logger logger;
+    extern DLLRepo DLLs;
 };
 
 #endif

@@ -118,11 +118,11 @@ NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_VULKAN_CreateFeature1(VkDevi
 	initParams.maxRenderSize.height = inParams->Height;
 	initParams.displaySize.width = inParams->OutWidth;
 	initParams.displaySize.height = inParams->OutHeight;
-	initParams.flags = (inParams->DepthInverted) ? FFX_FSR2_ENABLE_DEPTH_INVERTED : 0
-		| (inParams->AutoExposure) ? FFX_FSR2_ENABLE_AUTO_EXPOSURE : 0
-		| (inParams->Hdr) ? FFX_FSR2_ENABLE_HIGH_DYNAMIC_RANGE : 0
-		| (inParams->JitterMotion) ? FFX_FSR2_ENABLE_MOTION_VECTORS_JITTER_CANCELLATION : 0
-		| (!inParams->LowRes) ? FFX_FSR2_ENABLE_DISPLAY_RESOLUTION_MOTION_VECTORS : 0;
+	initParams.flags = ((inParams->DepthInverted) ? FFX_FSR2_ENABLE_DEPTH_INVERTED : 0)
+		| ((inParams->AutoExposure) ? FFX_FSR2_ENABLE_AUTO_EXPOSURE : 0)
+		| ((inParams->Hdr) ? FFX_FSR2_ENABLE_HIGH_DYNAMIC_RANGE : 0)
+		| ((inParams->JitterMotion) ? FFX_FSR2_ENABLE_MOTION_VECTORS_JITTER_CANCELLATION : 0)
+		| ((!inParams->LowRes) ? FFX_FSR2_ENABLE_DISPLAY_RESOLUTION_MOTION_VECTORS : 0);
 
 	initParams.flags = 0;
 	if (config->DepthInverted.value_or(inParams->DepthInverted))

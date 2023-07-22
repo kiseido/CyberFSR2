@@ -3,7 +3,7 @@
 
 bool CyberInterposer::PFN_Table_NVNGX_CUDA::LoadDLL(HMODULE hModule, bool populateChildren)
 {
-    CyberLOG();
+    CyberInterposer::logger.logVerboseInfo(__func__, "");
 
     if (hModule == nullptr)
     {
@@ -29,7 +29,37 @@ bool CyberInterposer::PFN_Table_NVNGX_CUDA::LoadDLL(HMODULE hModule, bool popula
     pfn_cuEvaluateFeature = reinterpret_cast<PFN_NVSDK_NGX_CUDA_EvaluateFeature>(GetProcAddress(hModule, "cuEvaluateFeature"));
     pfn_cuEvaluateFeature_C = reinterpret_cast<PFN_NVSDK_NGX_CUDA_EvaluateFeature_C>(GetProcAddress(hModule, "cuEvaluateFeature_C"));
 
-    return true;
+    bool foundFunctions = true;
+
+#define CyDLLLoadLog(name) \
+	do { \
+		const bool found = (name == nullptr); \
+		if(found){ \
+			CyberLOGi(#name, " found"); \
+		} \
+		else { \
+			CyberLOGi(#name, " not found"); \
+		} \
+		foundFunctions = false; \
+	} while(false)
+
+    CyDLLLoadLog(pfn_cuInit);
+    CyDLLLoadLog(pfn_cuInit_Ext);
+    CyDLLLoadLog(pfn_cuInit_with_ProjectID);
+    CyDLLLoadLog(pfn_cuShutdown);
+    CyDLLLoadLog(pfn_cuShutdown1);
+    CyDLLLoadLog(pfn_cuGetCapabilityParameters);
+    CyDLLLoadLog(pfn_cuAllocateParameters);
+    CyDLLLoadLog(pfn_cuDestroyParameters);
+    CyDLLLoadLog(pfn_cuGetScratchBufferSize);
+    CyDLLLoadLog(pfn_cuCreateFeature);
+    CyDLLLoadLog(pfn_cuReleaseFeature);
+    CyDLLLoadLog(pfn_cuEvaluateFeature);
+    CyDLLLoadLog(pfn_cuEvaluateFeature_C);
+
+#undef CyDLLLoadLog
+
+    return foundFunctions;
 }
 
 NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_CUDA_Init(unsigned long long a, const wchar_t* b, const NVSDK_NGX_FeatureCommonInfo* c, NVSDK_NGX_Version d) {

@@ -24,12 +24,18 @@
     <ClInclude Include="CyberLogger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CyberTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CyberLogger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CyberTypes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

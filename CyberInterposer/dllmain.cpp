@@ -4,11 +4,11 @@
 
 HMODULE dllModule;
 
-static const LPCWSTR cyberFSRdllFileName = L"CyberFSR.dll";
+const LPCWSTR cyberFSRdllFileName = L"CyberFSR.dll";
 
-static bool CyberFSRLoaded = false;
-static bool LoggerLoaded = false;
-static std::mutex startupMutex;
+bool CyberFSRLoaded = false;
+bool LoggerLoaded = false;
+std::mutex startupMutex;
 
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
@@ -19,23 +19,38 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
         if (!LoggerLoaded)
         {
             LoggerLoaded = true;
-            CyberInterposer::logger.start(L"CyberInterposer.log", true, true, true);
-            CyberLOGy("CyberLOGy test");
+            //CyberInterposer::logger.config(LogFilename, true, true, true);
+            CyberInterposer::logger.start();
+            CyberLOGvi("CyberLOGvi test");
+            CyberLOGi("CyberLOGi test");
+            CyberLOGw("CyberLOGw test");
+            CyberLOGe("CyberLOGe test");
             CyberLogLots("CyberLogLots test", "");
             CyberLogArgs("CyberLogArgs test", "");
         }
 
+        
         if (!CyberFSRLoaded)
         {
             CyberFSRLoaded = true;
 
-            const bool dllLoadStatus = CyberInterposer::DLLs.LoadDLL(LoadLibraryW(cyberFSRdllFileName), true);
+            const auto hmodule = LoadLibraryW(cyberFSRdllFileName);
 
-            if (!dllLoadStatus)
+            if (!hmodule)
             {
-                CyberLOGy("Loading NVNGX.dll failed");
+                CyberLOGe("Loading NVNGX.dll failed");
                 // Handle the error if the dependent DLL cannot be loaded
                 // return FALSE;
+            }
+            else {
+                const bool dllLoadStatus = CyberInterposer::DLLs.LoadDLL(hmodule, true);
+
+                if (!dllLoadStatus)
+                {
+                    CyberLOGe("LoadDLL failed");
+                    // Handle the error if the dependent DLL cannot be loaded
+                    // return FALSE;
+                }
             }
         }
     }
@@ -44,19 +59,19 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
     {
     case DLL_PROCESS_ATTACH:
     {
-        CyberLOGy("Interposer_DLL_PROCESS_ATTACH");
+        CyberLOGvi("Interposer_DLL_PROCESS_ATTACH");
         DisableThreadLibraryCalls(hModule);
         dllModule = hModule;
         break;
     }
     case DLL_THREAD_ATTACH:
-        CyberLOGy("Interposer_DLL_THREAD_ATTACH");
+        CyberLOGvi("Interposer_DLL_THREAD_ATTACH");
         break;
     case DLL_THREAD_DETACH:
-        CyberLOGy("Interposer_DLL_THREAD_DETACH");
+        CyberLOGvi("Interposer_DLL_THREAD_DETACH");
         break;
     case DLL_PROCESS_DETACH:
-        CyberLOGy("Interposer_DLL_PROCESS_DETACH");
+        CyberLOGvi("Interposer_DLL_PROCESS_DETACH");
         CyberInterposer::logger.stop();
         break;
     }

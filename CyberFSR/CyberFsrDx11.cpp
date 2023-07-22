@@ -72,13 +72,13 @@ NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_Init_Ext(unsigned long
     if (initializationSuccess)
     {
         // Print a success message to the console or log
-        CyberLOGy("Initialization successful!");
+        CyberLOGi("Initialization successful!");
 
     }
     else
     {
         // Print an error message to the console or log
-        CyberLOGy("Initialization failed!");
+        CyberLOGe("Initialization failed!");
 
         // Set the appropriate error code based on the initialization failure reason
         result = NVSDK_NGX_Result_Fail;

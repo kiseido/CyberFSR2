@@ -48,6 +48,9 @@
     <ClInclude Include="NGX_Parameter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="NGX_Types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
