@@ -3,10 +3,76 @@
 
 using namespace CyberInterposer;
 
-
-void NVSDK_CONV NvParameter::Set(const char* InName, unsigned long long InValue)
+CyberInterposer::PFN_Table_NVNGX_Parameter::PFN_Table_NVNGX_Parameter(NVSDK_NGX_Parameter& other)
 {
-    CyberLOG();
+    std::memcpy(original.data(), &other, sizeof(NVSDK_NGX_Parameter));
+
+}
+
+
+/*
+bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool populateChildren)
+{
+    CyberLogArgs(inputFile, populateChildren);
+
+    if (inputFile == nullptr || inputFile == 0) {
+        CyberLOGe("hModule is bad");
+        return false;
+    }
+
+    // common
+    pfn_GetULL = reinterpret_cast<PFN_NVSDK_NGX_Parameter_GetULL>(GetProcAddress(inputFile, "GetULL"));
+    pfn_SetULL = reinterpret_cast<PFN_NVSDK_NGX_Parameter_SetULL>(GetProcAddress(inputFile, "SetULL"));
+    pfn_GetD = reinterpret_cast<PFN_NVSDK_NGX_Parameter_GetD>(GetProcAddress(inputFile, "GetD"));
+    pfn_SetD = reinterpret_cast<PFN_NVSDK_NGX_Parameter_SetD>(GetProcAddress(inputFile, "SetD"));
+    pfn_GetI = reinterpret_cast<PFN_NVSDK_NGX_Parameter_GetI>(GetProcAddress(inputFile, "GetI"));
+    pfn_SetI = reinterpret_cast<PFN_NVSDK_NGX_Parameter_SetI>(GetProcAddress(inputFile, "SetI"));
+    pfn_SetVoidPointer = reinterpret_cast<PFN_NVSDK_NGX_Parameter_SetVoidPointer>(GetProcAddress(inputFile, "SetVoidPointer"));
+    pfn_GetVoidPointer = reinterpret_cast<PFN_NVSDK_NGX_Parameter_GetVoidPointer>(GetProcAddress(inputFile, "GetVoidPointer"));
+    pfn_GetF = reinterpret_cast<PFN_NVSDK_NGX_Parameter_GetF>(GetProcAddress(inputFile, "GetF"));
+    pfn_SetF = reinterpret_cast<PFN_NVSDK_NGX_Parameter_SetF>(GetProcAddress(inputFile, "SetF"));
+    pfn_GetUI = reinterpret_cast<PFN_NVSDK_NGX_Parameter_GetUI>(GetProcAddress(inputFile, "GetUI"));
+    pfn_SetUI = reinterpret_cast<PFN_NVSDK_NGX_Parameter_SetUI>(GetProcAddress(inputFile, "SetUI"));
+
+    bool foundFunctions = true;
+
+#define CyDLLLoadLog(name) \
+    do { \
+        const bool found = (name == nullptr); \
+        if(found){ \
+            CyberLOGi(#name, " found"); \
+        } \
+        else { \
+            CyberLOGi(#name, " not found"); \
+        } \
+        foundFunctions = false; \
+    } while(false)
+
+
+    CyDLLLoadLog(pfn_GetULL);
+    CyDLLLoadLog(pfn_SetULL);
+    CyDLLLoadLog(pfn_GetD);
+    CyDLLLoadLog(pfn_SetD);
+    CyDLLLoadLog(pfn_GetI);
+    CyDLLLoadLog(pfn_SetI);
+    CyDLLLoadLog(pfn_SetVoidPointer);
+    CyDLLLoadLog(pfn_GetVoidPointer);
+    CyDLLLoadLog(pfn_GetF);
+    CyDLLLoadLog(pfn_SetF);
+    CyDLLLoadLog(pfn_GetUI);
+    CyDLLLoadLog(pfn_SetUI);
+
+#undef CyDLLLoadLog
+
+    return foundFunctions;
+}
+*/
+
+
+
+void CI_NGX_Parameter::Set(const char* InName, unsigned long long InValue)
+{
+    CyberLogArgs(InName, InValue);
 
     auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_Parameter.pfn_SetULL;
 
@@ -14,9 +80,9 @@ void NVSDK_CONV NvParameter::Set(const char* InName, unsigned long long InValue)
         ptr(this, InName, InValue);
 }
 
-void NVSDK_CONV NvParameter::Set(const char* InName, float InValue)
+void CI_NGX_Parameter::Set(const char* InName, float InValue)
 {
-    CyberLOG();
+    CyberLogArgs(InName, InValue);
 
     auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_Parameter.pfn_SetF;
 
@@ -24,9 +90,9 @@ void NVSDK_CONV NvParameter::Set(const char* InName, float InValue)
         ptr(this, InName, InValue);
 }
 
-void NVSDK_CONV NvParameter::Set(const char* InName, double InValue)
+void CI_NGX_Parameter::Set(const char* InName, double InValue)
 {
-    CyberLOG();
+    CyberLogArgs(InName, InValue);
 
     auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_Parameter.pfn_SetD;
 
@@ -34,9 +100,9 @@ void NVSDK_CONV NvParameter::Set(const char* InName, double InValue)
         ptr(this, InName, InValue);
 }
 
-void NVSDK_CONV NvParameter::Set(const char* InName, unsigned int InValue)
+void CI_NGX_Parameter::Set(const char* InName, unsigned int InValue)
 {
-    CyberLOG();
+    CyberLogArgs(InName, InValue);
 
     auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_Parameter.pfn_SetUI;
 
@@ -44,9 +110,9 @@ void NVSDK_CONV NvParameter::Set(const char* InName, unsigned int InValue)
         ptr(this, InName, InValue);
 }
 
-void NVSDK_CONV NvParameter::Set(const char* InName, int InValue)
+void CI_NGX_Parameter::Set(const char* InName, int InValue)
 {
-    CyberLOG();
+    CyberLogArgs(InName, InValue);
 
     auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_Parameter.pfn_SetI;
 
@@ -54,9 +120,9 @@ void NVSDK_CONV NvParameter::Set(const char* InName, int InValue)
         ptr(this, InName, InValue);
 }
 
-void NVSDK_CONV NvParameter::Set(const char* InName, ID3D11Resource* InValue)
+void CI_NGX_Parameter::Set(const char* InName, ID3D11Resource* InValue)
 {
-    CyberLOG();
+    CyberLogArgs(InName, InValue);
 
     auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_Parameter.pfn_SetD3d11Resource;
 
@@ -64,9 +130,9 @@ void NVSDK_CONV NvParameter::Set(const char* InName, ID3D11Resource* InValue)
         ptr(this, InName, InValue);
 }
 
-void NVSDK_CONV NvParameter::Set(const char* InName, ID3D12Resource* InValue)
+void CI_NGX_Parameter::Set(const char* InName, ID3D12Resource* InValue)
 {
-    CyberLOG();
+    CyberLogArgs(InName, InValue);
 
     auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_Parameter.pfn_SetD3d12Resource;
 
@@ -74,9 +140,9 @@ void NVSDK_CONV NvParameter::Set(const char* InName, ID3D12Resource* InValue)
         ptr(this, InName, InValue);
 }
 
-void NVSDK_CONV NvParameter::Set(const char* InName, void* InValue)
+void CI_NGX_Parameter::Set(const char* InName, void* InValue)
 {
-    CyberLOG();
+    CyberLogArgs(InName, InValue);
 
     auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_Parameter.pfn_SetVoidPointer;
 
@@ -84,9 +150,9 @@ void NVSDK_CONV NvParameter::Set(const char* InName, void* InValue)
         ptr(this, InName, InValue);
 }
 
-NVSDK_NGX_Result NVSDK_CONV NvParameter::Get(const char* InName, unsigned long long* OutValue) const
+NVSDK_NGX_Result CI_NGX_Parameter::Get(const char* InName, unsigned long long* OutValue) const
 {
-    CyberLOG();
+    CyberLogArgs(InName, OutValue);
 
     auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_Parameter.pfn_GetULL;
 
@@ -96,9 +162,9 @@ NVSDK_NGX_Result NVSDK_CONV NvParameter::Get(const char* InName, unsigned long l
     return NVSDK_NGX_Result_Fail;
 }
 
-NVSDK_NGX_Result NVSDK_CONV NvParameter::Get(const char* InName, float* OutValue) const
+NVSDK_NGX_Result CI_NGX_Parameter::Get(const char* InName, float* OutValue) const
 {
-    CyberLOG();
+    CyberLogArgs(InName, OutValue);
 
     auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_Parameter.pfn_GetF;
 
@@ -108,9 +174,9 @@ NVSDK_NGX_Result NVSDK_CONV NvParameter::Get(const char* InName, float* OutValue
     return NVSDK_NGX_Result_Fail;
 }
 
-NVSDK_NGX_Result NVSDK_CONV NvParameter::Get(const char* InName, double* OutValue) const
+NVSDK_NGX_Result CI_NGX_Parameter::Get(const char* InName, double* OutValue) const
 {
-    CyberLOG();
+    CyberLogArgs(InName, OutValue);
 
     auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_Parameter.pfn_GetD;
 
@@ -120,9 +186,9 @@ NVSDK_NGX_Result NVSDK_CONV NvParameter::Get(const char* InName, double* OutValu
     return NVSDK_NGX_Result_Fail;
 }
 
-NVSDK_NGX_Result NVSDK_CONV NvParameter::Get(const char* InName, unsigned int* OutValue) const
+NVSDK_NGX_Result CI_NGX_Parameter::Get(const char* InName, unsigned int* OutValue) const
 {
-    CyberLOG();
+    CyberLogArgs(InName, OutValue);
 
     auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_Parameter.pfn_GetUI;
 
@@ -132,9 +198,9 @@ NVSDK_NGX_Result NVSDK_CONV NvParameter::Get(const char* InName, unsigned int* O
     return NVSDK_NGX_Result_Fail;
 }
 
-NVSDK_NGX_Result NVSDK_CONV NvParameter::Get(const char* InName, int* OutValue) const
+NVSDK_NGX_Result CI_NGX_Parameter::Get(const char* InName, int* OutValue) const
 {
-    CyberLOG();
+    CyberLogArgs(InName, OutValue);
 
     auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_Parameter.pfn_GetI;
 
@@ -144,9 +210,9 @@ NVSDK_NGX_Result NVSDK_CONV NvParameter::Get(const char* InName, int* OutValue) 
     return NVSDK_NGX_Result_Fail;
 }
 
-NVSDK_NGX_Result NVSDK_CONV NvParameter::Get(const char* InName, ID3D11Resource** OutValue) const
+NVSDK_NGX_Result CI_NGX_Parameter::Get(const char* InName, ID3D11Resource** OutValue) const
 {
-    CyberLOG();
+    CyberLogArgs(InName, OutValue);
 
     auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_Parameter.pfn_GetD3d11Resource;
 
@@ -156,9 +222,9 @@ NVSDK_NGX_Result NVSDK_CONV NvParameter::Get(const char* InName, ID3D11Resource*
     return NVSDK_NGX_Result_Fail;
 }
 
-NVSDK_NGX_Result NVSDK_CONV NvParameter::Get(const char* InName, ID3D12Resource** OutValue) const
+NVSDK_NGX_Result CI_NGX_Parameter::Get(const char* InName, ID3D12Resource** OutValue) const
 {
-    CyberLOG();
+    CyberLogArgs(InName, OutValue);
 
     auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_Parameter.pfn_GetD3d12Resource;
 
@@ -168,9 +234,9 @@ NVSDK_NGX_Result NVSDK_CONV NvParameter::Get(const char* InName, ID3D12Resource*
     return NVSDK_NGX_Result_Fail;
 }
 
-NVSDK_NGX_Result NVSDK_CONV NvParameter::Get(const char* InName, void** OutValue) const
+NVSDK_NGX_Result CI_NGX_Parameter::Get(const char* InName, void** OutValue) const
 {
-    CyberLOG();
+    CyberLogArgs(InName, OutValue);
 
     auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_Parameter.pfn_GetVoidPointer;
 
@@ -180,47 +246,8 @@ NVSDK_NGX_Result NVSDK_CONV NvParameter::Get(const char* InName, void** OutValue
     return NVSDK_NGX_Result_Fail;
 }
 
-bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool populateChildren)
+void CI_NGX_Parameter::Reset()
 {
-    CyberLogArgs(inputFile, populateChildren);
-
-    if (inputFile == nullptr || inputFile == 0) {
-        CyberLOGy("hModule is bad");
-        return false;
-    }
-
-    // common
-    pfn_GetULL = reinterpret_cast<PFN_NVSDK_NGX_Parameter_GetULL>(GetProcAddress(inputFile, "NVSDK_NGX_Parameter_GetULL"));
-    pfn_SetULL = reinterpret_cast<PFN_NVSDK_NGX_Parameter_SetULL>(GetProcAddress(inputFile, "NVSDK_NGX_Parameter_SetULL"));
-    pfn_GetD = reinterpret_cast<PFN_NVSDK_NGX_Parameter_GetD>(GetProcAddress(inputFile, "NVSDK_NGX_Parameter_GetD"));
-    pfn_SetD = reinterpret_cast<PFN_NVSDK_NGX_Parameter_SetD>(GetProcAddress(inputFile, "NVSDK_NGX_Parameter_SetD"));
-    pfn_GetI = reinterpret_cast<PFN_NVSDK_NGX_Parameter_GetI>(GetProcAddress(inputFile, "NVSDK_NGX_Parameter_GetI"));
-    pfn_SetI = reinterpret_cast<PFN_NVSDK_NGX_Parameter_SetI>(GetProcAddress(inputFile, "NVSDK_NGX_Parameter_SetI"));
-    pfn_SetVoidPointer = reinterpret_cast<PFN_NVSDK_NGX_Parameter_SetVoidPointer>(GetProcAddress(inputFile, "NVSDK_NGX_Parameter_SetVoidPointer"));
-    pfn_GetVoidPointer = reinterpret_cast<PFN_NVSDK_NGX_Parameter_GetVoidPointer>(GetProcAddress(inputFile, "NVSDK_NGX_Parameter_GetVoidPointer"));
-    pfn_GetF = reinterpret_cast<PFN_NVSDK_NGX_Parameter_GetF>(GetProcAddress(inputFile, "NVSDK_NGX_Parameter_GetF"));
-    pfn_SetF = reinterpret_cast<PFN_NVSDK_NGX_Parameter_SetF>(GetProcAddress(inputFile, "NVSDK_NGX_Parameter_SetF"));
-    pfn_GetUI = reinterpret_cast<PFN_NVSDK_NGX_Parameter_GetUI>(GetProcAddress(inputFile, "NVSDK_NGX_Parameter_GetUI"));
-    pfn_SetUI = reinterpret_cast<PFN_NVSDK_NGX_Parameter_SetUI>(GetProcAddress(inputFile, "NVSDK_NGX_Parameter_SetUI"));
-
-    const bool foundCommonFunctions =
-        (pfn_GetULL != nullptr) &&
-        (pfn_SetULL != nullptr) &&
-        (pfn_GetD != nullptr) &&
-        (pfn_SetD != nullptr) &&
-        (pfn_GetI != nullptr) &&
-        (pfn_SetI != nullptr) &&
-        (pfn_SetVoidPointer != nullptr) &&
-        (pfn_GetVoidPointer != nullptr) &&
-        (pfn_GetF != nullptr) &&
-        (pfn_SetF != nullptr) &&
-        (pfn_GetUI != nullptr) &&
-        (pfn_SetUI != nullptr);
-
-    if (foundCommonFunctions == false) {
-        CyberLOGy("NVNGX Parameter functions not found");
-        return false;
-    }
-
-    return true;
+    CyberLOG();
 }
+

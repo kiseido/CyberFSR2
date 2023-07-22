@@ -3,16 +3,18 @@
 
 using namespace CyberInterposer;
 
+DLLRepo CyberInterposer::DLLs = DLLRepo();
+
 bool PFN_Table_NVNGX_Top_Interposer::LoadDLL(HMODULE hModule, bool populateChildren)
 {
     CyberLogArgs(hModule, populateChildren);
 
     if (hModule == nullptr || hModule == 0) {
-        CyberLOGy("hModule is bad");
+        CyberLOGe("hModule is bad");
         return false;
     }
-    
-    const bool foundParameter = PFN_Parameter.LoadDLL(hModule, false);
+   
+    bool foundFunctions = true;
 
     if (populateChildren) {
         const bool foundDx11 = PFN_DX11.LoadDLL(hModule, false);
@@ -21,27 +23,45 @@ bool PFN_Table_NVNGX_Top_Interposer::LoadDLL(HMODULE hModule, bool populateChild
         const bool foundVulkan = PFN_Vulkan.LoadDLL(hModule, false);
 
         if (foundDx11)
-            CyberLOGy("DX11 functions loaded");
+        {
+            CyberLOGi("DX11 functions loaded");
+        }
         else 
-            CyberLOGy("DX11 functions not found");
+        {
+            CyberLOGe("DX11 functions not found");
+        }
 
         if (foundDx12)
-            CyberLOGy("DX12 functions loaded");
+        {
+            CyberLOGi("DX12 functions loaded");
+        }
         else 
-            CyberLOGy("DX12 functions not found");
+        {
+            CyberLOGe("DX12 functions not found");
+        }
 
         if (foundDx12)
-            CyberLOGy("CUDA functions loaded");
+        {
+            CyberLOGi("CUDA functions loaded");
+        }
         else 
-            CyberLOGy("CUDA functions not found");
+        {
+            CyberLOGe("CUDA functions not found");
+        }
 
         if (foundDx12)
-            CyberLOGy("Vulkan functions loaded");
+        {
+            CyberLOGi("Vulkan functions loaded");
+        }
         else 
-            CyberLOGy("Vulkan functions not found");
+        {
+            CyberLOGe("Vulkan functions not found");
+        }
+
+        return foundDx11 & foundDx12 & foundVulkan;
     }
+    return false;
 
-    return foundParameter;
 }
 
 NVSDK_NGX_Result NVSDK_NGX_UpdateFeature(const NVSDK_NGX_Application_Identifier* ApplicationId, const NVSDK_NGX_Feature FeatureID)
@@ -84,14 +104,14 @@ bool CyberInterposer::DLLRepo::UseLoadedDLL(size_t index)
 
 const std::array<NVNGX_NvDLL, DLLRepo::RepoMaxLoadedDLLs>* CyberInterposer::DLLRepo::GetLoadedDLLs()
 {
-    CyberLogArgs();
+    CyberLOG();
 
     return &dlls;
 }
 
 const NVNGX_NvDLL& CyberInterposer::DLLRepo::GetLoadedDLL()
 {
-    CyberLogArgs();
+    CyberLOG();
 
     return dlls[0];
 }

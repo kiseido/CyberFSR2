@@ -35,7 +35,40 @@ bool CyberInterposer::PFN_Table_NVNGX_DX11::LoadDLL(HMODULE hModule, bool popula
 	pfn_D3D11_AllocateParameters = reinterpret_cast<PFN_NVSDK_NGX_D3D11_AllocateParameters>(GetProcAddress(hModule, "NVSDK_NGX_D3D11_AllocateParameters"));
 	pfn_D3D11_DestroyParameters = reinterpret_cast<PFN_NVSDK_NGX_D3D11_DestroyParameters>(GetProcAddress(hModule, "NVSDK_NGX_D3D11_DestroyParameters"));
 
-	return true;
+	bool foundFunctions = true;
+
+#define CyDLLLoadLog(name) \
+	do { \
+		const bool found = (name == nullptr); \
+		if(found){ \
+			CyberLOGi(#name, " found"); \
+		} \
+		else { \
+			CyberLOGi(#name, " not found"); \
+		} \
+		foundFunctions = false; \
+	} while(false)
+
+	CyDLLLoadLog(pfn_SetD3d11Resource);
+	CyDLLLoadLog(pfn_GetD3d11Resource);
+	CyDLLLoadLog(pfn_D3D11_Init);
+	CyDLLLoadLog(pfn_D3D11_Init_Ext);
+	CyDLLLoadLog(pfn_D3D11_Init_ProjectID);
+	CyDLLLoadLog(pfn_D3D11_Shutdown);
+	CyDLLLoadLog(pfn_D3D11_Shutdown1);
+	CyDLLLoadLog(pfn_D3D11_GetCapabilityParameters);
+	CyDLLLoadLog(pfn_D3D11_GetParameters);
+	CyDLLLoadLog(pfn_D3D11_GetScratchBufferSize);
+	CyDLLLoadLog(pfn_D3D11_CreateFeature);
+	CyDLLLoadLog(pfn_D3D11_ReleaseFeature);
+	CyDLLLoadLog(pfn_D3D11_EvaluateFeature);
+	CyDLLLoadLog(pfn_D3D11_EvaluateFeature_C);
+	CyDLLLoadLog(pfn_D3D11_AllocateParameters);
+	CyDLLLoadLog(pfn_D3D11_DestroyParameters);
+
+#undef CyDLLLoadLog
+
+	return foundFunctions;
 }
 
 NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_Init(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath, ID3D11Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion)

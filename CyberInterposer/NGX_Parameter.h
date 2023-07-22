@@ -7,7 +7,7 @@
 
 namespace CyberInterposer
 {
-    struct PFN_Table_NVNGX_Parameter : public  PFN_Table_T {
+    struct PFN_Table_NVNGX_Parameter {
 
 		PFN_NVSDK_NGX_Parameter_SetD3d11Resource pfn_SetD3d11Resource = nullptr;
 		PFN_NVSDK_NGX_Parameter_GetD3d11Resource pfn_GetD3d11Resource = nullptr;
@@ -36,11 +36,13 @@ namespace CyberInterposer
 
 		PFN_NVSDK_NGX_Reset pfn_Reset = nullptr;
 
-        bool LoadDLL(HMODULE inputFile, bool populateChildren) override;
+		std::array<std::byte, sizeof(NVSDK_NGX_Parameter)> original;
+
+		PFN_Table_NVNGX_Parameter(const NVSDK_NGX_Parameter&);
     };
 }
 
-struct NvParameter : NVSDK_NGX_Parameter
+struct CI_NGX_Parameter : NVSDK_NGX_Parameter
 {
 	virtual void Set(const char* InName, unsigned long long InValue) override;
 	virtual void Set(const char* InName, float InValue) override;

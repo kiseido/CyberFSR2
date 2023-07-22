@@ -3,27 +3,52 @@
 #ifndef CyInt_CyberFSRLogging
 #define CyInt_CyberFSRLogging
 
+namespace CyberInterposer {
+    extern CyberLogger::Logger logger;
+}
 
-#define CyberLOG() CyberInterposer::logger.log(CyberLogger::LogType::INFO_t, __func__, "")
 
-#define CyberLOGy(stringy) \
-    do { \
-        std::stringstream logStream;\
-        logStream << stringy;\
+#define CyberLOG() CyberInterposer::logger.logVerboseInfo(__func__, L"")
+
+#define CyberLOGvi(...) \
+    { \
+        std::wstringstream logStream;\
+        logStream << CyberLogger::convertToString(__VA_ARGS__);\
         auto string = logStream.str();\
-        CyberInterposer::logger.log(CyberLogger::LogType::INFO_t, __func__, string); \
-    } while (false)
+        CyberInterposer::logger.logVerboseInfo(__func__, string); \
+    }
+
+#define CyberLOGi(...) \
+    { \
+        std::wstringstream logStream;\
+        logStream << CyberLogger::convertToString(__VA_ARGS__);\
+        auto string = logStream.str();\
+        CyberInterposer::logger.logInfo(__func__, string); \
+    }
+
+#define CyberLOGw(...) \
+    { \
+        std::wstringstream logStream;\
+        logStream << CyberLogger::convertToString(__VA_ARGS__);\
+        auto string = logStream.str();\
+        CyberInterposer::logger.logWarning(__func__, string); \
+    }
+
+#define CyberLOGe(...) \
+    { \
+        std::wstringstream logStream;\
+        logStream << __VA_ARGS__;\
+        auto string = logStream.str();\
+        CyberInterposer::logger.logError(__func__, string); \
+    }
 
 #define CyberLogLots(...) \
-    do { \
-        std::string stream_sv = CyberLogger::convertToString(__VA_ARGS__); \
-        CyberInterposer::logger.log(CyberLogger::LogType::INFO_t, __func__, stream_sv); \
-    } while (false)
+    { \
+        std::wstring stream_sv = CyberLogger::convertToString(__VA_ARGS__); \
+        CyberInterposer::logger.logVerboseInfo(__func__, stream_sv); \
+    }
 
 
-#define CyberLogArgs(...) \
-    do { \
-        CyberInterposer::logger.log(CyberLogger::LogType::INFO_t, __func__, "CyberLogArgs TODO "); \
-    } while (false)
+#define CyberLogArgs(...) CyberLOGvi(__VA_ARGS__)
 
 #endif
