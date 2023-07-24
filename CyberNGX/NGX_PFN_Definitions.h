@@ -3,6 +3,16 @@
 #ifndef PFN_DEFINITIONS
 #define PFN_DEFINITIONS
 
+
+
+#include <d3d11.h>
+#include <d3dcompiler.h>
+
+#include <d3d12.h>
+
+#include <vulkan/vulkan.hpp>
+
+
 typedef void(NVSDK_CONV* PFN_NVSDK_NGX_Reset)(NVSDK_NGX_Parameter*);
 
 typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_UpdateFeature)(const NVSDK_NGX_Application_Identifier*, const NVSDK_NGX_Feature);

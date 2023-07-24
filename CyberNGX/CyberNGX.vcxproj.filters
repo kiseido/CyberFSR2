@@ -21,15 +21,24 @@
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CyberLogger.h">
+    <ClInclude Include="CyberNGX.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CyberTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NGX_PFN_Definitions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CyberNGX.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CyberLogger.cpp">
+    <ClCompile Include="CyberTypes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

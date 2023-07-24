@@ -1,41 +1,70 @@
 #include "pch.h"
-#include "CyberTypes.h"
 
 #ifndef CyberLOGGER_H
 #define CyberLOGGER_H
+
+#include "CyberNGX.h"
 
 #include <queue>
 
 #include <fstream>
 
 namespace CyberLogger {
- 
+
+    enum LoggerStatus {
+        Fresh,
+        Starting,
+        Running,
+        Stopping,
+        Stopped
+    };
+
+    struct StatusContainer {
+        LoggerStatus status;
+        std::mutex statusLock;
+
+        StatusContainer();
+    };
+
+    enum LogType {
+        CLEAN,      // Represents a clean state of the logger
+        INFO_t,     // Represents an information log type
+        INFO_VERBOSE_t,     // Represents an information log type
+        WARNING_t,  // Represents a warning log type
+        ERROR_t,    // Represents an error log type
+        BAD         // Represents an error occurred inside the logger somehow, don't use it
+    };
+
+    struct LogEntry {
+        LogType type;
+        CyberTypes::SystemInfo hardware_info;
+        CyberTypes::CyString message;
+        std::string_view function;
+
+        LogEntry(const CyberLogger::LogType&, const CyberTypes::SystemInfo&, const std::string_view& , const CyberTypes::CyString&);
+        LogEntry(const LogEntry& other);
+    };
+
+
+    CyberTypes::CyString_view getLogTypeName(const LogType& logType);
+
+
+
     class Logger {
     public:
         ~Logger();
         Logger();
-        Logger(const LPCWSTR fileName, const bool doPerformanceInfo, const bool doCoreInfo, const bool doRTC);
+        Logger(const LPCWSTR& fileName, const bool& doPerformanceInfo, const bool& doCoreInfo, const bool& doRTC);
         void start();
         void stop();
 
-        void logVerboseInfo( const std::string_view& functionName, CyString message);
+        void logVerboseInfo( const std::string_view& functionName, const CyberTypes::CyString& message);
 
-        void logInfo( const std::string_view& functionName, CyString message);
-        void logWarning(const std::string_view& functionName, CyString message);
-        void logError(const std::string_view& functionName, CyString message);
+        void logInfo( const std::string_view& functionName, const CyberTypes::CyString& message);
+        void logWarning(const std::string_view& functionName, const CyberTypes::CyString& message);
+        void logError(const std::string_view& functionName, const CyberTypes::CyString& message);
 
-    private:
-
-
-    public:
-        template<typename... Args>
-        void log(const LogType& logType, const CyString& functionName, Args&&... args) {
-            std::wostringstream strStream; 
-            variadicLogHelper(strStream, std::forward<Args>(args)...);
-            log(logType, functionName, strStream);
-        }
-
-        CyString FileName;
+        CyberTypes::CyString FileName;
 
         bool DoPerformanceInfo = true;
         bool DoCoreInfo = true;
@@ -60,8 +89,17 @@ namespace CyberLogger {
         void WritingThreadFunction();
     };
 
-
-
 }  // namespace CyberLogger
+
+
+
+CyberTypes::CyString_view to_CyString(const CyberLogger::LogType&);
+CyberTypes::CyString to_CyString(const CyberLogger::LogEntry&);
+
+
+std::wostream& operator<<(std::wostream& os, const CyberLogger::LogType& logType);
+std::wostream& operator<<(std::wostream& os, const CyberLogger::LogEntry& entry);
+
+
 
 #endif
