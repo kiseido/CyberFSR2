@@ -71,8 +71,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LibraryPath>$(SolutionDir)$(Platform)\$(Configuration)\;$(SolutionDir)external\FidelityFX-FSR2\bin\ffx_fsr2_api;$(VULKAN_SDK)\Lib;$(LibraryPath);$(SolutionDir)CyberLogger\$(Platform)\$(Configuration)\</LibraryPath>
-    <IncludePath>$(SolutionDir)CyberLogger;$(SolutionDir)external\simpleini;$(SolutionDir)external\nvngx_dlss_sdk\include;$(SolutionDir)external\unordered_dense\include;$(SolutionDir)external\FidelityFX-FSR2\src;$(VULKAN_SDK)\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)$(Platform)\$(Configuration)\;$(SolutionDir)external\FidelityFX-FSR2\bin\ffx_fsr2_api;$(VULKAN_SDK)\Lib;$(LibraryPath);$(SolutionDir)CyberLogger\$(Platform)\$(Configuration)\;$(SolutionDir)CyberNGX\$(Platform)\$(Configuration)\;</LibraryPath>
+    <IncludePath>$(SolutionDir)CyberNGX;$(SolutionDir)CyberLogger;$(SolutionDir)external\simpleini;$(SolutionDir)external\nvngx_dlss_sdk\include;$(SolutionDir)external\unordered_dense\include;$(SolutionDir)external\FidelityFX-FSR2\src;$(VULKAN_SDK)\Include;$(IncludePath)</IncludePath>
     <TargetName>nvngx</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -129,7 +129,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>CyberLogger.lib;vulkan-1.lib;ffx_fsr2_api_x64d.lib;ffx_fsr2_api_dx12_x64d.lib;ffx_fsr2_api_vk_x64d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>CyberNGX.lib;CyberLogger.lib;vulkan-1.lib;ffx_fsr2_api_x64d.lib;ffx_fsr2_api_dx12_x64d.lib;ffx_fsr2_api_vk_x64d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -162,10 +162,8 @@
     <ClInclude Include="NGX_Cuda.h" />
     <ClInclude Include="NGX_DX11.h" />
     <ClInclude Include="NGX_DX12.h" />
-    <ClInclude Include="NGX_Types.h" />
     <ClInclude Include="NGX_Vk.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="NGX_PFN_Definitions.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />

@@ -1,8 +1,10 @@
 #include "pch.h"
-#include "CI_Logging.h"
 
 #ifndef CyInt_INTERPOSER
 #define CyInt_INTERPOSER
+
+#include "CI_Logging.h"
+#include "CyberNGX.h"
 
 #include "Common.h"
 
@@ -24,7 +26,6 @@ namespace CyberInterposer
         PFN_Table_NVNGX_DX12 PFN_DX12;
         PFN_Table_NVNGX_Vulkan PFN_Vulkan;
         PFN_Table_NVNGX_CUDA PFN_CUDA;
-        PFN_Table_NVNGX_Parameter PFN_Parameter;
 
         bool LoadDLL(HMODULE inputFile, bool populateChildren) override;
     };

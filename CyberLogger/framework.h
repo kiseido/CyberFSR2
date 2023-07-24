@@ -16,6 +16,6 @@
 #include <filesystem>
 #include <stdexcept>
 
-
+#include "CyberNGX.h"
 
 #endif

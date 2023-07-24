@@ -3,13 +3,6 @@
 
 using namespace CyberInterposer;
 
-CyberInterposer::PFN_Table_NVNGX_Parameter::PFN_Table_NVNGX_Parameter(NVSDK_NGX_Parameter& other)
-{
-    std::memcpy(original.data(), &other, sizeof(NVSDK_NGX_Parameter));
-
-}
-
-
 /*
 bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool populateChildren)
 {
@@ -74,180 +67,137 @@ void CI_NGX_Parameter::Set(const char* InName, unsigned long long InValue)
 {
     CyberLogArgs(InName, InValue);
 
-    auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_Parameter.pfn_SetULL;
+    wrapped.param->Set(InName, InValue);
 
-    if (ptr != nullptr)
-        ptr(this, InName, InValue);
+    return;
 }
 
 void CI_NGX_Parameter::Set(const char* InName, float InValue)
 {
     CyberLogArgs(InName, InValue);
 
-    auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_Parameter.pfn_SetF;
+    wrapped.param->Set(InName, InValue);
 
-    if (ptr != nullptr)
-        ptr(this, InName, InValue);
+    return;
 }
 
 void CI_NGX_Parameter::Set(const char* InName, double InValue)
 {
     CyberLogArgs(InName, InValue);
 
-    auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_Parameter.pfn_SetD;
+    wrapped.param->Set(InName, InValue);
 
-    if (ptr != nullptr)
-        ptr(this, InName, InValue);
+    return;
 }
 
 void CI_NGX_Parameter::Set(const char* InName, unsigned int InValue)
 {
     CyberLogArgs(InName, InValue);
 
-    auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_Parameter.pfn_SetUI;
+    wrapped.param->Set(InName, InValue);
 
-    if (ptr != nullptr)
-        ptr(this, InName, InValue);
+    return;
 }
 
 void CI_NGX_Parameter::Set(const char* InName, int InValue)
 {
     CyberLogArgs(InName, InValue);
 
-    auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_Parameter.pfn_SetI;
+    wrapped.param->Set(InName, InValue);
 
-    if (ptr != nullptr)
-        ptr(this, InName, InValue);
+    return;
 }
 
 void CI_NGX_Parameter::Set(const char* InName, ID3D11Resource* InValue)
 {
     CyberLogArgs(InName, InValue);
 
-    auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_Parameter.pfn_SetD3d11Resource;
+    wrapped.param->Set(InName, InValue);
 
-    if (ptr != nullptr)
-        ptr(this, InName, InValue);
+    return;
 }
 
 void CI_NGX_Parameter::Set(const char* InName, ID3D12Resource* InValue)
 {
     CyberLogArgs(InName, InValue);
 
-    auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_Parameter.pfn_SetD3d12Resource;
+    wrapped.param->Set(InName, InValue);
 
-    if (ptr != nullptr)
-        ptr(this, InName, InValue);
+    return;
 }
 
 void CI_NGX_Parameter::Set(const char* InName, void* InValue)
 {
     CyberLogArgs(InName, InValue);
 
-    auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_Parameter.pfn_SetVoidPointer;
+    wrapped.param->Set(InName, InValue);
 
-    if (ptr != nullptr)
-        ptr(this, InName, InValue);
+    return;
 }
 
 NVSDK_NGX_Result CI_NGX_Parameter::Get(const char* InName, unsigned long long* OutValue) const
 {
     CyberLogArgs(InName, OutValue);
 
-    auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_Parameter.pfn_GetULL;
-
-    if (ptr != nullptr)
-        return ptr((NVSDK_NGX_Parameter* const) this, InName, OutValue);
-
-    return NVSDK_NGX_Result_Fail;
+    return wrapped.param->Get(InName, OutValue);
 }
 
 NVSDK_NGX_Result CI_NGX_Parameter::Get(const char* InName, float* OutValue) const
 {
     CyberLogArgs(InName, OutValue);
 
-    auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_Parameter.pfn_GetF;
-
-    if (ptr != nullptr)
-        return ptr((NVSDK_NGX_Parameter* const) this, InName, OutValue);
-
-    return NVSDK_NGX_Result_Fail;
+    return wrapped.param->Get(InName, OutValue);
 }
 
 NVSDK_NGX_Result CI_NGX_Parameter::Get(const char* InName, double* OutValue) const
 {
     CyberLogArgs(InName, OutValue);
 
-    auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_Parameter.pfn_GetD;
-
-    if (ptr != nullptr)
-        return ptr((NVSDK_NGX_Parameter* const) this, InName, OutValue);
-
-    return NVSDK_NGX_Result_Fail;
+    return wrapped.param->Get(InName, OutValue);
 }
 
 NVSDK_NGX_Result CI_NGX_Parameter::Get(const char* InName, unsigned int* OutValue) const
 {
     CyberLogArgs(InName, OutValue);
 
-    auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_Parameter.pfn_GetUI;
-
-    if (ptr != nullptr)
-        return ptr((NVSDK_NGX_Parameter* const) this, InName, OutValue);
-
-    return NVSDK_NGX_Result_Fail;
+    return wrapped.param->Get(InName, OutValue);
 }
 
 NVSDK_NGX_Result CI_NGX_Parameter::Get(const char* InName, int* OutValue) const
 {
     CyberLogArgs(InName, OutValue);
 
-    auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_Parameter.pfn_GetI;
-
-    if (ptr != nullptr)
-        return ptr((NVSDK_NGX_Parameter* const) this, InName, OutValue);
-
-    return NVSDK_NGX_Result_Fail;
+    return wrapped.param->Get(InName, OutValue);
 }
 
 NVSDK_NGX_Result CI_NGX_Parameter::Get(const char* InName, ID3D11Resource** OutValue) const
 {
     CyberLogArgs(InName, OutValue);
 
-    auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_Parameter.pfn_GetD3d11Resource;
-
-    if (ptr != nullptr)
-        return ptr((NVSDK_NGX_Parameter* const) this, InName, OutValue);
-
-    return NVSDK_NGX_Result_Fail;
+    return wrapped.param->Get(InName, OutValue);
 }
 
 NVSDK_NGX_Result CI_NGX_Parameter::Get(const char* InName, ID3D12Resource** OutValue) const
 {
     CyberLogArgs(InName, OutValue);
 
-    auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_Parameter.pfn_GetD3d12Resource;
-
-    if (ptr != nullptr)
-        return ptr((NVSDK_NGX_Parameter* const) this, InName, OutValue);
-
-    return NVSDK_NGX_Result_Fail;
+    return wrapped.param->Get(InName, OutValue);
 }
 
 NVSDK_NGX_Result CI_NGX_Parameter::Get(const char* InName, void** OutValue) const
 {
     CyberLogArgs(InName, OutValue);
 
-    auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_Parameter.pfn_GetVoidPointer;
-
-    if (ptr != nullptr)
-        return ptr((NVSDK_NGX_Parameter* const) this, InName, OutValue);
-
-    return NVSDK_NGX_Result_Fail;
+    return wrapped.param->Get(InName, OutValue);
 }
 
 void CI_NGX_Parameter::Reset()
 {
     CyberLOG();
+
+    wrapped.param->Reset();
 }
 
+CyberInterposer::CI_NGX_Parameter::CI_NGX_Parameter(NVSDK_NGX_Parameter* other) : wrapped(other){}
+
+CyberInterposer::PFN_Table_NVNGX_Parameter_Union_P::PFN_Table_NVNGX_Parameter_Union_P(NVSDK_NGX_Parameter* other) : param(other){}
