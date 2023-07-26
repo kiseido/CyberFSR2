@@ -1,6 +1,28 @@
 #include "pch.h"
 #include "CyberTypes.h"
 
+constexpr std::wstring_view GET_PART_AFTER_PREFIX(const std::wstring_view& prefix, const std::wstring_view& name) {
+    return name.substr(prefix.size());
+}
+
+constexpr bool CHECK_STARTS_WITH(const std::wstring_view& prefix, const std::wstring_view& name) {
+    return name.compare(0, prefix.size(), prefix) == 0;
+}
+
+constexpr std::wstring_view TRY_REMOVE_PREFIX(const std::wstring_view& prefix, const std::wstring_view& name) {
+    if (CHECK_STARTS_WITH(prefix, name)) {
+        return GET_PART_AFTER_PREFIX(prefix, name);
+    }
+    else {
+        return name;
+    }
+}
+
+#define CyberEnumSwitchHelper(prefix, name) \
+    case name: { \
+        return TRY_REMOVE_PREFIX(L#prefix, L#name); \
+    }
+
 std::wstring CyberTypes::stringToWstring(const std::string& str) {
     if (str.empty())
         return std::wstring();
@@ -54,6 +76,10 @@ CyberTypes::RTC::RTC(const bool& performInitLogic) {
 CyberTypes::RTC::RTC(const RTC& other) : timestamp(other.timestamp) {}
 
 
+
+CyberTypes::SystemInfo::SystemInfo() : coreInfo(), highPerformanceCounterInfo(), rtc()
+{
+}
 
 CyberTypes::SystemInfo::SystemInfo(const bool& doCoreInfo, const bool& doPerformanceInfo, const bool& doRTC) : coreInfo(doCoreInfo), highPerformanceCounterInfo(doPerformanceInfo), rtc(doRTC), DoCoreInfo(doCoreInfo), DoPerformanceInfo(doPerformanceInfo), DoRTC(doRTC) {}
 
@@ -206,14 +232,7 @@ std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_Feature_t&
 }
 
 std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_Application_Identifier_t& identifier) {
-    os << "NVSDK_NGX_Application_Identifier: ";
-    os << "IdentifierType: " << identifier.IdentifierType << ", ";
-    if (identifier.IdentifierType == NVSDK_NGX_Application_Identifier_Type_Application_Id) {
-        os << "ApplicationId: " << identifier.v.ApplicationId;
-    }
-    else if (identifier.IdentifierType == NVSDK_NGX_Application_Identifier_Type_Project_Id) {
-        os << "ProjectDesc: " << identifier.v.ProjectDesc;
-    }
+    os << to_CyString(identifier);
     return os;
 }
 
@@ -221,45 +240,29 @@ CyberTypes::CyString::CyString()
 {
 }
 
-CyberTypes::CyString::CyString(const std::wstring& wstr) : std::wstring(wstr)
-{
-}
+CyberTypes::CyString::CyString(const CyString& other) : std::wstring(other){}
 
-CyberTypes::CyString::CyString(const std::wstring_view& wview) : std::wstring(wview)
-{
-}
+CyberTypes::CyString::CyString(const std::wstring& wstr) : std::wstring(wstr){}
 
-CyberTypes::CyString::CyString(const std::string& str) : std::wstring(to_CyString(str))
-{
-}
+CyberTypes::CyString::CyString(const std::wstring_view& wview) : CyString(to_CyString(wview)){}
 
-CyberTypes::CyString::CyString(const std::string_view& view) : std::wstring(to_CyString(view))
-{
-}
+CyberTypes::CyString::CyString(const std::string& str) : CyString(to_CyString(str)){}
 
-CyberTypes::CyString::CyString(const char* cstr) : std::wstring(to_CyString(std::string_view(cstr)))
-{
-}
+CyberTypes::CyString::CyString(const std::string_view& view) : CyString(to_CyString(view)){}
 
-CyberTypes::CyString::CyString(const wchar_t* wcstr) : std::wstring(wcstr)
-{
-}
+CyberTypes::CyString::CyString(const char* cstr) : CyString(std::string_view(cstr)){}
 
-CyberTypes::CyString_view::CyString_view() : std::wstring_view()
-{
-}
+CyberTypes::CyString::CyString(const wchar_t* wcstr) : CyString((std::wstring_view)wcstr){}
 
-CyberTypes::CyString_view::CyString_view(const std::wstring& wstr) : std::wstring_view(wstr)
-{
-}
+CyberTypes::CyString_view::CyString_view() : std::wstring_view(){}
 
-CyberTypes::CyString_view::CyString_view(const std::wstring_view& wview) : std::wstring_view(wview)
-{
-}
+CyberTypes::CyString_view::CyString_view(const CyString_view& other) : std::wstring_view(other){}
 
-CyberTypes::CyString_view::CyString_view(const wchar_t* wcstr) : std::wstring_view(wcstr)
-{
-}
+CyberTypes::CyString_view::CyString_view(const std::wstring& wstr) : std::wstring_view(wstr){}
+
+CyberTypes::CyString_view::CyString_view(const std::wstring_view& wview) : std::wstring_view(wview){}
+
+CyberTypes::CyString_view::CyString_view(const wchar_t* wcstr) : std::wstring_view(wcstr){}
 
 // Convert std::wstring to CyberTypes::CyString
 CyberTypes::CyString to_CyString(const std::wstring& input) {
@@ -345,16 +348,84 @@ CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_Application_Identifier
     return os.str();
 }
 
-// Convert CyberTypes::CT_NGX_Application_Identifier_t to CyberTypes::CyString
-CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_Application_Identifier_t& input) {
-    std::wostringstream os;
-    os << L"NVSDK_NGX_Application_Identifier: ";
-    os << L"IdentifierType: " << input.IdentifierType << L", ";
-    if (input.IdentifierType == NVSDK_NGX_Application_Identifier_Type_Application_Id) {
-        os << L"ApplicationId: " << input.v.ApplicationId;
+// Helper function to convert NVSDK_NGX_Application_Identifier to CyString
+CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_Application_Identifier_t& identifier) {
+    switch (identifier.IdentifierType) {
+    case NVSDK_NGX_Application_Identifier_Type_Application_Id:
+        return std::to_wstring(identifier.v.ApplicationId);
+    case NVSDK_NGX_Application_Identifier_Type_Project_Id:
+        return to_CyString(identifier.v.ProjectDesc);
+    default:
+        return L"CI_Unknown";
     }
-    else if (input.IdentifierType == NVSDK_NGX_Application_Identifier_Type_Project_Id) {
-        os << L"ProjectDesc: " << input.v.ProjectDesc;
+}
+
+CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_Result_t& result) {
+    return CyberTypes::CyString(std::to_wstring(result));
+}
+
+std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_Result_t& result) {
+    os << to_CyString(result);
+    return os;
+}
+
+CyberTypes::CyString_view to_CyString(const CyberTypes::CT_NGX_Buffer_Format_t& bufferFormat) {
+    switch (bufferFormat) {
+        CyberEnumSwitchHelper(NVSDK_NGX_Buffer_Format_, NVSDK_NGX_Buffer_Format_Unknown);
+        CyberEnumSwitchHelper(NVSDK_NGX_Buffer_Format_, NVSDK_NGX_Buffer_Format_RGB8UI);
+        CyberEnumSwitchHelper(NVSDK_NGX_Buffer_Format_, NVSDK_NGX_Buffer_Format_RGB16F);
+        CyberEnumSwitchHelper(NVSDK_NGX_Buffer_Format_, NVSDK_NGX_Buffer_Format_RGB32F);
+        CyberEnumSwitchHelper(NVSDK_NGX_Buffer_Format_, NVSDK_NGX_Buffer_Format_RGBA8UI);
+        CyberEnumSwitchHelper(NVSDK_NGX_Buffer_Format_, NVSDK_NGX_Buffer_Format_RGBA16F);
+        CyberEnumSwitchHelper(NVSDK_NGX_Buffer_Format_, NVSDK_NGX_Buffer_Format_RGBA32F);
+    default:
+        return L"CI_Unknown";
     }
-    return os.str();
+}
+
+std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_Buffer_Format_t& bufferFormat) {
+    os << to_CyString(bufferFormat);
+    return os;
+}
+
+CyberTypes::CyString_view to_CyString(const CyberTypes::CT_NGX_ToneMapperType_t& toneMapperType) {
+    switch (toneMapperType) {
+        CyberEnumSwitchHelper(NVSDK_NGX_TONEMAPPER_, NVSDK_NGX_TONEMAPPER_STRING);
+        CyberEnumSwitchHelper(NVSDK_NGX_TONEMAPPER_, NVSDK_NGX_TONEMAPPER_REINHARD);
+        CyberEnumSwitchHelper(NVSDK_NGX_TONEMAPPER_, NVSDK_NGX_TONEMAPPER_ONEOVERLUMA);
+        CyberEnumSwitchHelper(NVSDK_NGX_TONEMAPPER_, NVSDK_NGX_TONEMAPPER_ACES);
+        CyberEnumSwitchHelper(NVSDK_NGX_TONEMAPPER_, NVSDK_NGX_TONEMAPPERTYPE_NUM);
+    default: 
+        return L"CI_Unknown";
+    }
+}
+
+std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_ToneMapperType_t& toneMapperType) {
+    os << to_CyString(toneMapperType);
+    return os;
+}
+
+CyberTypes::CyString_view to_CyString(const CyberTypes::CT_NGX_GBufferType_t& gBufferType) {
+    switch (gBufferType) {
+    CyberEnumSwitchHelper(NVSDK_NGX_GBUFFER_, NVSDK_NGX_GBUFFER_ALBEDO);
+    CyberEnumSwitchHelper(NVSDK_NGX_GBUFFER_, NVSDK_NGX_GBUFFER_ROUGHNESS);
+    CyberEnumSwitchHelper(NVSDK_NGX_GBUFFER_, NVSDK_NGX_GBUFFER_METALLIC);
+    CyberEnumSwitchHelper(NVSDK_NGX_GBUFFER_, NVSDK_NGX_GBUFFER_SPECULAR);
+    CyberEnumSwitchHelper(NVSDK_NGX_GBUFFER_, NVSDK_NGX_GBUFFER_NORMALS);
+    CyberEnumSwitchHelper(NVSDK_NGX_GBUFFER_, NVSDK_NGX_GBUFFER_SHADINGMODELID);
+    CyberEnumSwitchHelper(NVSDK_NGX_GBUFFER_, NVSDK_NGX_GBUFFER_MATERIALID);
+    CyberEnumSwitchHelper(NVSDK_NGX_GBUFFER_, NVSDK_NGX_GBUFFER_SPECULAR_ALBEDO);
+    CyberEnumSwitchHelper(NVSDK_NGX_GBUFFER_, NVSDK_NGX_GBUFFER_INDIRECT_ALBEDO);
+    CyberEnumSwitchHelper(NVSDK_NGX_GBUFFER_, NVSDK_NGX_GBUFFER_SPECULAR_MVEC);
+    CyberEnumSwitchHelper(NVSDK_NGX_GBUFFER_, NVSDK_NGX_GBUFFER_DISOCCL_MASK);
+    CyberEnumSwitchHelper(NVSDK_NGX_GBUFFER_, NVSDK_NGX_GBUFFER_EMISSIVE);
+    CyberEnumSwitchHelper(NVSDK_NGX_GBUFFER_, NVSDK_NGX_GBUFFERTYPE_NUM);
+    default:
+        return L"CI_Unknown";
+    }
+}
+
+std::wostream& operator<<(std::wostream& os, const NVSDK_NGX_GBufferType& gBufferType) {
+    os << to_CyString(gBufferType);
+    return os;
 }
