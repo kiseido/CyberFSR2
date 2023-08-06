@@ -43,10 +43,10 @@ bool CyberInterposer::PFN_Table_NVNGX_DX12::LoadDLL(HMODULE hModule, bool popula
 	do { \
 		const bool found = (name == nullptr); \
 		if(found){ \
-			CyberLOGi(#name, " found"); \
+			CyberLOGi(L#name, L" found"); \
 		} \
 		else { \
-			CyberLOGi(#name, " not found"); \
+			CyberLOGi(L#name, L" not found"); \
 		} \
 		foundFunctions = false; \
 	} while(false)

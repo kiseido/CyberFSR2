@@ -409,7 +409,8 @@ std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_Feature_t&
 // CT_NGX_Coordinates_t
 
 CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_Coordinates_t& coordinates) {
-    return L"(" + std::to_wstring(coordinates.X) + L", " + std::to_wstring(coordinates.Y) + L")";
+    std::wstring output = L"(" + std::to_wstring(coordinates.X) + L", " + std::to_wstring(coordinates.Y) + L")";
+    return output;
 }
 
 std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_Coordinates_t& coordinates) {
@@ -420,7 +421,8 @@ std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_Coordinate
 // CT_NGX_Dimensions_t
 
 CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_Dimensions_t& dimensions) {
-    return L"[" + std::to_wstring(dimensions.Width) + L"x" + std::to_wstring(dimensions.Height) + L"]";
+    std::wstring output = L"[" + std::to_wstring(dimensions.Width) + L"x" + std::to_wstring(dimensions.Height) + L"]";
+    return output;
 }
 
 std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_Dimensions_t& dimensions) {

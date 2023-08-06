@@ -66,7 +66,7 @@ bool CyberInterposer::PFN_Table_NVNGX_Vulkan::LoadDLL(HMODULE hModule, bool popu
 
 NVSDK_NGX_Result NVSDK_NGX_VULKAN_Init(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath, VkInstance InInstance, VkPhysicalDevice InPD, VkDevice InDevice, PFN_vkGetInstanceProcAddr InGIPA, PFN_vkGetDeviceProcAddr InGDPA, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion)
 {
-	{ std::wstringstream logStream; logStream << CyberTypes::convertToString(InApplicationId, InApplicationDataPath, InInstance, InPD, InDevice, InGIPA, InGDPA, InFeatureInfo, InSDKVersion); auto string = logStream.str(); CyberInterposer::logger.logVerboseInfo(__func__, string); };
+	CyberLogArgs(InApplicationId, InApplicationDataPath, InInstance, InPD, InDevice, InGIPA, InGDPA, InFeatureInfo, InSDKVersion);
 
 	// is pointer good? cast pointer and call it and return any results!
 	return NVSDK_NGX_Result_Success;

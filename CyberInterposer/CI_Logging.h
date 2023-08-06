@@ -12,43 +12,35 @@ namespace CyberInterposer {
 
 #define CyberLOGvi(...) \
     { \
-        std::wstringstream logStream;\
-        logStream << CyberTypes::convertToString(__VA_ARGS__);\
-        auto string = logStream.str();\
-        CyberInterposer::logger.logVerboseInfo(__func__, string); \
+        std::wstring str = CyberTypes::concat_arguments(__VA_ARGS__); \
+        CyberInterposer::logger.logVerboseInfo(__func__, str); \
     }
 
 #define CyberLOGi(...) \
     { \
-        std::wstringstream logStream;\
-        logStream << CyberTypes::convertToString(__VA_ARGS__);\
-        auto string = logStream.str();\
-        CyberInterposer::logger.logInfo(__func__, string); \
+        std::wstring str = CyberTypes::concat_arguments(__VA_ARGS__); \
+        CyberInterposer::logger.logInfo(__func__, str); \
     }
 
 #define CyberLOGw(...) \
     { \
-        std::wstringstream logStream;\
-        logStream << CyberTypes::convertToString(__VA_ARGS__);\
-        auto string = logStream.str();\
-        CyberInterposer::logger.logWarning(__func__, string); \
+        std::wstring str = CyberTypes::concat_arguments(__VA_ARGS__); \
+        CyberInterposer::logger.logWarning(__func__, str); \
     }
 
 #define CyberLOGe(...) \
     { \
-        std::wstringstream logStream;\
-        logStream << CyberTypes::convertToString(__VA_ARGS__);\
-        auto string = logStream.str();\
-        CyberInterposer::logger.logError(__func__, string); \
+        std::wstring str = CyberTypes::concat_arguments(__VA_ARGS__); \
+        CyberInterposer::logger.logError(__func__, str); \
     }
 
 #define CyberLogLots(...) \
     { \
-        std::wstring stream_sv = CyberTypes::convertToString(__VA_ARGS__); \
-        CyberInterposer::logger.logVerboseInfo(__func__, stream_sv); \
+        std::wstring str = CyberTypes::concat_arguments(__VA_ARGS__); \
+        CyberInterposer::logger.logVerboseInfo(__func__, str); \
     }
 
 
-#define CyberLogArgs(...) CyberLOGvi(__VA_ARGS__)
+#define CyberLogArgs(...) CyberLOGvi(CyberTypes::output_arguments(__VA_ARGS__))
 
 #endif
