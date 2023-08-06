@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "CyberTypes.h"
 
+
+
 constexpr std::wstring_view GET_PART_AFTER_PREFIX(const std::wstring_view& prefix, const std::wstring_view& name) {
     return name.substr(prefix.size());
 }
@@ -18,7 +20,13 @@ constexpr std::wstring_view TRY_REMOVE_PREFIX(const std::wstring_view& prefix, c
     }
 }
 
-#define CyberEnumSwitchHelper(prefix, name) \
+#define CyberEnumSwitchHelperOStream(stream, prefix, name) \
+    case name: { \
+        stream << TRY_REMOVE_PREFIX(L#prefix, L#name); \
+        break;\
+    }
+
+#define CyberEnumSwitchHelperReturner(prefix, name) \
     case name: { \
         return TRY_REMOVE_PREFIX(L#prefix, L#name); \
     }
@@ -91,67 +99,6 @@ CyberTypes::CyString to_CyString(const std::string_view& input) {
     return std::wstring(input.begin(), input.end());
 }
 
-CyberTypes::CyString_view to_CyString(const CyberTypes::CT_NGX_Feature_t& input){
-    switch (input) {
-
-    case NVSDK_NGX_Feature_Reserved0:
-        return L"Reserved0";
-
-    case NVSDK_NGX_Feature_SuperSampling:
-        return L"SuperSampling";
-
-    case NVSDK_NGX_Feature_InPainting:
-        return L"InPainting";
-
-    case NVSDK_NGX_Feature_ImageSuperResolution:
-        return L"ImageSuperResolution";
-
-    case NVSDK_NGX_Feature_SlowMotion:
-        return L"SlowMotion";
-
-    case NVSDK_NGX_Feature_VideoSuperResolution:
-        return L"VideoSuperResolution";
-
-    case NVSDK_NGX_Feature_Reserved1:
-        return L"Reserved1";
-
-    case NVSDK_NGX_Feature_Reserved2:
-        return L"Reserved2";
-
-    case NVSDK_NGX_Feature_Reserved3:
-        return L"Reserved3";
-
-    case NVSDK_NGX_Feature_ImageSignalProcessing:
-        return L"ImageSignalProcessing";
-
-    case NVSDK_NGX_Feature_DeepResolve:
-        return L"DeepResolve";
-
-    case NVSDK_NGX_Feature_FrameGeneration:
-        return L"FrameGeneration";
-
-    case NVSDK_NGX_Feature_DeepDVC:
-        return L"DeepDVC";
-
-    case NVSDK_NGX_Feature_Reserved13:
-        return L"Reserved13";
-
-    case NVSDK_NGX_Feature_Count:
-        return L"Count";
-
-    case NVSDK_NGX_Feature_Reserved_SDK:
-        return L"Reserved_SDK";
-
-    case NVSDK_NGX_Feature_Reserved_Core:
-        return L"Reserved_Core";
-
-    case NVSDK_NGX_Feature_Reserved_Unknown:
-        return L"Reserved_Unknown";
-    }
-
-    return L"Unknown_Feature";
-}
-
 
 std::wostream& operator<<(std::wostream& os, const std::string_view& view) {
     os << std::wstring(view.begin(), view.end());
@@ -170,75 +117,10 @@ std::wostream& operator<<(std::wostream& os, const CyberTypes::CyString_view& vi
     return os;
 }
 
-std::wostream& operator<<(std::wostream& os, const CyberTypes::HighPerformanceCounterInfo& counterInfo) {
-    os << "HPC: " << counterInfo.counter.QuadPart << " / " << counterInfo.frequency.QuadPart;
-    return os;
-}
-std::wostream& operator<<(std::wostream& os, const CyberTypes::CoreInfo& coreInfo) {
-    os << "Core: " << coreInfo.logicalProcessorId << " - " << "Tick: " << coreInfo.processorTick;
-    return os;
-}
-
-std::wostream& operator<<(std::wostream& os, const CyberTypes::RTC& rtc) {
-    os << "RTC: " << rtc.timestamp;
-    return os;
-}
-
-std::wostream& operator<<(std::wostream& os, const CyberTypes::SystemInfo& systemInfo) {
-    if (systemInfo.DoCoreInfo) {
-        os << systemInfo.coreInfo;
-        os << " -- ";
-    }
-    if (systemInfo.DoPerformanceInfo) {
-        os << systemInfo.highPerformanceCounterInfo;
-        os << " -- ";
-    }
-    if (systemInfo.DoRTC) {
-        os << systemInfo.rtc;
-    }
-    return os;
-}
-
-std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_Version_t& version) {
-    os << (DWORD)version;
-    return os;
-}
-
-std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_ProjectIdDescription_t& desc) {
-    os << "Project ID: " << desc.ProjectId << ", ";
-    os << "Engine Type: " << desc.EngineType << ", ";
-    os << "Engine Version: " << desc.EngineVersion;
-    return os;
-}
-
-std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_Application_Identifier_Type_t& identifierType) {
-    os << "NVSDK_NGX_Application_Identifier_Type: ";
-    switch (identifierType) {
-    case NVSDK_NGX_Application_Identifier_Type_Application_Id:
-        os << "Application_Id";
-        break;
-    case NVSDK_NGX_Application_Identifier_Type_Project_Id:
-        os << "Project_Id";
-        break;
-    }
-    return os;
-}
 
 
-std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_Feature_t& feature)
-{
-    os << to_CyString(feature);
-    return os;
-}
 
-std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_Application_Identifier_t& identifier) {
-    os << to_CyString(identifier);
-    return os;
-}
-
-CyberTypes::CyString::CyString()
-{
-}
+CyberTypes::CyString::CyString() : std::wstring() {}
 
 CyberTypes::CyString::CyString(const CyString& other) : std::wstring(other){}
 
@@ -264,43 +146,74 @@ CyberTypes::CyString_view::CyString_view(const std::wstring_view& wview) : std::
 
 CyberTypes::CyString_view::CyString_view(const wchar_t* wcstr) : std::wstring_view(wcstr){}
 
-// Convert std::wstring to CyberTypes::CyString
 CyberTypes::CyString to_CyString(const std::wstring& input) {
     return input;
 }
 
-// Convert std::wstring_view to CyberTypes::CyString
 CyberTypes::CyString to_CyString(const std::wstring_view& input) {
     return input.data();
 }
 
-// Convert std::string to CyberTypes::CyString
 CyberTypes::CyString to_CyString(const std::string& input) {
     return CyberTypes::stringToWstring(input);
 }
 
-// Convert CyberTypes::HighPerformanceCounterInfo to CyberTypes::CyString
+//
+
+std::wostream& operator<<(std::wostream& os, const CyberTypes::HighPerformanceCounterInfo& counterInfo) {
+    os << "HPC: " << counterInfo.counter.QuadPart << " / " << counterInfo.frequency.QuadPart;
+    return os;
+}
+
 CyberTypes::CyString to_CyString(const CyberTypes::HighPerformanceCounterInfo& input) {
     std::wostringstream os;
     os << "HPC: " << input.counter.QuadPart << " / " << input.frequency.QuadPart;
     return os.str();
 }
 
-// Convert CyberTypes::CoreInfo to CyberTypes::CyString
+//
+
+std::wostream& operator<<(std::wostream& os, const CyberTypes::CoreInfo& coreInfo) {
+    os << "Core: " << coreInfo.logicalProcessorId << " - " << "Tick: " << coreInfo.processorTick;
+    return os;
+}
+
 CyberTypes::CyString to_CyString(const CyberTypes::CoreInfo& input) {
     std::wostringstream os;
     os << "Core: " << input.logicalProcessorId << " - " << "Tick: " << input.processorTick;
     return os.str();
 }
 
-// Convert CyberTypes::RTC to CyberTypes::CyString
+//
+
+std::wostream& operator<<(std::wostream& os, const CyberTypes::RTC& rtc) {
+    os << "RTC: " << rtc.timestamp;
+    return os;
+}
+
 CyberTypes::CyString to_CyString(const CyberTypes::RTC& input) {
     std::wostringstream os;
     os << "RTC: " << input.timestamp;
     return os.str();
 }
 
-// Convert CyberTypes::SystemInfo to CyberTypes::CyString
+//
+
+std::wostream& operator<<(std::wostream& os, const CyberTypes::SystemInfo& systemInfo) {
+    if (systemInfo.DoCoreInfo) {
+        os << systemInfo.coreInfo;
+        os << " -- ";
+    }
+    if (systemInfo.DoPerformanceInfo) {
+        os << systemInfo.highPerformanceCounterInfo;
+        os << " -- ";
+    }
+    if (systemInfo.DoRTC) {
+        os << systemInfo.rtc;
+    }
+    return os;
+}
+
 CyberTypes::CyString to_CyString(const CyberTypes::SystemInfo& input) {
     std::wostringstream os;
     if (input.DoCoreInfo) {
@@ -317,14 +230,47 @@ CyberTypes::CyString to_CyString(const CyberTypes::SystemInfo& input) {
     return os.str();
 }
 
-// Convert CyberTypes::CT_NGX_Version_t to CyberTypes::CyString
+//
+
+std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_Version_t& version) {
+    os << (DWORD)version;
+    return os;
+}
+
+
 CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_Version_t& input) {
     std::wostringstream os;
     os << (DWORD)input;
     return os.str();
 }
 
-// Convert CyberTypes::CT_NGX_ProjectIdDescription_t to CyberTypes::CyString
+//
+
+// Convert CyberTypes::CT_NGX_Application_Identifier_Type_t to CyberTypes::CyString
+CyberTypes::CyString_view to_CyString(const CyberTypes::CT_NGX_Application_Identifier_Type_t& input) {
+    switch (input) {
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_Application_Identifier_Type_, NVSDK_NGX_Application_Identifier_Type_Application_Id);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_Application_Identifier_Type_, NVSDK_NGX_Application_Identifier_Type_Project_Id);
+    default:
+        return L"CI_Unknown";
+    }
+}
+
+std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_Application_Identifier_Type_t& identifierType) {
+    os << "NVSDK_NGX_Application_Identifier_Type: ";
+    os << to_CyString(identifierType);
+    return os;
+}
+
+//
+
+std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_ProjectIdDescription_t& desc) {
+    os << "Project ID: " << desc.ProjectId << ", ";
+    os << "Engine Type: " << desc.EngineType << ", ";
+    os << "Engine Version: " << desc.EngineVersion;
+    return os;
+}
+
 CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_ProjectIdDescription_t& input) {
     std::wostringstream os;
     os << "Project ID: " << input.ProjectId << L", ";
@@ -333,22 +279,13 @@ CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_ProjectIdDescription_t
     return os.str();
 }
 
-// Convert CyberTypes::CT_NGX_Application_Identifier_Type_t to CyberTypes::CyString
-CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_Application_Identifier_Type_t& input) {
-    std::wostringstream os;
-    os << L"NVSDK_NGX_Application_Identifier_Type: ";
-    switch (input) {
-    case NVSDK_NGX_Application_Identifier_Type_Application_Id:
-        os << L"Application_Id";
-        break;
-    case NVSDK_NGX_Application_Identifier_Type_Project_Id:
-        os << L"Project_Id";
-        break;
-    }
-    return os.str();
+//
+
+std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_Application_Identifier_t& identifier) {
+    os << to_CyString(identifier);
+    return os;
 }
 
-// Helper function to convert NVSDK_NGX_Application_Identifier to CyString
 CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_Application_Identifier_t& identifier) {
     switch (identifier.IdentifierType) {
     case NVSDK_NGX_Application_Identifier_Type_Application_Id:
@@ -360,6 +297,8 @@ CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_Application_Identifier
     }
 }
 
+//
+
 CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_Result_t& result) {
     return CyberTypes::CyString(std::to_wstring(result));
 }
@@ -369,15 +308,17 @@ std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_Result_t& 
     return os;
 }
 
+//
+
 CyberTypes::CyString_view to_CyString(const CyberTypes::CT_NGX_Buffer_Format_t& bufferFormat) {
     switch (bufferFormat) {
-        CyberEnumSwitchHelper(NVSDK_NGX_Buffer_Format_, NVSDK_NGX_Buffer_Format_Unknown);
-        CyberEnumSwitchHelper(NVSDK_NGX_Buffer_Format_, NVSDK_NGX_Buffer_Format_RGB8UI);
-        CyberEnumSwitchHelper(NVSDK_NGX_Buffer_Format_, NVSDK_NGX_Buffer_Format_RGB16F);
-        CyberEnumSwitchHelper(NVSDK_NGX_Buffer_Format_, NVSDK_NGX_Buffer_Format_RGB32F);
-        CyberEnumSwitchHelper(NVSDK_NGX_Buffer_Format_, NVSDK_NGX_Buffer_Format_RGBA8UI);
-        CyberEnumSwitchHelper(NVSDK_NGX_Buffer_Format_, NVSDK_NGX_Buffer_Format_RGBA16F);
-        CyberEnumSwitchHelper(NVSDK_NGX_Buffer_Format_, NVSDK_NGX_Buffer_Format_RGBA32F);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_Buffer_Format_, NVSDK_NGX_Buffer_Format_Unknown);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_Buffer_Format_, NVSDK_NGX_Buffer_Format_RGB8UI);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_Buffer_Format_, NVSDK_NGX_Buffer_Format_RGB16F);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_Buffer_Format_, NVSDK_NGX_Buffer_Format_RGB32F);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_Buffer_Format_, NVSDK_NGX_Buffer_Format_RGBA8UI);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_Buffer_Format_, NVSDK_NGX_Buffer_Format_RGBA16F);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_Buffer_Format_, NVSDK_NGX_Buffer_Format_RGBA32F);
     default:
         return L"CI_Unknown";
     }
@@ -388,13 +329,15 @@ std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_Buffer_For
     return os;
 }
 
+//
+
 CyberTypes::CyString_view to_CyString(const CyberTypes::CT_NGX_ToneMapperType_t& toneMapperType) {
     switch (toneMapperType) {
-        CyberEnumSwitchHelper(NVSDK_NGX_TONEMAPPER_, NVSDK_NGX_TONEMAPPER_STRING);
-        CyberEnumSwitchHelper(NVSDK_NGX_TONEMAPPER_, NVSDK_NGX_TONEMAPPER_REINHARD);
-        CyberEnumSwitchHelper(NVSDK_NGX_TONEMAPPER_, NVSDK_NGX_TONEMAPPER_ONEOVERLUMA);
-        CyberEnumSwitchHelper(NVSDK_NGX_TONEMAPPER_, NVSDK_NGX_TONEMAPPER_ACES);
-        CyberEnumSwitchHelper(NVSDK_NGX_TONEMAPPER_, NVSDK_NGX_TONEMAPPERTYPE_NUM);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_TONEMAPPER_, NVSDK_NGX_TONEMAPPER_STRING);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_TONEMAPPER_, NVSDK_NGX_TONEMAPPER_REINHARD);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_TONEMAPPER_, NVSDK_NGX_TONEMAPPER_ONEOVERLUMA);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_TONEMAPPER_, NVSDK_NGX_TONEMAPPER_ACES);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_TONEMAPPER_, NVSDK_NGX_TONEMAPPERTYPE_NUM);
     default: 
         return L"CI_Unknown";
     }
@@ -405,27 +348,369 @@ std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_ToneMapper
     return os;
 }
 
+//
+
 CyberTypes::CyString_view to_CyString(const CyberTypes::CT_NGX_GBufferType_t& gBufferType) {
     switch (gBufferType) {
-    CyberEnumSwitchHelper(NVSDK_NGX_GBUFFER_, NVSDK_NGX_GBUFFER_ALBEDO);
-    CyberEnumSwitchHelper(NVSDK_NGX_GBUFFER_, NVSDK_NGX_GBUFFER_ROUGHNESS);
-    CyberEnumSwitchHelper(NVSDK_NGX_GBUFFER_, NVSDK_NGX_GBUFFER_METALLIC);
-    CyberEnumSwitchHelper(NVSDK_NGX_GBUFFER_, NVSDK_NGX_GBUFFER_SPECULAR);
-    CyberEnumSwitchHelper(NVSDK_NGX_GBUFFER_, NVSDK_NGX_GBUFFER_NORMALS);
-    CyberEnumSwitchHelper(NVSDK_NGX_GBUFFER_, NVSDK_NGX_GBUFFER_SHADINGMODELID);
-    CyberEnumSwitchHelper(NVSDK_NGX_GBUFFER_, NVSDK_NGX_GBUFFER_MATERIALID);
-    CyberEnumSwitchHelper(NVSDK_NGX_GBUFFER_, NVSDK_NGX_GBUFFER_SPECULAR_ALBEDO);
-    CyberEnumSwitchHelper(NVSDK_NGX_GBUFFER_, NVSDK_NGX_GBUFFER_INDIRECT_ALBEDO);
-    CyberEnumSwitchHelper(NVSDK_NGX_GBUFFER_, NVSDK_NGX_GBUFFER_SPECULAR_MVEC);
-    CyberEnumSwitchHelper(NVSDK_NGX_GBUFFER_, NVSDK_NGX_GBUFFER_DISOCCL_MASK);
-    CyberEnumSwitchHelper(NVSDK_NGX_GBUFFER_, NVSDK_NGX_GBUFFER_EMISSIVE);
-    CyberEnumSwitchHelper(NVSDK_NGX_GBUFFER_, NVSDK_NGX_GBUFFERTYPE_NUM);
+    CyberEnumSwitchHelperReturner(NVSDK_NGX_GBUFFER_, NVSDK_NGX_GBUFFER_ALBEDO);
+    CyberEnumSwitchHelperReturner(NVSDK_NGX_GBUFFER_, NVSDK_NGX_GBUFFER_ROUGHNESS);
+    CyberEnumSwitchHelperReturner(NVSDK_NGX_GBUFFER_, NVSDK_NGX_GBUFFER_METALLIC);
+    CyberEnumSwitchHelperReturner(NVSDK_NGX_GBUFFER_, NVSDK_NGX_GBUFFER_SPECULAR);
+    CyberEnumSwitchHelperReturner(NVSDK_NGX_GBUFFER_, NVSDK_NGX_GBUFFER_NORMALS);
+    CyberEnumSwitchHelperReturner(NVSDK_NGX_GBUFFER_, NVSDK_NGX_GBUFFER_SHADINGMODELID);
+    CyberEnumSwitchHelperReturner(NVSDK_NGX_GBUFFER_, NVSDK_NGX_GBUFFER_MATERIALID);
+    CyberEnumSwitchHelperReturner(NVSDK_NGX_GBUFFER_, NVSDK_NGX_GBUFFER_SPECULAR_ALBEDO);
+    CyberEnumSwitchHelperReturner(NVSDK_NGX_GBUFFER_, NVSDK_NGX_GBUFFER_INDIRECT_ALBEDO);
+    CyberEnumSwitchHelperReturner(NVSDK_NGX_GBUFFER_, NVSDK_NGX_GBUFFER_SPECULAR_MVEC);
+    CyberEnumSwitchHelperReturner(NVSDK_NGX_GBUFFER_, NVSDK_NGX_GBUFFER_DISOCCL_MASK);
+    CyberEnumSwitchHelperReturner(NVSDK_NGX_GBUFFER_, NVSDK_NGX_GBUFFER_EMISSIVE);
+    CyberEnumSwitchHelperReturner(NVSDK_NGX_GBUFFER_, NVSDK_NGX_GBUFFERTYPE_NUM);
     default:
         return L"CI_Unknown";
     }
 }
 
-std::wostream& operator<<(std::wostream& os, const NVSDK_NGX_GBufferType& gBufferType) {
+std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_GBufferType_t& gBufferType) {
     os << to_CyString(gBufferType);
+    return os;
+}
+
+//
+
+CyberTypes::CyString_view to_CyString(const CyberTypes::CT_NGX_Feature_t& input) {
+    switch (input) {
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_Feature_, NVSDK_NGX_Feature_Reserved0);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_Feature_, NVSDK_NGX_Feature_SuperSampling);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_Feature_, NVSDK_NGX_Feature_InPainting);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_Feature_, NVSDK_NGX_Feature_ImageSuperResolution);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_Feature_, NVSDK_NGX_Feature_SlowMotion);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_Feature_, NVSDK_NGX_Feature_VideoSuperResolution);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_Feature_, NVSDK_NGX_Feature_Reserved1);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_Feature_, NVSDK_NGX_Feature_Reserved2);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_Feature_, NVSDK_NGX_Feature_Reserved3);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_Feature_, NVSDK_NGX_Feature_ImageSignalProcessing);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_Feature_, NVSDK_NGX_Feature_DeepResolve);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_Feature_, NVSDK_NGX_Feature_DeepDVC);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_Feature_, NVSDK_NGX_Feature_Reserved13);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_Feature_, NVSDK_NGX_Feature_Count);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_Feature_, NVSDK_NGX_Feature_Reserved_SDK);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_Feature_, NVSDK_NGX_Feature_Reserved_Core);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_Feature_, NVSDK_NGX_Feature_Reserved_Unknown);
+    default:
+        return L"CI_Unknown";
+    }
+}
+
+std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_Feature_t& input) {
+    os << to_CyString(input);
+    return os;
+}
+
+// CT_NGX_Coordinates_t
+
+CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_Coordinates_t& coordinates) {
+    return L"(" + std::to_wstring(coordinates.X) + L", " + std::to_wstring(coordinates.Y) + L")";
+}
+
+std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_Coordinates_t& coordinates) {
+    os << to_CyString(coordinates);
+    return os;
+}
+
+// CT_NGX_Dimensions_t
+
+CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_Dimensions_t& dimensions) {
+    return L"[" + std::to_wstring(dimensions.Width) + L"x" + std::to_wstring(dimensions.Height) + L"]";
+}
+
+std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_Dimensions_t& dimensions) {
+    os << to_CyString(dimensions);
+    return os;
+}
+
+// CT_NGX_PathListInfo_t
+
+CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_PathListInfo_t& pathListInfo) {
+    CyberTypes::CyString result = L"[";
+    for (unsigned int i = 0; i < pathListInfo.Length; ++i) {
+        result += pathListInfo.Path[i];
+        if (i < pathListInfo.Length - 1) {
+            result += L", ";
+        }
+    }
+    result += L"]";
+    return result;
+}
+
+std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_PathListInfo_t& pathListInfo) {
+    os << to_CyString(pathListInfo);
+    return os;
+}
+
+// CT_NGX_Logging_Level_t
+
+CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_Logging_Level_t& loggingLevel) {
+    switch (loggingLevel) {
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_LOGGING_LEVEL_, NVSDK_NGX_LOGGING_LEVEL_OFF);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_LOGGING_LEVEL_, NVSDK_NGX_LOGGING_LEVEL_ON);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_LOGGING_LEVEL_, NVSDK_NGX_LOGGING_LEVEL_VERBOSE);
+    default:
+        return L"CI_Unknown";
+    }
+}
+
+std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_Logging_Level_t& loggingLevel) {
+    os << to_CyString(loggingLevel);
+    return os;
+}
+
+// CT_NGX_Resource_VK_Type_t
+
+CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_Resource_VK_Type_t& resourceVKType) {
+    switch (resourceVKType) {
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_RESOURCE_VK_TYPE_, NVSDK_NGX_RESOURCE_VK_TYPE_VK_IMAGEVIEW);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_RESOURCE_VK_TYPE_, NVSDK_NGX_RESOURCE_VK_TYPE_VK_BUFFER);
+    default:
+        return L"CI_Unknown";
+    }
+}
+
+std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_Resource_VK_Type_t& resourceVKType) {
+    os << to_CyString(resourceVKType);
+    return os;
+}
+
+// CT_NGX_Opt_Level_t
+
+CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_Opt_Level_t& optLevel) {
+    switch (optLevel) {
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_OPT_LEVEL_, NVSDK_NGX_OPT_LEVEL_UNDEFINED);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_OPT_LEVEL_, NVSDK_NGX_OPT_LEVEL_DEBUG);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_OPT_LEVEL_, NVSDK_NGX_OPT_LEVEL_DEVELOP);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_OPT_LEVEL_, NVSDK_NGX_OPT_LEVEL_RELEASE);
+    default:
+        return L"CI_Unknown";
+    }
+}
+
+std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_Opt_Level_t& optLevel) {
+    os << to_CyString(optLevel);
+    return os;
+}
+
+
+// CT_NGX_EngineType_t
+
+CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_EngineType_t& engineType) {
+    switch (engineType) {
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_ENGINE_TYPE_, NVSDK_NGX_ENGINE_TYPE_CUSTOM);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_ENGINE_TYPE_, NVSDK_NGX_ENGINE_TYPE_UNREAL);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_ENGINE_TYPE_, NVSDK_NGX_ENGINE_TYPE_UNITY);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_ENGINE_TYPE_, NVSDK_NGX_ENGINE_TYPE_OMNIVERSE);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_ENGINE_TYPE_, NVSDK_NGX_ENGINE_COUNT);
+    default:
+        return L"CI_Unknown";
+    }
+}
+
+std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_EngineType_t& engineType) {
+    os << to_CyString(engineType);
+    return os;
+}
+
+// CT_NGX_Feature_Support_Result_t
+
+CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_Feature_Support_Result_t& featureSupportResult) {
+    switch (featureSupportResult) {
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_FeatureSupportResult_, NVSDK_NGX_FeatureSupportResult_Supported);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_FeatureSupportResult_, NVSDK_NGX_FeatureSupportResult_CheckNotPresent);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_FeatureSupportResult_, NVSDK_NGX_FeatureSupportResult_DriverVersionUnsupported);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_FeatureSupportResult_, NVSDK_NGX_FeatureSupportResult_AdapterUnsupported);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_FeatureSupportResult_, NVSDK_NGX_FeatureSupportResult_OSVersionBelowMinimumSupported);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_FeatureSupportResult_, NVSDK_NGX_FeatureSupportResult_NotImplemented);
+    default:
+        return L"CI_Unknown";
+    }
+}
+
+std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_Feature_Support_Result_t& featureSupportResult) {
+    os << to_CyString(featureSupportResult);
+    return os;
+}
+
+// CT_AppId_t
+
+CyberTypes::CyString to_CyString(const CyberTypes::CT_AppId_t& appId) {
+    return CyberTypes::CyString(std::to_wstring((unsigned long long) appId));
+}
+
+std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_AppId_t& appId) {
+    os << to_CyString(appId);
+    return os;
+}
+
+// CT_NVSDK_NGX_GPU_Arch_t
+
+CyberTypes::CyString to_CyString(const CyberTypes::CT_NVSDK_NGX_GPU_Arch_t& gpuArch) {
+    switch (gpuArch) {
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_GPU_Arch_, NVSDK_NGX_GPU_Arch_NotSupported);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_GPU_Arch_, NVSDK_NGX_GPU_Arch_Volta);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_GPU_Arch_, NVSDK_NGX_GPU_Arch_Turing);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_GPU_Arch_, NVSDK_NGX_GPU_Arch_Unknown);
+    default:
+        return L"CI_Unknown";
+    }
+}
+
+std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NVSDK_NGX_GPU_Arch_t& gpuArch) {
+    os << to_CyString(gpuArch);
+    return os;
+}
+
+// CT_NGX_DLSS_Hint_Render_Preset_t
+
+CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_DLSS_Hint_Render_Preset_t& renderPreset) {
+    switch (renderPreset) {
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_DLSS_Hint_Render_Preset_, NVSDK_NGX_DLSS_Hint_Render_Preset_Default);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_DLSS_Hint_Render_Preset_, NVSDK_NGX_DLSS_Hint_Render_Preset_A);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_DLSS_Hint_Render_Preset_, NVSDK_NGX_DLSS_Hint_Render_Preset_B);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_DLSS_Hint_Render_Preset_, NVSDK_NGX_DLSS_Hint_Render_Preset_C);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_DLSS_Hint_Render_Preset_, NVSDK_NGX_DLSS_Hint_Render_Preset_D);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_DLSS_Hint_Render_Preset_, NVSDK_NGX_DLSS_Hint_Render_Preset_E);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_DLSS_Hint_Render_Preset_, NVSDK_NGX_DLSS_Hint_Render_Preset_F);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_DLSS_Hint_Render_Preset_, NVSDK_NGX_DLSS_Hint_Render_Preset_G);
+    default:
+        return L"CI_Unknown";
+    }
+}
+
+std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_DLSS_Hint_Render_Preset_t& renderPreset) {
+    os << to_CyString(renderPreset);
+    return os;
+}
+
+
+// CT_NGX_DLSS_Mode_t
+CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_DLSS_Mode_t& dlssMode) {
+    switch (dlssMode) {
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_DLSS_Mode_, NVSDK_NGX_DLSS_Mode_Off);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_DLSS_Mode_, NVSDK_NGX_DLSS_Mode_DLSS_DLISP);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_DLSS_Mode_, NVSDK_NGX_DLSS_Mode_DLISP_Only);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_DLSS_Mode_, NVSDK_NGX_DLSS_Mode_DLSS);
+    default:
+        return L"CI_Unknown";
+    }
+}
+
+std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_DLSS_Mode_t& dlssMode) {
+    os << to_CyString(dlssMode);
+    return os;
+}
+
+// CT_NGX_DeepDVC_Mode_t
+CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_DeepDVC_Mode_t& deepDVCMode) {
+    switch (deepDVCMode) {
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_DLSS_DeepDVC_Mode_, NVSDK_NGX_DLSS_DeepDVC_Mode_Off);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_DLSS_DeepDVC_Mode_, NVSDK_NGX_DLSS_DeepDVC_Mode_On);
+    default:
+        return L"CI_Unknown";
+    }
+}
+
+std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_DeepDVC_Mode_t& deepDVCMode) {
+    os << to_CyString(deepDVCMode);
+    return os;
+}
+
+// CT_NGX_FeatureCommonInfo_Internal_t
+
+CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_FeatureCommonInfo_Internal_t& featureCommonInfo) {
+    // Placeholder. Adjust based on the actual members of the struct.
+    return L"FeatureCommonInfo_Internal";
+}
+
+std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_FeatureCommonInfo_Internal_t& featureCommonInfo) {
+    os << to_CyString(featureCommonInfo);
+    return os;
+}
+
+// CT_NGX_DLSS_Feature_Flags_t
+
+CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_DLSS_Feature_Flags_t& dlssFeatureFlags) {
+    switch (dlssFeatureFlags) {
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_DLSS_DeepDVC_Mode_, NVSDK_NGX_DLSS_Feature_Flags_IsInvalid);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_DLSS_DeepDVC_Mode_, NVSDK_NGX_DLSS_Feature_Flags_None);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_DLSS_DeepDVC_Mode_, NVSDK_NGX_DLSS_Feature_Flags_IsHDR);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_DLSS_DeepDVC_Mode_, NVSDK_NGX_DLSS_Feature_Flags_MVLowRes);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_DLSS_DeepDVC_Mode_, NVSDK_NGX_DLSS_Feature_Flags_MVJittered);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_DLSS_DeepDVC_Mode_, NVSDK_NGX_DLSS_Feature_Flags_DepthInverted);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_DLSS_DeepDVC_Mode_, NVSDK_NGX_DLSS_Feature_Flags_Reserved_0);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_DLSS_DeepDVC_Mode_, NVSDK_NGX_DLSS_Feature_Flags_DoSharpening);
+        CyberEnumSwitchHelperReturner(NVSDK_NGX_DLSS_DeepDVC_Mode_, NVSDK_NGX_DLSS_Feature_Flags_AutoExposure);
+    default:
+        return L"CI_Unknown";
+    }
+}
+
+std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_DLSS_Feature_Flags_t& dlssFeatureFlags) {
+    os << to_CyString(dlssFeatureFlags);
+    return os;
+}
+
+// CT_NGX_Handle_t
+CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_Handle_t& ngxHandle) {
+    return std::to_wstring(ngxHandle.Id);
+}
+
+std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_Handle_t& ngxHandle) {
+    os << to_CyString(ngxHandle);
+    return os;
+}
+
+CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_FeatureRequirement_t& featureRequirement) {
+    CyberTypes::CyString result;
+
+    result += L"Feature Supported: ";
+    switch (featureRequirement.FeatureSupported) {
+    case NVSDK_NGX_FeatureSupportResult_Supported:
+        result += L"Supported";
+        break;
+    case NVSDK_NGX_FeatureSupportResult_CheckNotPresent:
+        result += L"CheckNotPresent";
+        break;
+    case NVSDK_NGX_FeatureSupportResult_DriverVersionUnsupported:
+        result += L"DriverVersionUnsupported";
+        break;
+    case NVSDK_NGX_FeatureSupportResult_AdapterUnsupported:
+        result += L"AdapterUnsupported";
+        break;
+    case NVSDK_NGX_FeatureSupportResult_OSVersionBelowMinimumSupported:
+        result += L"OSVersionBelowMinimumSupported";
+        break;
+    case NVSDK_NGX_FeatureSupportResult_NotImplemented:
+        result += L"NotImplemented";
+        break;
+    default:
+        result += L"Unknown";
+        break;
+    }
+
+    // Add a separator (e.g., a comma) between members or use any other appropriate format.
+    result += L", ";
+
+    // Convert the MinHWArchitecture to a string.
+    result += L"Minimum HW Architecture: " + std::to_wstring(featureRequirement.MinHWArchitecture);
+
+    // Add another separator.
+    result += L", ";
+
+    // Convert the MinOSVersion to a string.
+    result += L"Minimum OS Version: " + to_CyString(std::string_view(featureRequirement.MinOSVersion));
+
+    return result;
+}
+
+std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_FeatureRequirement_t& featureRequirement) {
+    os << to_CyString(featureRequirement);
     return os;
 }
