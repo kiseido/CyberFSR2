@@ -5,6 +5,9 @@
 
 #include <map>
 #include <string_view>
+#include <chrono>
+#include <iostream>
+#include <sstream>
 
 #include <nvsdk_ngx.h>
 #include <nvsdk_ngx_defs.h>
@@ -105,32 +108,30 @@ namespace CyberTypes {
         SystemInfo(const SystemInfo& other);
     };
 
-    template<typename T1>
-    T1& variadicLogHelper(T1& os) {
-        return os;
-    }
-
-    template<typename T1, typename T2>
-    T1& variadicLogHelper(T1& os, T2& str) {
-        os << to_CyString((T2) str);
-        return os;
-    }
-
-    template<typename T1, typename T2, typename... Args>
-    T1& variadicLogHelper(T1& os, const T2& str, Args&&... args) {
-        os << to_CyString((T2) str);
-        variadicLogHelper(os, std::forward<Args>(args)...);
-        return os;
-    }
-
-    template<typename... Args>
-    CyString convertToString(Args&&... args) {
-        std::wostringstream  ss;
-        variadicLogHelper(ss, std::forward<Args>(args)...);
-        return ss.str();
-    };
-
     std::wstring stringToWstring(const std::string& str);
+
+
+    // Function to concatenate wstring arguments
+    template <typename... Args>
+    std::wstring concat_arguments(const Args&... args) {
+        std::wstringstream ss;
+        ((ss << args << L" "), ...);
+        return ss.str();
+    }
+
+    // Function to output arguments to wstring
+    template <typename... Args>
+    std::wstring output_arguments(const Args&... args) {
+        std::wstring result = concat_arguments(args...);
+        return result;
+    }
+}
+
+template <typename T>
+CyberTypes::CyString to_CyString(const T& value) {
+    std::wostringstream ss;
+    ss << value;
+    return ss.str();
 }
 
 CyberTypes::CyString to_CyString(const std::wstring&);
@@ -193,7 +194,7 @@ CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_FeatureRequirement_t&)
 std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_FeatureRequirement_t& featureRequirement);
 
 CyberTypes::CyString to_CyString(const CyberTypes::CT_AppId_t&);
-std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_AppId_t& appId);
+// std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_AppId_t& appId);
 
 CyberTypes::CyString to_CyString(const CyberTypes::CT_NVSDK_NGX_GPU_Arch_t&);
 std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NVSDK_NGX_GPU_Arch_t& gpuArch);

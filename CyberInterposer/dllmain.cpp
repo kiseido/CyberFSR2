@@ -21,7 +21,6 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
             LoggerLoaded = true;
             //CyberInterposer::logger.config(LogFilename, true, true, true);
             CyberInterposer::logger.start();
-            CyberLOGvi("CyberLOGvi test");
             CyberLOGi("CyberLOGi test");
             CyberLOGw("CyberLOGw test");
             CyberLOGe("CyberLOGe test");
