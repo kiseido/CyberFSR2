@@ -44,7 +44,6 @@ namespace CyberTypes {
     typedef NVSDK_NGX_FeatureDiscoveryInfo          CT_NGX_FeatureDiscoveryInfo_t;
     typedef NVSDK_NGX_FeatureRequirement            CT_NGX_FeatureRequirement_t;
 
-
     class CyString : public std::wstring {
     public:
         CyString();
@@ -112,14 +111,14 @@ namespace CyberTypes {
     }
 
     template<typename T1, typename T2>
-    T1& variadicLogHelper(T1& os, const T2& str) {
-        os << str;
+    T1& variadicLogHelper(T1& os, T2& str) {
+        os << to_CyString((T2) str);
         return os;
     }
 
     template<typename T1, typename T2, typename... Args>
     T1& variadicLogHelper(T1& os, const T2& str, Args&&... args) {
-        os << str;
+        os << to_CyString((T2) str);
         variadicLogHelper(os, std::forward<Args>(args)...);
         return os;
     }
@@ -223,7 +222,7 @@ std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_Version_t&
 CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_ProjectIdDescription_t&);
 std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_ProjectIdDescription_t& desc);
 
-CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_Application_Identifier_Type_t&);
+CyberTypes::CyString_view to_CyString(const CyberTypes::CT_NGX_Application_Identifier_Type_t&);
 std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_Application_Identifier_Type_t& identifierType);
 
 CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_Application_Identifier_t&);
