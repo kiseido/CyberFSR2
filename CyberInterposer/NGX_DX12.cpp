@@ -83,7 +83,9 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_Init_Ext(unsigned long long InApplicationId, co
 
     if (ptr != nullptr)
     {
-        return ptr(InApplicationId, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion, unknown0);
+        auto result = ptr(InApplicationId, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion, unknown0);
+        CyberLOGvi(result);
+        return result;
     }
 
     return NVSDK_NGX_Result_Fail;
@@ -97,7 +99,9 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_Init(unsigned long long InApplicationId, const 
 
     if (ptr != nullptr)
     {
-        return ptr(InApplicationId, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion);
+        auto result = ptr(InApplicationId, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion);
+        CyberLOGvi(result);
+        return result;
     }
 
     return NVSDK_NGX_Result_Fail;
@@ -109,12 +113,14 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_Init_ProjectID(const char* InProjectId, NVSDK_N
 
     auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX12.pfn_D3D12_Init_ProjectID;
 
-    if (ptr == nullptr)
+    if (ptr != nullptr)
     {
-        return NVSDK_NGX_Result_Fail;
+        auto result = ptr(InProjectId, InEngineType, InEngineVersion, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion);
+        CyberLOGvi(result);
+        return result;
     }
 
-    return ptr(InProjectId, InEngineType, InEngineVersion, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion);
+    return NVSDK_NGX_Result_Fail;
 }
 
 NVSDK_NGX_Result NVSDK_NGX_D3D12_Shutdown(void)
@@ -123,8 +129,11 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_Shutdown(void)
 
     auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX12.pfn_D3D12_Shutdown;
 
-    if (ptr != nullptr) {
-        return ptr();
+    if (ptr != nullptr)
+    {
+        auto result = ptr();
+        CyberLOGvi(result);
+        return result;
     }
 
     return NVSDK_NGX_Result_Fail;
@@ -138,7 +147,9 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_Shutdown1(ID3D12Device* InDevice)
 
     if (ptr != nullptr)
     {
-        return ptr(InDevice);
+        auto result = ptr(InDevice);
+        CyberLOGvi(result);
+        return result;
     }
 
     return NVSDK_NGX_Result_Fail;
@@ -152,7 +163,9 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_GetParameters(NVSDK_NGX_Parameter** OutParamete
 
     if (ptr != nullptr)
     {
-        return ptr(OutParameters);
+        auto result = ptr(OutParameters);
+        CyberLOGvi(result);
+        return result;
     }
 
     return NVSDK_NGX_Result_Fail;
@@ -166,7 +179,9 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_GetCapabilityParameters(NVSDK_NGX_Parameter** O
 
     if (ptr != nullptr)
     {
-        return ptr(OutParameters);
+        auto result = ptr(OutParameters);
+        CyberLOGvi(result);
+        return result;
     }
 
     return NVSDK_NGX_Result_Fail;
@@ -180,7 +195,9 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_AllocateParameters(NVSDK_NGX_Parameter** OutPar
 
     if (ptr != nullptr)
     {
-        return ptr(OutParameters);
+        auto result = ptr(OutParameters);
+        CyberLOGvi(result);
+        return result;
     }
 
     return NVSDK_NGX_Result_Fail;
@@ -194,7 +211,9 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_DestroyParameters(NVSDK_NGX_Parameter* InParame
 
     if (ptr != nullptr)
     {
-        return ptr(InParameters);
+        auto result = ptr(InParameters);
+        CyberLOGvi(result);
+        return result;
     }
 
     return NVSDK_NGX_Result_Fail;
@@ -209,7 +228,9 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_GetScratchBufferSize(NVSDK_NGX_Feature InFeatur
 
     if (ptr != nullptr)
     {
-        return ptr(InFeatureId, InParameters, OutSizeInBytes);
+        auto result = ptr(InFeatureId, InParameters, OutSizeInBytes);
+        CyberLOGvi(result);
+        return result;
     }
 
     return NVSDK_NGX_Result_Fail;
@@ -224,7 +245,9 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_CreateFeature(ID3D12GraphicsCommandList* InCmdL
 
     if (ptr != nullptr)
     {
-        return ptr(InCmdList, InFeatureID, InParameters, OutHandle);
+        auto result = ptr(InCmdList, InFeatureID, InParameters, OutHandle);
+        CyberLOGvi(result);
+        return result;
     }
 
     return NVSDK_NGX_Result_Fail;
@@ -238,7 +261,9 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_ReleaseFeature(NVSDK_NGX_Handle* InHandle)
 
     if (ptr != nullptr)
     {
-        return ptr(InHandle);
+        auto result = ptr(InHandle);
+        CyberLOGvi(result);
+        return result;
     }
 
     return NVSDK_NGX_Result_Fail;
@@ -252,7 +277,9 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_GetFeatureRequirements(IDXGIAdapter* Adapter, c
 
     if (ptr != nullptr)
     {
-        return ptr(Adapter, FeatureDiscoveryInfo, OutSupported);
+        auto result = ptr(Adapter, FeatureDiscoveryInfo, OutSupported);
+        CyberLOGvi(result);
+        return result;
     }
 
     return NVSDK_NGX_Result_Fail;
@@ -266,7 +293,9 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCm
 
     if (ptr != nullptr)
     {
-        return ptr(InCmdList, InFeatureHandle, InParameters, InCallback);
+        auto result = ptr(InCmdList, InFeatureHandle, InParameters, InCallback);
+        CyberLOGvi(result);
+        return result;
     }
 
     return NVSDK_NGX_Result_Fail;

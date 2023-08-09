@@ -4,6 +4,7 @@
 #define CyInt_NGX_Parameter
 
 #include "Common.h"
+#include <set>
 
 namespace CyberInterposer
 {
@@ -16,7 +17,7 @@ namespace CyberInterposer
 		PFN_Table_NVNGX_Parameter_Union_P(NVSDK_NGX_Parameter*);
 	};
 
-	struct CI_NGX_Parameter : NVSDK_NGX_Parameter
+	struct CI_NGX_Parameter : public NVSDK_NGX_Parameter
 	{
 		virtual void Set(const char* InName, unsigned long long InValue) override;
 		virtual void Set(const char* InName, float InValue) override;
@@ -39,6 +40,28 @@ namespace CyberInterposer
 		PFN_Table_NVNGX_Parameter_Union_P wrapped;
 
 		CI_NGX_Parameter(NVSDK_NGX_Parameter*);
+
+		CI_NGX_Parameter();
+	};
+
+	struct CI_MGX_Parameter_StaticAlloc {
+		static constexpr std::size_t PoolSize = 10000;
+
+		CI_NGX_Parameter* claim() noexcept(false);
+		CI_NGX_Parameter* claim(std::size_t number) noexcept(false);
+		bool release(CI_NGX_Parameter* p) noexcept(false);
+		bool release(CI_NGX_Parameter* p, std::size_t number) noexcept(false);
+
+		CI_MGX_Parameter_StaticAlloc();
+
+		static CI_MGX_Parameter_StaticAlloc GetParameters_depreciated;
+		static CI_MGX_Parameter_StaticAlloc AllocateParameters;
+
+	private:
+
+		std::array<CI_NGX_Parameter, PoolSize> memoryPool;
+		std::set<std::size_t> freeSlots;
+		std::mutex allocatorMutex;
 	};
 }
 

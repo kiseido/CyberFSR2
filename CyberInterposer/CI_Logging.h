@@ -8,39 +8,39 @@ namespace CyberInterposer {
 }
 
 
-#define CyberLOG() CyberInterposer::logger.logVerboseInfo(__func__, L"")
+#define CyberLOG() CyberInterposer::logger.logVerboseInfo(__FUNCTIONW__, L"")
 
 #define CyberLOGvi(...) \
     { \
-        std::wstring str = CyberTypes::concat_arguments(__VA_ARGS__); \
-        CyberInterposer::logger.logVerboseInfo(__func__, str); \
+        std::wstring str = stringify_args(__VA_ARGS__); \
+        CyberInterposer::logger.logVerboseInfo(__FUNCTIONW__, str); \
     }
 
 #define CyberLOGi(...) \
     { \
-        std::wstring str = CyberTypes::concat_arguments(__VA_ARGS__); \
-        CyberInterposer::logger.logInfo(__func__, str); \
+        std::wstring str = stringify_args(__VA_ARGS__); \
+        CyberInterposer::logger.logInfo(__FUNCTIONW__, str); \
     }
 
 #define CyberLOGw(...) \
     { \
-        std::wstring str = CyberTypes::concat_arguments(__VA_ARGS__); \
-        CyberInterposer::logger.logWarning(__func__, str); \
+        std::wstring str = stringify_args(__VA_ARGS__); \
+        CyberInterposer::logger.logWarning(__FUNCTIONW__, str); \
     }
 
 #define CyberLOGe(...) \
     { \
-        std::wstring str = CyberTypes::concat_arguments(__VA_ARGS__); \
-        CyberInterposer::logger.logError(__func__, str); \
+        std::wstring str = stringify_args(__VA_ARGS__); \
+        CyberInterposer::logger.logError(__FUNCTIONW__, str); \
     }
 
 #define CyberLogLots(...) \
     { \
-        std::wstring str = CyberTypes::concat_arguments(__VA_ARGS__); \
-        CyberInterposer::logger.logVerboseInfo(__func__, str); \
+        std::wstring str = stringify_args(__VA_ARGS__); \
+        CyberInterposer::logger.logVerboseInfo(__FUNCTIONW__, str); \
     }
 
 
-#define CyberLogArgs(...) CyberLOGvi(CyberTypes::output_arguments(__VA_ARGS__))
+#define CyberLogArgs(...) CyberLOGvi(__VA_ARGS__)
 
 #endif

@@ -209,8 +209,8 @@
     <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugControl|x64'">
-    <IncludePath>$(SolutionDir)CyberLogger;$(SolutionDir)external\simpleini;$(SolutionDir)external\nvngx_dlss_sdk\include;$(SolutionDir)external\unordered_dense\include;$(SolutionDir)external\FidelityFX-FSR2\src;$(VULKAN_SDK)\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)$(Platform)\Debug\;$(SolutionDir)external\FidelityFX-FSR2\bin\ffx_fsr2_api;$(VULKAN_SDK)\Lib;$(LibraryPath);$(SolutionDir)CyberLogger\$(Platform)\$(Configuration)\</LibraryPath>
+    <IncludePath>$(SolutionDir)CyberNGX\;$(SolutionDir)CyberLogger\;$(SolutionDir)external\simpleini;$(SolutionDir)external\nvngx_dlss_sdk\include;$(SolutionDir)external\unordered_dense\include;$(SolutionDir)external\FidelityFX-FSR2\src;$(VULKAN_SDK)\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)$(Platform)\$(Configuration)\;$(SolutionDir)external\FidelityFX-FSR2\bin\ffx_fsr2_api;$(VULKAN_SDK)\Lib;$(LibraryPath);$(SolutionDir)CyberLogger\$(Platform)\$(Configuration)\;$(SolutionDir)CyberNGX\$(Platform)\$(Configuration)\</LibraryPath>
     <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugCyberPunk|x64'">

@@ -58,7 +58,7 @@ bool PFN_Table_NVNGX_Top_Interposer::LoadDLL(HMODULE hModule, bool populateChild
             CyberLOGe("Vulkan functions not found");
         }
 
-        return foundDx11 & foundDx12 & foundVulkan;
+        return foundDx11 && foundDx12 && foundVulkan;
     }
     return false;
 

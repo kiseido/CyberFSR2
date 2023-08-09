@@ -3,7 +3,7 @@
 
 bool CyberInterposer::PFN_Table_NVNGX_CUDA::LoadDLL(HMODULE hModule, bool populateChildren)
 {
-    CyberInterposer::logger.logVerboseInfo(__func__, "");
+    CyberInterposer::logger.logVerboseInfo(__FUNCTIONW__, "");
 
     if (hModule == nullptr)
     {

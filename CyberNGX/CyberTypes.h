@@ -5,47 +5,56 @@
 
 #include <map>
 #include <string_view>
-#include <chrono>
-#include <iostream>
-#include <sstream>
+#include <format>
 
 #include <nvsdk_ngx.h>
 #include <nvsdk_ngx_defs.h>
 
+#include "Utils.h"
+
 namespace CyberTypes {
 
-    typedef AppId                                   CT_AppId_t;
 
-    typedef NVSDK_NGX_GPU_Arch                      CT_NVSDK_NGX_GPU_Arch_t;
+// #define WrapIt(BaseType) typedef Wrapper<BaseType> CT_##BaseType##_t; typedef union {BaseType base; CT_##BaseType##_t wrapped;} CT_##BaseType##_u; std::wostream& CyberTypes::CT_##BaseType##_u::operator<<(std::wostream& wos)
 
-    typedef NVSDK_NGX_DLSS_Hint_Render_Preset       CT_NGX_DLSS_Hint_Render_Preset_t;
-    typedef NVSDK_NGX_FeatureCommonInfo_Internal    CT_NGX_FeatureCommonInfo_Internal_t;
-    typedef NVSDK_NGX_Version                       CT_NGX_Version_t;
-    typedef NVSDK_NGX_Result                        CT_NGX_Result_t;
-    typedef NVSDK_NGX_Feature                       CT_NGX_Feature_t;
-    typedef NVSDK_NGX_Buffer_Format                 CT_NGX_Buffer_Format_t;
-    typedef NVSDK_NGX_PerfQuality_Value             CT_NGX_PerfQuality_Value_t;
-    typedef NVSDK_NGX_RTX_Value                     CT_NGX_RTX_Value_t;
-    typedef NVSDK_NGX_DLSS_Mode                     CT_NGX_DLSS_Mode_t;
-    typedef NVSDK_NGX_DeepDVC_Mode                  CT_NGX_DeepDVC_Mode_t;
-    typedef NVSDK_NGX_Handle                        CT_NGX_Handle_t;
-    typedef NVSDK_NGX_DLSS_Feature_Flags            CT_NGX_DLSS_Feature_Flags_t;
-    typedef NVSDK_NGX_ToneMapperType                CT_NGX_ToneMapperType_t;
-    typedef NVSDK_NGX_GBufferType                   CT_NGX_GBufferType_t;
-    typedef NVSDK_NGX_Coordinates                   CT_NGX_Coordinates_t;
-    typedef NVSDK_NGX_Dimensions                    CT_NGX_Dimensions_t;
-    typedef NVSDK_NGX_PathListInfo                  CT_NGX_PathListInfo_t;
-    typedef NVSDK_NGX_Logging_Level                 CT_NGX_Logging_Level_t;
-    typedef NVSDK_NGX_FeatureCommonInfo             CT_NGX_FeatureCommonInfo_t;
-    typedef NVSDK_NGX_Resource_VK_Type              CT_NGX_Resource_VK_Type_t;
-    typedef NVSDK_NGX_Opt_Level                     CT_NGX_Opt_Level_t;
-    typedef NVSDK_NGX_EngineType                    CT_NGX_EngineType_t;
-    typedef NVSDK_NGX_Feature_Support_Result        CT_NGX_Feature_Support_Result_t;
-    typedef NVSDK_NGX_Application_Identifier_Type   CT_NGX_Application_Identifier_Type_t;
-    typedef NVSDK_NGX_ProjectIdDescription          CT_NGX_ProjectIdDescription_t;
-    typedef NVSDK_NGX_Application_Identifier        CT_NGX_Application_Identifier_t;
-    typedef NVSDK_NGX_FeatureDiscoveryInfo          CT_NGX_FeatureDiscoveryInfo_t;
-    typedef NVSDK_NGX_FeatureRequirement            CT_NGX_FeatureRequirement_t;
+#define WrapIt(BaseType) typedef CyberUtils::UnionWrapper<BaseType> CT_##BaseType##_u; std::wostream& operator<<(std::wostream& wos, const CT_##BaseType##_u&)
+
+    struct NVSDK_NGX_FeatureCommonInfo_Internal  {};
+
+    // Define wrapper classes for specific types
+    WrapIt(AppId);
+
+    WrapIt(NVSDK_NGX_GPU_Arch);
+    WrapIt(NVSDK_NGX_DLSS_Hint_Render_Preset);
+    WrapIt(NVSDK_NGX_FeatureCommonInfo_Internal);
+    WrapIt(NVSDK_NGX_Version);
+    WrapIt(NVSDK_NGX_Result);
+    WrapIt(NVSDK_NGX_Feature);
+    WrapIt(NVSDK_NGX_Buffer_Format);
+    WrapIt(NVSDK_NGX_PerfQuality_Value);
+    WrapIt(NVSDK_NGX_RTX_Value);
+    WrapIt(NVSDK_NGX_DLSS_Mode);
+    WrapIt(NVSDK_NGX_DeepDVC_Mode);
+    WrapIt(NVSDK_NGX_Handle);
+    WrapIt(NVSDK_NGX_DLSS_Feature_Flags);
+    WrapIt(NVSDK_NGX_ToneMapperType);
+    WrapIt(NVSDK_NGX_GBufferType);
+    WrapIt(NVSDK_NGX_Coordinates);
+    WrapIt(NVSDK_NGX_Dimensions);
+    WrapIt(NVSDK_NGX_PathListInfo);
+    WrapIt(NVSDK_NGX_Logging_Level);
+    WrapIt(NVSDK_NGX_FeatureCommonInfo);
+    WrapIt(NVSDK_NGX_Resource_VK_Type);
+    WrapIt(NVSDK_NGX_Opt_Level);
+    WrapIt(NVSDK_NGX_EngineType);
+    WrapIt(NVSDK_NGX_Feature_Support_Result);
+    WrapIt(NVSDK_NGX_Application_Identifier_Type);
+    WrapIt(NVSDK_NGX_ProjectIdDescription);
+    WrapIt(NVSDK_NGX_Application_Identifier);
+    WrapIt(NVSDK_NGX_FeatureDiscoveryInfo);
+    WrapIt(NVSDK_NGX_FeatureRequirement);
+
+#undef WrapIt
 
     class CyString : public std::wstring {
     public:
@@ -54,9 +63,13 @@ namespace CyberTypes {
         CyString(const std::wstring_view& wview);
         CyString(const std::string& str);
         CyString(const std::string_view& view);
+        CyString(const CyString& other);
         CyString(const char* cstr);
         CyString(const wchar_t* wcstr);
-        CyString(const CyString& other);
+
+        friend CyString operator"" _CyStrView(const char* str, size_t len) {
+            return CyString(std::string_view(str, len));
+        }
     };
 
     class CyString_view : public std::wstring_view {
@@ -66,6 +79,10 @@ namespace CyberTypes {
         CyString_view(const std::wstring_view& wview);
         CyString_view(const wchar_t* wcstr);
         CyString_view(const CyString_view& other);
+
+        friend CyString_view operator"" _CyWStrView(const wchar_t* str, size_t len) {
+            return std::wstring_view(str, len);
+        }
     };
 
     struct HighPerformanceCounterInfo {
@@ -110,130 +127,33 @@ namespace CyberTypes {
 
     std::wstring stringToWstring(const std::string& str);
 
-
-    // Function to concatenate wstring arguments
-    template <typename... Args>
-    std::wstring concat_arguments(const Args&... args) {
-        std::wstringstream ss;
-        ((ss << args << L" "), ...);
-        return ss.str();
-    }
-
-    // Function to output arguments to wstring
-    template <typename... Args>
-    std::wstring output_arguments(const Args&... args) {
-        std::wstring result = concat_arguments(args...);
-        return result;
-    }
 }
 
-template <typename T>
-CyberTypes::CyString to_CyString(const T& value) {
-    std::wostringstream ss;
-    ss << value;
-    return ss.str();
-}
-
-CyberTypes::CyString to_CyString(const std::wstring&);
-
-CyberTypes::CyString to_CyString(const std::wstring_view&);
-
-CyberTypes::CyString to_CyString(const std::string&);
-
-CyberTypes::CyString to_CyString(const std::string_view&);
-
-CyberTypes::CyString to_CyString(const CyberTypes::HighPerformanceCounterInfo&);
+std::wostream& operator<<(std::wostream& os, const CyberTypes::SystemInfo& systemInfo);
+std::wostream& operator<<(std::wostream& os, const CyberTypes::RTC& rtc);
+std::wostream& operator<<(std::wostream& os, const CyberTypes::CoreInfo& coreInfo);
 std::wostream& operator<<(std::wostream& os, const CyberTypes::HighPerformanceCounterInfo& counterInfo);
 
-CyberTypes::CyString to_CyString(const CyberTypes::CoreInfo&);
-std::wostream& operator<<(std::wostream& os, const CyberTypes::CoreInfo& coreInfo);
+template <typename T1, typename T2>
+void stringify_args_helper(T1& os, const T2& str) {
+    os << str << L" ";
+}
 
-CyberTypes::CyString to_CyString(const CyberTypes::RTC&);
-std::wostream& operator<<(std::wostream& os, const CyberTypes::RTC& rtc);
+template <typename T1>
+void stringify_args_helper(T1& os, const char str[]) {
+    os << CyberTypes::stringToWstring(str) << L" ";
+}
 
-CyberTypes::CyString to_CyString(const CyberTypes::SystemInfo&);
-std::wostream& operator<<(std::wostream& os, const CyberTypes::SystemInfo& systemInfo);
+template <typename T1>
+void stringify_args_helper(T1& os, const wchar_t str[]) {
+    os << str << L" ";
+}
 
-CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_Result_t&);
-std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_Result_t& result);
-
-CyberTypes::CyString_view to_CyString(const CyberTypes::CT_NGX_Buffer_Format_t&);
-std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_Buffer_Format_t& bufferFormat);
-
-CyberTypes::CyString_view to_CyString(const CyberTypes::CT_NGX_ToneMapperType_t&);
-std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_ToneMapperType_t& toneMapperType);
-
-CyberTypes::CyString_view to_CyString(const CyberTypes::CT_NGX_GBufferType_t&);
-std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_GBufferType_t& gBufferType);
-
-CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_Coordinates_t&);
-std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_Coordinates_t& coordinates);
-
-CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_Dimensions_t&);
-std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_Dimensions_t& dimensions);
-
-CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_PathListInfo_t&);
-std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_PathListInfo_t& pathListInfo);
-
-CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_Logging_Level_t&);
-std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_Logging_Level_t& loggingLevel);
-
-CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_Resource_VK_Type_t&);
-std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_Resource_VK_Type_t& resourceVKType);
-
-CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_Opt_Level_t&);
-std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_Opt_Level_t& optLevel);
-
-CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_EngineType_t&);
-std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_EngineType_t& engineType);
-
-CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_Feature_Support_Result_t&);
-std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_Feature_Support_Result_t& featureSupportResult);
-
-CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_FeatureRequirement_t&);
-std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_FeatureRequirement_t& featureRequirement);
-
-CyberTypes::CyString to_CyString(const CyberTypes::CT_AppId_t&);
-// std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_AppId_t& appId);
-
-CyberTypes::CyString to_CyString(const CyberTypes::CT_NVSDK_NGX_GPU_Arch_t&);
-std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NVSDK_NGX_GPU_Arch_t& gpuArch);
-
-CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_DLSS_Hint_Render_Preset_t&);
-std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_DLSS_Hint_Render_Preset_t& renderPreset);
-
-CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_DLSS_Mode_t&);
-std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_DLSS_Mode_t& dlssMode);
-
-CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_DeepDVC_Mode_t&);
-std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_DeepDVC_Mode_t& deepDVCMode);
-
-CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_FeatureCommonInfo_Internal_t&);
-std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_FeatureCommonInfo_Internal_t& featureCommonInfo);
-
-CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_DLSS_Feature_Flags_t&);
-std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_DLSS_Feature_Flags_t& dlssFeatureFlags);
-
-CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_Handle_t&);
-std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_Handle_t& ngxHandle);
-
-CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_Version_t&);
-std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_Version_t& version);
-
-CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_ProjectIdDescription_t&);
-std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_ProjectIdDescription_t& desc);
-
-CyberTypes::CyString_view to_CyString(const CyberTypes::CT_NGX_Application_Identifier_Type_t&);
-std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_Application_Identifier_Type_t& identifierType);
-
-CyberTypes::CyString to_CyString(const CyberTypes::CT_NGX_Application_Identifier_t&);
-std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_Application_Identifier_t& identifier);
-
-CyberTypes::CyString_view to_CyString(const CyberTypes::CT_NGX_Feature_t&);
-std::wostream& operator<<(std::wostream& os, const CyberTypes::CT_NGX_Feature_t& feature);
-
-std::wostream& operator<<(std::wostream& os, const CyberTypes::CyString& view);
-
-std::wostream& operator<<(std::wostream& os, const CyberTypes::CyString_view& view);
+template <typename... Args>
+std::wstring stringify_args(const Args&... args) {
+    std::wostringstream ss;
+    (stringify_args_helper(ss, args), ...);
+    return ss.str();
+}
 
 #endif
