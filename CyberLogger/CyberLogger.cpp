@@ -31,7 +31,7 @@ CyberLogger::Logger::Logger(const LPCWSTR& fileName, const bool& doPerformanceIn
     DoPerformanceInfo = doPerformanceInfo;
     DoCoreInfo = doCoreInfo;
     DoRTC = doRTC;
-    FileName = fileName;
+    FileName = CyString_view(fileName);
     LoggerStatus.status = Fresh;
 }
 
@@ -58,7 +58,7 @@ void CyberLogger::Logger::start()
 
     auto string = logStream.str();
 
-    logQueue.push({ LogType::INFO_t, perfInfo, __func__, string });
+    logQueue.push({ LogType::INFO_t, perfInfo, __FUNCTIONW__, string });
 
     if (!writingThread.joinable()) {
         stopWritingThread = false;
@@ -83,7 +83,7 @@ void CyberLogger::Logger::stop() {
     logStream << "CyberLogger Stop" << '\n';
     auto string = logStream.str();
 
-    logQueue.push({ LogType::INFO_t, perfInfo, __func__, string });
+    logQueue.push({ LogType::INFO_t, perfInfo, __FUNCTIONW__, string });
 
     queueCondVar.notify_one();
     stopWritingThread.store(true);
@@ -123,7 +123,7 @@ void CyberLogger::Logger::WritingThreadFunction() {
     logFile.close();
 }
 
-void CyberLogger::Logger::logVerboseInfo(const std::string_view& functionName, const CyString& message)
+void CyberLogger::Logger::logVerboseInfo(const CyString_view& functionName, const CyString& message)
 {
     if (!doVerbose) return;
 
@@ -135,7 +135,7 @@ void CyberLogger::Logger::logVerboseInfo(const std::string_view& functionName, c
     queueCondVar.notify_one();
 }
 
-void CyberLogger::Logger::logInfo(const std::string_view& functionName, const CyString& message)
+void CyberLogger::Logger::logInfo(const CyString_view& functionName, const CyString& message)
 {
     SystemInfo perfInfo(DoCoreInfo, DoPerformanceInfo, DoRTC);
     {
@@ -145,7 +145,7 @@ void CyberLogger::Logger::logInfo(const std::string_view& functionName, const Cy
     queueCondVar.notify_one();
 }
 
-void CyberLogger::Logger::logWarning(const std::string_view& functionName, const CyString& message)
+void CyberLogger::Logger::logWarning(const CyString_view& functionName, const CyString& message)
 {
     SystemInfo perfInfo(DoCoreInfo, DoPerformanceInfo, DoRTC);
     {
@@ -155,7 +155,7 @@ void CyberLogger::Logger::logWarning(const std::string_view& functionName, const
     queueCondVar.notify_one();
 }
 
-void CyberLogger::Logger::logError(const std::string_view& functionName, const CyString& message)
+void CyberLogger::Logger::logError(const CyString_view& functionName, const CyString& message)
 {
     SystemInfo perfInfo(DoCoreInfo, DoPerformanceInfo, DoRTC);
     {
@@ -169,7 +169,7 @@ void CyberLogger::Logger::logError(const std::string_view& functionName, const C
 
 CyberLogger::StatusContainer::StatusContainer() : status(Fresh) {}
 
-CyberLogger::LogEntry::LogEntry(const LogType& a, const SystemInfo& b, const std::string_view& c, const CyberTypes::CyString& d): type(a), hardware_info(b), function(c), message(d)
+CyberLogger::LogEntry::LogEntry(const LogType& a, const SystemInfo& b, const CyString_view& c, const CyberTypes::CyString& d): type(a), hardware_info(b), function(c), message(d)
 {
 }
 
@@ -183,22 +183,10 @@ std::wostream& operator<<(std::wostream& os, const CyberLogger::LogType& logType
 }
 
 std::wostream& operator<<(std::wostream& os, const CyberLogger::LogEntry& entry) {
-    os << "type: " << entry.type << ", ";
+    os << "type: " << getLogTypeName(entry.type) << ", ";
     os << "hardware info: " << entry.hardware_info << ", ";
     os << "function: " << entry.function << ", ";
     os << "message: " << entry.message << " ";
     return os;
 }
 
-CyberTypes::CyString_view to_CyString(const CyberLogger::LogType& input) {
-    return CyberTypes::CyString(getLogTypeName(input));
-}
-
-CyberTypes::CyString to_CyString(const CyberLogger::LogEntry& input) {
-    std::wstringstream wss;
-    wss << L"type: " << to_CyString(input.type) << L", ";
-    wss << L"hardware info: " << to_CyString(input.hardware_info) << L", ";
-    wss << L"function: " << to_CyString(input.function) << L", ";
-    wss << L"message: " << input.message.c_str();
-    return wss.str();
-}

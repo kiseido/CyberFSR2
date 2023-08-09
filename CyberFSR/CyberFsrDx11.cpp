@@ -50,14 +50,14 @@ NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_Init_Ext(unsigned long
     // Perform input validation
     if (InDevice == nullptr || InFeatureInfo == nullptr)
     {
-        CyberLogLots("InDevice == nullptr || InFeatureInfo == nullptr");
+        CyberLogLots(L"InDevice == nullptr || InFeatureInfo == nullptr");
         return NVSDK_NGX_Result_FAIL_InvalidParameter;
     }
 
     // Check the compatibility of the NGX SDK version
     if (InSDKVersion < NVSDK_NGX_Version_API)
     {
-        CyberLogLots("NVSDK_NGX_Result_FAIL_OutOfDate", (int) InSDKVersion, " was less than ", (int)NVSDK_NGX_Version_API);
+        CyberLogLots(L"NVSDK_NGX_Result_FAIL_OutOfDate", (int) InSDKVersion, L" was less than ", (int)NVSDK_NGX_Version_API);
         return NVSDK_NGX_Result_FAIL_OutOfDate;
     }
 

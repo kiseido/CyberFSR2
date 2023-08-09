@@ -7,37 +7,36 @@ namespace CyberFSR{
     extern CyberLogger::Logger logger;
 }
 
+#define CyberLOG() CyberFSR::logger.logVerboseInfo(__FUNCTIONW__, L"")
 
-#define CyberLOG() CyberFSR::logger.logVerboseInfo(__func__, L"")
-
-#define CyberLOGvi(stringy) \
+#define CyberLOGvi(...) \
     do { \
-        std::wstring stream_sv = CyberTypes::concat_arguments(stringy); \
-        CyberFSR::logger.logVerboseInfo(__func__, stream_sv); \
+        std::wstring str = stringify_args(__VA_ARGS__); \
+        CyberFSR::logger.logVerboseInfo(__FUNCTIONW__, str); \
     } while (false)
 
-#define CyberLOGi(stringy) \
+#define CyberLOGi(...) \
     do { \
-        std::wstring stream_sv = CyberTypes::concat_arguments(stringy); \
-        CyberFSR::logger.logInfo(__func__, stream_sv); \
+        std::wstring str = stringify_args(__VA_ARGS__); \
+        CyberFSR::logger.logInfo(__FUNCTIONW__, str); \
     } while (false)
 
-#define CyberLOGw(stringy) \
+#define CyberLOGw(...) \
     do { \
-        std::wstring stream_sv = CyberTypes::concat_arguments(stringy); \
-        CyberFSR::logger.logWarning(__func__, stream_sv); \
+        std::wstring str = stringify_args(__VA_ARGS__); \
+        CyberFSR::logger.logWarning(__FUNCTIONW__, str); \
     } while (false)
 
-#define CyberLOGe(stringy) \
+#define CyberLOGe(...) \
     do { \
-        std::wstring stream_sv = CyberTypes::concat_arguments(stringy); \
-        CyberFSR::logger.logError(__func__, stream_sv); \
+        std::wstring str = stringify_args(__VA_ARGS__); \
+        CyberFSR::logger.logError(__FUNCTIONW__, str); \
     } while (false)
 
 #define CyberLogLots(...) \
     do { \
-        std::wstring stream_sv = CyberTypes::concat_arguments(__VA_ARGS__); \
-        CyberFSR::logger.logVerboseInfo(__func__, stream_sv); \
+        std::wstring str = stringify_args(__VA_ARGS__); \
+        CyberFSR::logger.logVerboseInfo(__FUNCTIONW__, str); \
     } while (false)
 
 

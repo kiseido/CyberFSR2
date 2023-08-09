@@ -198,6 +198,86 @@ void CI_NGX_Parameter::Reset()
     wrapped.param->Reset();
 }
 
+CyberInterposer::CI_NGX_Parameter::CI_NGX_Parameter() : wrapped(nullptr) {}
+
 CyberInterposer::CI_NGX_Parameter::CI_NGX_Parameter(NVSDK_NGX_Parameter* other) : wrapped(other){}
 
 CyberInterposer::PFN_Table_NVNGX_Parameter_Union_P::PFN_Table_NVNGX_Parameter_Union_P(NVSDK_NGX_Parameter* other) : param(other){}
+
+CI_MGX_Parameter_StaticAlloc CI_MGX_Parameter_StaticAlloc::GetParameters_depreciated = {};
+CI_MGX_Parameter_StaticAlloc CI_MGX_Parameter_StaticAlloc::AllocateParameters = {};
+
+CI_NGX_Parameter* CI_MGX_Parameter_StaticAlloc::claim() noexcept(false) {
+    std::lock_guard<std::mutex> lock(allocatorMutex);
+
+    if (freeSlots.empty()) {
+        throw std::runtime_error("No available memory slots!");
+    }
+
+    auto slot = *freeSlots.begin();
+    freeSlots.erase(freeSlots.begin());
+
+    return &memoryPool[slot];
+}
+
+CI_NGX_Parameter* CI_MGX_Parameter_StaticAlloc::claim(std::size_t number) noexcept(false) {
+    if (number == 0 || number > PoolSize)
+        throw std::invalid_argument("Invalid number requested");
+
+    std::lock_guard<std::mutex> lock(allocatorMutex);
+
+    auto it = freeSlots.begin();
+    while (it != freeSlots.end()) {
+        auto start = it;
+        std::size_t count = 0;
+        while (it != freeSlots.end() && *it - *start == count) {
+            ++count;
+            ++it;
+            if (count == number) {
+                CI_NGX_Parameter* result = &memoryPool[*start];
+                while (count--) {
+                    freeSlots.erase(start++);
+                }
+                return result;
+            }
+        }
+        if (it != freeSlots.end()) {
+            ++it;
+        }
+    }
+
+    throw std::runtime_error("No contiguous memory slots available for the requested number");
+}
+
+bool CI_MGX_Parameter_StaticAlloc::release(CI_NGX_Parameter* p) noexcept(false) {
+    std::lock_guard<std::mutex> lock(allocatorMutex);
+
+    std::size_t index = p - &memoryPool[0];
+    if (index >= PoolSize) {
+        return false;
+    }
+    freeSlots.insert(index);
+
+    return true;
+}
+
+bool CI_MGX_Parameter_StaticAlloc::release(CI_NGX_Parameter* p, std::size_t number) noexcept(false) {
+    std::lock_guard<std::mutex> lock(allocatorMutex);
+
+    std::size_t index = p - &memoryPool[0];
+    if (index >= PoolSize || index + number > PoolSize) {
+        return false;
+    }
+    for (std::size_t i = 0; i < number; i++) {
+        freeSlots.insert(index + i);
+    }
+
+    return true;
+}
+
+// Initialization of the free slots
+CI_MGX_Parameter_StaticAlloc::CI_MGX_Parameter_StaticAlloc() {
+    for (std::size_t i = 0; i < PoolSize; i++) {
+        freeSlots.insert(i);
+    }
+}

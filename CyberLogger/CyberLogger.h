@@ -39,9 +39,9 @@ namespace CyberLogger {
         LogType type;
         CyberTypes::SystemInfo hardware_info;
         CyberTypes::CyString message;
-        std::string_view function;
+        CyberTypes::CyString_view function;
 
-        LogEntry(const CyberLogger::LogType&, const CyberTypes::SystemInfo&, const std::string_view& , const CyberTypes::CyString&);
+        LogEntry(const CyberLogger::LogType&, const CyberTypes::SystemInfo&, const CyberTypes::CyString_view& , const CyberTypes::CyString&);
         LogEntry(const LogEntry& other);
     };
 
@@ -58,11 +58,11 @@ namespace CyberLogger {
         void start();
         void stop();
 
-        void logVerboseInfo( const std::string_view& functionName, const CyberTypes::CyString& message);
+        void logVerboseInfo( const CyberTypes::CyString_view& functionName, const CyberTypes::CyString& message);
 
-        void logInfo( const std::string_view& functionName, const CyberTypes::CyString& message);
-        void logWarning(const std::string_view& functionName, const CyberTypes::CyString& message);
-        void logError(const std::string_view& functionName, const CyberTypes::CyString& message);
+        void logInfo( const CyberTypes::CyString_view& functionName, const CyberTypes::CyString& message);
+        void logWarning(const CyberTypes::CyString_view& functionName, const CyberTypes::CyString& message);
+        void logError(const CyberTypes::CyString_view& functionName, const CyberTypes::CyString& message);
 
         CyberTypes::CyString FileName;
 
