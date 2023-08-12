@@ -1,6 +1,9 @@
 #include "pch.h"
 #include "NGX_Interposer.h"
 
+
+#ifdef CyberInterposer_DO_CUDA
+
 bool CyberInterposer::PFN_Table_NVNGX_CUDA::LoadDLL(HMODULE hModule, bool populateChildren)
 {
     CyberInterposer::logger.logVerboseInfo(__FUNCTIONW__, "");
@@ -33,9 +36,9 @@ bool CyberInterposer::PFN_Table_NVNGX_CUDA::LoadDLL(HMODULE hModule, bool popula
 
 #define CyDLLLoadLog(name) \
 	do { \
-		const bool found = (name == nullptr); \
+		const bool found = (name != nullptr); \
 		if(found){ \
-			CyberLOGi(#name, " found"); \
+			CyberLOGi(#name, " found", name); \
 		} \
 		else { \
 			CyberLOGi(#name, " not found"); \
@@ -63,6 +66,7 @@ bool CyberInterposer::PFN_Table_NVNGX_CUDA::LoadDLL(HMODULE hModule, bool popula
 }
 
 NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_CUDA_Init(unsigned long long a, const wchar_t* b, const NVSDK_NGX_FeatureCommonInfo* c, NVSDK_NGX_Version d) {
+    WaitForLoading();
     CyberLogArgs(a, b, c, d);
 
     auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_CUDA.pfn_cuInit;
@@ -74,6 +78,7 @@ NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_CUDA_Init(unsigned long long a, const wcha
 }
 
 NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_CUDA_Init_Ext(unsigned long long a , const wchar_t* b , const NVSDK_NGX_FeatureCommonInfo* c, NVSDK_NGX_Version d, unsigned long long e) {
+    WaitForLoading();
     CyberLogArgs(a, b, c, d, e);
 
     auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_CUDA.pfn_cuInit_Ext;
@@ -85,6 +90,7 @@ NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_CUDA_Init_Ext(unsigned long long a , const
 }
 
 NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_CUDA_Init_with_ProjectID(const char* a, NVSDK_NGX_EngineType b, const char* c, const wchar_t* d, const NVSDK_NGX_FeatureCommonInfo* e, NVSDK_NGX_Version f) {
+    WaitForLoading();
     CyberLogArgs(a, b, c, d, e, f);
 
     auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_CUDA.pfn_cuInit_with_ProjectID;
@@ -96,6 +102,7 @@ NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_CUDA_Init_with_ProjectID(const char* a, NV
 }
 
 NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_CUDA_Shutdown(void) {
+    WaitForLoading();
     CyberLogArgs();
 
     auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_CUDA.pfn_cuShutdown;
@@ -107,6 +114,7 @@ NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_CUDA_Shutdown(void) {
 }
 
 NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_CUDA_Shutdown1(void) {
+    WaitForLoading();
     CyberLogArgs();
 
     auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_CUDA.pfn_cuShutdown1;
@@ -118,6 +126,7 @@ NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_CUDA_Shutdown1(void) {
 }
 
 NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_CUDA_GetCapabilityParameters(NVSDK_NGX_Parameter** a) {
+    WaitForLoading();
     CyberLogArgs(a);
 
     auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_CUDA.pfn_cuGetCapabilityParameters;
@@ -129,6 +138,7 @@ NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_CUDA_GetCapabilityParameters(NVSDK_NGX_Par
 }
 
 NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_CUDA_AllocateParameters(NVSDK_NGX_Parameter** a) {
+    WaitForLoading();
     CyberLogArgs(a);
 
     auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_CUDA.pfn_cuAllocateParameters;
@@ -140,6 +150,7 @@ NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_CUDA_AllocateParameters(NVSDK_NGX_Paramete
 }
 
 NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_CUDA_DestroyParameters(NVSDK_NGX_Parameter* a) {
+    WaitForLoading();
     CyberLogArgs(a);
 
     auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_CUDA.pfn_cuDestroyParameters;
@@ -151,6 +162,7 @@ NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_CUDA_DestroyParameters(NVSDK_NGX_Parameter
 }
 
 NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_CUDA_GetScratchBufferSize(NVSDK_NGX_Feature a, const NVSDK_NGX_Parameter* b, size_t* c) {
+    WaitForLoading();
     CyberLogArgs(a, b, c);
 
     auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_CUDA.pfn_cuGetScratchBufferSize;
@@ -162,6 +174,7 @@ NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_CUDA_GetScratchBufferSize(NVSDK_NGX_Featur
 }
 
 NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_CUDA_CreateFeature(NVSDK_NGX_Feature a, const NVSDK_NGX_Parameter* b, NVSDK_NGX_Handle** c) {
+    WaitForLoading();
     CyberLogArgs(a, b, c);
 
     auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_CUDA.pfn_cuCreateFeature;
@@ -173,6 +186,7 @@ NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_CUDA_CreateFeature(NVSDK_NGX_Feature a, co
 }
 
 NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_CUDA_ReleaseFeature(NVSDK_NGX_Handle* a) {
+    WaitForLoading();
     CyberLogArgs(a);
 
     auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_CUDA.pfn_cuReleaseFeature;
@@ -184,6 +198,7 @@ NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_CUDA_ReleaseFeature(NVSDK_NGX_Handle* a) {
 }
 
 NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_CUDA_EvaluateFeature(const NVSDK_NGX_Handle* a, const NVSDK_NGX_Parameter* b, PFN_NVSDK_NGX_ProgressCallback c) {
+    WaitForLoading();
     CyberLogArgs(a, b, c);
 
     auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_CUDA.pfn_cuEvaluateFeature;
@@ -195,6 +210,7 @@ NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_CUDA_EvaluateFeature(const NVSDK_NGX_Handl
 }
 
 NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_CUDA_EvaluateFeature_C(const NVSDK_NGX_Handle* a, const NVSDK_NGX_Parameter* b, PFN_NVSDK_NGX_ProgressCallback_C c) {
+    WaitForLoading();
     CyberLogArgs(a, b, c);
 
     auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_CUDA.pfn_cuEvaluateFeature_C;
@@ -204,3 +220,5 @@ NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_CUDA_EvaluateFeature_C(const NVSDK_NGX_Han
 
     return NVSDK_NGX_Result_Fail;
 }
+
+#endif

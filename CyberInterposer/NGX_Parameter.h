@@ -4,7 +4,7 @@
 #define CyInt_NGX_Parameter
 
 #include "Common.h"
-#include <set>
+#include <bitset>
 
 namespace CyberInterposer
 {
@@ -15,6 +15,7 @@ namespace CyberInterposer
 		Raw_NVNGX_Parameter* bytes;
 		NVSDK_NGX_Parameter* param;
 		PFN_Table_NVNGX_Parameter_Union_P(NVSDK_NGX_Parameter*);
+		PFN_Table_NVNGX_Parameter_Union_P();
 	};
 
 	struct CI_NGX_Parameter : public NVSDK_NGX_Parameter
@@ -24,24 +25,40 @@ namespace CyberInterposer
 		virtual void Set(const char* InName, double InValue) override;
 		virtual void Set(const char* InName, unsigned int InValue) override;
 		virtual void Set(const char* InName, int InValue) override;
+
 		virtual void Set(const char* InName, ID3D11Resource* InValue) override;
 		virtual void Set(const char* InName, ID3D12Resource* InValue) override;
+		virtual NVSDK_NGX_Result Get(const char* InName, ID3D11Resource** OutValue) const override;
+		virtual NVSDK_NGX_Result Get(const char* InName, ID3D12Resource** OutValue) const override;
+
 		virtual void Set(const char* InName, void* InValue) override;
 		virtual NVSDK_NGX_Result Get(const char* InName, unsigned long long* OutValue) const override;
 		virtual NVSDK_NGX_Result Get(const char* InName, float* OutValue) const override;
 		virtual NVSDK_NGX_Result Get(const char* InName, double* OutValue) const override;
 		virtual NVSDK_NGX_Result Get(const char* InName, unsigned int* OutValue) const override;
 		virtual NVSDK_NGX_Result Get(const char* InName, int* OutValue) const override;
-		virtual NVSDK_NGX_Result Get(const char* InName, ID3D11Resource** OutValue) const override;
-		virtual NVSDK_NGX_Result Get(const char* InName, ID3D12Resource** OutValue) const override;
 		virtual NVSDK_NGX_Result Get(const char* InName, void** OutValue) const override;
 		virtual void Reset() override;
 
-		PFN_Table_NVNGX_Parameter_Union_P wrapped;
+		NVSDK_NGX_Result GetOptimalSettingsCallback();
+		NVSDK_NGX_Result GetStatsCallback();
 
 		CI_NGX_Parameter(NVSDK_NGX_Parameter*);
 
 		CI_NGX_Parameter();
+
+	private:
+
+		using GetOptimalSettingsCallbackType = NVSDK_NGX_Result(*)(NVSDK_NGX_Parameter*);
+		using GetStatsCallbackType = NVSDK_NGX_Result(*)(NVSDK_NGX_Parameter*);
+
+	public:
+
+		mutable PFN_Table_NVNGX_Parameter_Union_P wrapped = PFN_Table_NVNGX_Parameter_Union_P(nullptr);
+
+		mutable GetOptimalSettingsCallbackType* wrapped_GetOptimalSettingsCallback = nullptr;
+		mutable GetStatsCallbackType* wrapped_GetStatsCallback = nullptr;
+
 	};
 
 	struct CI_MGX_Parameter_StaticAlloc {
@@ -60,10 +77,9 @@ namespace CyberInterposer
 	private:
 
 		std::array<CI_NGX_Parameter, PoolSize> memoryPool;
-		std::set<std::size_t> freeSlots;
+		std::bitset<PoolSize> freeSlots;
 		std::mutex allocatorMutex;
 	};
 }
-
 
 #endif

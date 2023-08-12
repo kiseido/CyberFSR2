@@ -127,6 +127,7 @@ namespace CyberTypes {
 
     std::wstring stringToWstring(const std::string& str);
 
+
 }
 
 std::wostream& operator<<(std::wostream& os, const CyberTypes::SystemInfo& systemInfo);

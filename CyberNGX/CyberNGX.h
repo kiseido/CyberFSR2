@@ -5,5 +5,7 @@
 
 #include "CyberTypes.h"
 #include "NGX_PFN_Definitions.h"
+#include "Utils.h"
+#include "CyberNGX_Strings.h"
 
 #endif

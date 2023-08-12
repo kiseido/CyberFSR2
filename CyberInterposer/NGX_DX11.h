@@ -9,6 +9,8 @@
 //#include "DirectXHooks.h"
 //#include "Util.h"
 
+#ifdef CyberInterposer_DO_DX11
+
 #include <d3d11.h>
 #include <d3dcompiler.h>
 
@@ -84,3 +86,5 @@ NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_DestroyParameters(NVSDK_NGX_Paramete
 
 
 #endif
+
+#endif // CyberInterposer_DO_DX11
