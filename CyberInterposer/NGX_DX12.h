@@ -1,5 +1,6 @@
 #include "pch.h"
 
+
 #ifndef CyInt_DX12_INTERPOSER_H
 #define CyInt_DX12_INTERPOSER_H
 
@@ -8,6 +9,8 @@
 //#include "Config.h"
 //#include "DirectXHooks.h"
 //#include "Util.h"
+
+#ifdef CyberInterposer_DO_DX12
 
 #include <D3D12.h>
 #include <d3dcompiler.h>
@@ -45,8 +48,6 @@ namespace CyberInterposer
         bool LoadDLL(HMODULE inputFile, bool populateChildren) override;
     };
 }
-
-
 
 // void NVSDK_CONV NVSDK_NGX_Parameter_SetD3d12Resource(NVSDK_NGX_Parameter* InParameter, const char* InName, ID3D12Resource* InValue);
 // NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_Parameter_GetD3d12Resource(NVSDK_NGX_Parameter* InParameter, const char* InName, ID3D12Resource** OutValue);
@@ -93,5 +94,7 @@ NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D12_GetFeatureRequirements(IDXGIAdapter*
 // external\nvngx_dlss_sdk\include\nvsdk_ngx_defs.h
 // external\nvngx_dlss_sdk\include\nvsdk_ngx_helpers.h
 
+
+#endif
 
 #endif

@@ -39,8 +39,6 @@ namespace CyberUtils {
         Wrapper<BaseT> wrapped;
     };
 
-    //
-
     constexpr std::wstring_view GET_PART_AFTER_PREFIX(const std::wstring_view& prefix, const std::wstring_view& name) {
         return name.substr(prefix.size());
     }
@@ -57,8 +55,8 @@ namespace CyberUtils {
             return name;
         }
     }
-
 }
+
 
 #define CyberEnumSwitchHelperOStream(stream, prefix, name) \
     case name: { \

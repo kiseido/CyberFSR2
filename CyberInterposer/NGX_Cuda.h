@@ -1,9 +1,12 @@
 #include "pch.h"
 
+
 #ifndef CyInt_NVCUDA
 #define CyInt_NVCUDA
 
 #include "Common.h"
+
+#ifdef CyberInterposer_DO_CUDA
 
 namespace CyberInterposer
 {
@@ -57,5 +60,7 @@ NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_CUDA_ReleaseFeature(NVSDK_NGX_Handle* a);
 NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_CUDA_EvaluateFeature(const NVSDK_NGX_Handle* a, const NVSDK_NGX_Parameter* b, PFN_NVSDK_NGX_ProgressCallback c);
 
 NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_CUDA_EvaluateFeature_C(const NVSDK_NGX_Handle* a, const NVSDK_NGX_Parameter* b, PFN_NVSDK_NGX_ProgressCallback_C c);
+
+#endif
 
 #endif

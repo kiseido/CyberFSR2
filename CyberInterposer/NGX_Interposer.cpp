@@ -9,7 +9,7 @@ bool PFN_Table_NVNGX_Top_Interposer::LoadDLL(HMODULE hModule, bool populateChild
 {
     CyberLogArgs(hModule, populateChildren);
 
-    if (hModule == nullptr || hModule == 0) {
+    if (hModule == nullptr ) {
         CyberLOGe("hModule is bad");
         return false;
     }
@@ -17,48 +17,64 @@ bool PFN_Table_NVNGX_Top_Interposer::LoadDLL(HMODULE hModule, bool populateChild
     bool foundFunctions = true;
 
     if (populateChildren) {
+#ifdef CyberInterposer_DO_DX11
         const bool foundDx11 = PFN_DX11.LoadDLL(hModule, false);
-        const bool foundDx12 = PFN_DX12.LoadDLL(hModule, false);
-        const bool foundCuda = PFN_CUDA.LoadDLL(hModule, false);
-        const bool foundVulkan = PFN_Vulkan.LoadDLL(hModule, false);
+
+        foundFunctions &= foundDx11;
 
         if (foundDx11)
         {
             CyberLOGi("DX11 functions loaded");
         }
-        else 
+        else
         {
             CyberLOGe("DX11 functions not found");
         }
+#endif
+#ifdef CyberInterposer_DO_DX12
+        const bool foundDx12 = PFN_DX12.LoadDLL(hModule, false);
+
+        foundFunctions &= foundDx12;
 
         if (foundDx12)
         {
             CyberLOGi("DX12 functions loaded");
         }
-        else 
+        else
         {
             CyberLOGe("DX12 functions not found");
         }
+#endif
+#ifdef CyberInterposer_DO_CUDA
+        const bool foundCuda = PFN_CUDA.LoadDLL(hModule, false);
 
-        if (foundDx12)
+        foundFunctions &= foundCuda;
+
+        if (foundCuda)
         {
             CyberLOGi("CUDA functions loaded");
         }
-        else 
+        else
         {
             CyberLOGe("CUDA functions not found");
         }
+#endif
+#ifdef CyberInterposer_DO_VULKAN
+        const bool foundVulkan = PFN_Vulkan.LoadDLL(hModule, false);
 
-        if (foundDx12)
+        foundFunctions &= foundVulkan;
+
+        if (foundVulkan)
         {
             CyberLOGi("Vulkan functions loaded");
         }
-        else 
+        else
         {
             CyberLOGe("Vulkan functions not found");
         }
+#endif
 
-        return foundDx11 && foundDx12 && foundVulkan;
+        return foundFunctions;
     }
     return false;
 

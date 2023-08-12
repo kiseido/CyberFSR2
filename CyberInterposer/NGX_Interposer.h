@@ -18,14 +18,27 @@ NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_GetVersion(NVSDK_NGX_Version
 
 namespace CyberInterposer
 {
+
+    static bool CyberFSRLoaded = false;
+    static bool LoggerLoaded = false;
+    static std::mutex startupMutex;
+    static std::condition_variable InterposerReady_cv;
+
     struct PFN_Table_NVNGX_Top_Interposer : public  PFN_Table_T {
 
         PFN_NVSDK_NGX_UpdateFeature pfn_UpdateFeature = nullptr;
-
+#ifdef CyberInterposer_DO_DX11
         PFN_Table_NVNGX_DX11 PFN_DX11;
+#endif
+#ifdef CyberInterposer_DO_DX12
         PFN_Table_NVNGX_DX12 PFN_DX12;
+#endif
+#ifdef CyberInterposer_DO_VULKAN
         PFN_Table_NVNGX_Vulkan PFN_Vulkan;
+#endif
+#ifdef CyberInterposer_DO_CUDA
         PFN_Table_NVNGX_CUDA PFN_CUDA;
+#endif
 
         bool LoadDLL(HMODULE inputFile, bool populateChildren) override;
     };

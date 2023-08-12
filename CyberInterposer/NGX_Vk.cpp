@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "NGX_Interposer.h"
 
+#ifdef CyberInterposer_DO_VULKAN
+
 using namespace CyberInterposer;
 
 bool CyberInterposer::PFN_Table_NVNGX_Vulkan::LoadDLL(HMODULE hModule, bool populateChildren)
@@ -34,9 +36,9 @@ bool CyberInterposer::PFN_Table_NVNGX_Vulkan::LoadDLL(HMODULE hModule, bool popu
 
 #define CyDLLLoadLog(name) \
 	do { \
-		const bool found = (name == nullptr); \
+		const bool found = (name != nullptr); \
 		if(found){ \
-			CyberLOGi(#name, " found"); \
+			CyberLOGi(#name, " found", name); \
 		} \
 		else { \
 			CyberLOGi(#name, " not found"); \
@@ -66,7 +68,9 @@ bool CyberInterposer::PFN_Table_NVNGX_Vulkan::LoadDLL(HMODULE hModule, bool popu
 
 NVSDK_NGX_Result NVSDK_NGX_VULKAN_Init(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath, VkInstance InInstance, VkPhysicalDevice InPD, VkDevice InDevice, PFN_vkGetInstanceProcAddr InGIPA, PFN_vkGetDeviceProcAddr InGDPA, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion)
 {
-	CyberLogArgs(InApplicationId, InApplicationDataPath, InInstance, InPD, InDevice, InGIPA, InGDPA, InFeatureInfo, InSDKVersion);
+	const CyberTypes::RTC start = CyberTypes::RTC(true);
+	WaitForLoading();
+	CyberLogArgs(InApplicationId, InApplicationDataPath, InInstance, InPD, InDevice, InGIPA, InGDPA, InFeatureInfo, InSDKVersion, start);
 
 	// is pointer good? cast pointer and call it and return any results!
 	return NVSDK_NGX_Result_Success;
@@ -74,23 +78,29 @@ NVSDK_NGX_Result NVSDK_NGX_VULKAN_Init(unsigned long long InApplicationId, const
 
 NVSDK_NGX_Result NVSDK_NGX_VULKAN_Init_ProjectID(const char* InProjectId, NVSDK_NGX_EngineType InEngineType, const char* InEngineVersion, const wchar_t* InApplicationDataPath, VkInstance InInstance, VkPhysicalDevice InPD, VkDevice InDevice, PFN_vkGetInstanceProcAddr InGIPA, PFN_vkGetDeviceProcAddr InGDPA, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion)
 {
-	CyberLogArgs(InProjectId, InEngineType, InEngineVersion, InApplicationDataPath, InInstance, InPD, InDevice, InGIPA, InGDPA, InFeatureInfo, InSDKVersion);
+	const CyberTypes::RTC start = CyberTypes::RTC(true);
+	WaitForLoading();
+	CyberLogArgs(InProjectId, InEngineType, InEngineVersion, InApplicationDataPath, InInstance, InPD, InDevice, InGIPA, InGDPA, InFeatureInfo, InSDKVersion, start);
 
 	// is pointer good? cast pointer and call it and return any results!
-	return NVSDK_NGX_VULKAN_Init(0x1337, InApplicationDataPath, InInstance, InPD, InDevice, InGIPA, InGDPA, InFeatureInfo, InSDKVersion);
+	return NVSDK_NGX_Result_Success;
 }
 
 NVSDK_NGX_Result NVSDK_NGX_VULKAN_Init_with_ProjectID(const char* InProjectId, NVSDK_NGX_EngineType InEngineType, const char* InEngineVersion, const wchar_t* InApplicationDataPath, VkInstance InInstance, VkPhysicalDevice InPD, VkDevice InDevice, PFN_vkGetInstanceProcAddr InGIPA, PFN_vkGetDeviceProcAddr InGDPA, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion)
 {
-	CyberLogArgs(InProjectId, InEngineType, InEngineVersion, InApplicationDataPath, InInstance, InPD, InDevice, InGIPA, InGDPA, InFeatureInfo, InSDKVersion);
+	const CyberTypes::RTC start = CyberTypes::RTC(true);
+	WaitForLoading();
+	CyberLogArgs(InProjectId, InEngineType, InEngineVersion, InApplicationDataPath, InInstance, InPD, InDevice, InGIPA, InGDPA, InFeatureInfo, InSDKVersion, start);
 
 	// is pointer good? cast pointer and call it and return any results!
-	return NVSDK_NGX_VULKAN_Init(0x1337, InApplicationDataPath, InInstance, InPD, InDevice, InGIPA, InGDPA, InFeatureInfo, InSDKVersion);
+	return NVSDK_NGX_Result_Success;
 }
 
 NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_VULKAN_Shutdown(void)
 {
-	CyberLOG();
+	const CyberTypes::RTC start = CyberTypes::RTC(true);
+	WaitForLoading();
+	CyberLogArgs(start);
 
 	// is pointer good? cast pointer and call it and return any results!
 	return NVSDK_NGX_Result_Success;
@@ -98,7 +108,9 @@ NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_VULKAN_Shutdown(void)
 
 NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_VULKAN_Shutdown1(VkDevice InDevice)
 {
-	CyberLogArgs(InDevice);
+	const CyberTypes::RTC start = CyberTypes::RTC(true);
+	WaitForLoading();
+	CyberLogArgs(InDevice, start);
 
 	// is pointer good? cast pointer and call it and return any results!
 	return NVSDK_NGX_Result_Success;
@@ -106,7 +118,9 @@ NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_VULKAN_Shutdown1(VkDevice InDevice)
 
 NVSDK_NGX_Result NVSDK_NGX_VULKAN_GetParameters(NVSDK_NGX_Parameter** OutParameters)
 {
-	CyberLogArgs(OutParameters);
+	const CyberTypes::RTC start = CyberTypes::RTC(true);
+	WaitForLoading();
+	CyberLogArgs(OutParameters, start);
 
 	// is pointer good? cast pointer and call it and return any results!
 	return NVSDK_NGX_Result_Success;
@@ -114,7 +128,9 @@ NVSDK_NGX_Result NVSDK_NGX_VULKAN_GetParameters(NVSDK_NGX_Parameter** OutParamet
 
 NVSDK_NGX_Result NVSDK_NGX_VULKAN_AllocateParameters(NVSDK_NGX_Parameter** OutParameters)
 {
-	CyberLogArgs(OutParameters);
+	const CyberTypes::RTC start = CyberTypes::RTC(true);
+	WaitForLoading();
+	CyberLogArgs(OutParameters, start);
 
 	// is pointer good? cast pointer and call it and return any results!
 	return NVSDK_NGX_Result_Success;
@@ -122,7 +138,9 @@ NVSDK_NGX_Result NVSDK_NGX_VULKAN_AllocateParameters(NVSDK_NGX_Parameter** OutPa
 
 NVSDK_NGX_Result NVSDK_NGX_VULKAN_GetCapabilityParameters(NVSDK_NGX_Parameter** OutParameters)
 {
-	CyberLogArgs(OutParameters);
+	const CyberTypes::RTC start = CyberTypes::RTC(true);
+	WaitForLoading();
+	CyberLogArgs(OutParameters, start);
 
 	// is pointer good? cast pointer and call it and return any results!
 	return NVSDK_NGX_Result_Success;
@@ -130,7 +148,9 @@ NVSDK_NGX_Result NVSDK_NGX_VULKAN_GetCapabilityParameters(NVSDK_NGX_Parameter** 
 
 NVSDK_NGX_Result NVSDK_NGX_VULKAN_DestroyParameters(NVSDK_NGX_Parameter* InParameters)
 {
-	CyberLogArgs(InParameters);
+	const CyberTypes::RTC start = CyberTypes::RTC(true);
+	WaitForLoading();
+	CyberLogArgs(InParameters, start);
 
 	// is pointer good? cast pointer and call it and return any results!
 	return NVSDK_NGX_Result_Success;
@@ -138,7 +158,9 @@ NVSDK_NGX_Result NVSDK_NGX_VULKAN_DestroyParameters(NVSDK_NGX_Parameter* InParam
 
 NVSDK_NGX_Result NVSDK_NGX_VULKAN_GetScratchBufferSize(NVSDK_NGX_Feature InFeatureId, const NVSDK_NGX_Parameter* InParameters, size_t* OutSizeInBytes)
 {
-	CyberLogArgs(InFeatureId, InParameters, OutSizeInBytes);
+	const CyberTypes::RTC start = CyberTypes::RTC(true);
+	WaitForLoading();
+	CyberLogArgs(InFeatureId, InParameters, OutSizeInBytes, start);
 
 	// is pointer good? cast pointer and call it and return any results!
 	return NVSDK_NGX_Result_Success;
@@ -146,7 +168,9 @@ NVSDK_NGX_Result NVSDK_NGX_VULKAN_GetScratchBufferSize(NVSDK_NGX_Feature InFeatu
 
 NVSDK_NGX_Result NVSDK_NGX_VULKAN_CreateFeature(VkCommandBuffer InCmdBuffer, NVSDK_NGX_Feature InFeatureID, NVSDK_NGX_Parameter* InParameters, NVSDK_NGX_Handle** OutHandle)
 {
-	CyberLogArgs(InCmdBuffer, InFeatureID, InParameters, OutHandle);
+	const CyberTypes::RTC start = CyberTypes::RTC(true);
+	WaitForLoading();
+	CyberLogArgs(InCmdBuffer, InFeatureID, InParameters, OutHandle, start);
 
 	// is pointer good? cast pointer and call it and return any results!
 	return NVSDK_NGX_Result_Success;
@@ -154,7 +178,9 @@ NVSDK_NGX_Result NVSDK_NGX_VULKAN_CreateFeature(VkCommandBuffer InCmdBuffer, NVS
 
 NVSDK_NGX_Result NVSDK_NGX_VULKAN_CreateFeature1(VkDevice InDevice, VkCommandBuffer InCmdList, NVSDK_NGX_Feature InFeatureID, NVSDK_NGX_Parameter* InParameters, NVSDK_NGX_Handle** OutHandle)
 {
-	CyberLogArgs(InDevice, InCmdList, InFeatureID, InParameters, OutHandle);
+	const CyberTypes::RTC start = CyberTypes::RTC(true);
+	WaitForLoading();
+	CyberLogArgs(InDevice, InCmdList, InFeatureID, InParameters, OutHandle, start);
 
 	// is pointer good? cast pointer and call it and return any results!
 	return NVSDK_NGX_Result_Success;
@@ -162,7 +188,9 @@ NVSDK_NGX_Result NVSDK_NGX_VULKAN_CreateFeature1(VkDevice InDevice, VkCommandBuf
 
 NVSDK_NGX_Result NVSDK_NGX_VULKAN_ReleaseFeature(NVSDK_NGX_Handle* InHandle)
 {
-	CyberLogArgs(InHandle);
+	const CyberTypes::RTC start = CyberTypes::RTC(true);
+	WaitForLoading();
+	CyberLogArgs(InHandle, start);
 
 	// is pointer good? cast pointer and call it and return any results!
 	return NVSDK_NGX_Result_Success;
@@ -170,8 +198,21 @@ NVSDK_NGX_Result NVSDK_NGX_VULKAN_ReleaseFeature(NVSDK_NGX_Handle* InHandle)
 
 NVSDK_NGX_Result NVSDK_NGX_VULKAN_EvaluateFeature(VkCommandBuffer InCmdList, const NVSDK_NGX_Handle* InFeatureHandle, const NVSDK_NGX_Parameter* InParameters, PFN_NVSDK_NGX_ProgressCallback InCallback)
 {
-	CyberLogArgs(InCmdList, InFeatureHandle, InParameters, InCallback);
+	const CyberTypes::RTC start = CyberTypes::RTC(true);
+	WaitForLoading();
+	CyberLogArgs(InCmdList, InFeatureHandle, InParameters, InCallback, start);
 
 	// is pointer good? cast pointer and call it and return any results!
 	return NVSDK_NGX_Result_Success;
 }
+
+NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_VULKAN_EvaluateFeature_C(VkCommandBuffer InCmdList, const NVSDK_NGX_Handle* InFeatureHandle, const NVSDK_NGX_Parameter* InParameters, PFN_NVSDK_NGX_ProgressCallback_C InCallback)
+{
+	const CyberTypes::RTC start = CyberTypes::RTC(true);
+	WaitForLoading();
+	CyberLogArgs(InCmdList, InFeatureHandle, InParameters, InCallback, start);
+
+	return NVSDK_NGX_Result_Success;
+}
+
+#endif

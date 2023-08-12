@@ -1,6 +1,9 @@
 #include "pch.h"
 #include "NGX_Interposer.h"
 
+
+#ifdef CyberInterposer_DO_DX11
+
 using namespace CyberInterposer;
 
 bool CyberInterposer::PFN_Table_NVNGX_DX11::LoadDLL(HMODULE hModule, bool populateChildren)
@@ -11,9 +14,6 @@ bool CyberInterposer::PFN_Table_NVNGX_DX11::LoadDLL(HMODULE hModule, bool popula
 	{
 		return false;
 	}
-
-	pfn_SetD3d11Resource = reinterpret_cast<PFN_NVSDK_NGX_Parameter_SetD3d11Resource>(GetProcAddress(hModule, "NVSDK_NGX_Parameter_SetD3d12Resource"));
-	pfn_GetD3d11Resource = reinterpret_cast<PFN_NVSDK_NGX_Parameter_GetD3d11Resource>(GetProcAddress(hModule, "NVSDK_NGX_Parameter_GetD3d12Resource"));
 
 	pfn_D3D11_Init = reinterpret_cast<PFN_NVSDK_NGX_D3D11_Init>(GetProcAddress(hModule, "NVSDK_NGX_D3D11_Init"));
 	pfn_D3D11_Init_Ext = reinterpret_cast<PFN_NVSDK_NGX_D3D11_Init_Ext>(GetProcAddress(hModule, "NVSDK_NGX_D3D11_Init_Ext"));
@@ -39,9 +39,9 @@ bool CyberInterposer::PFN_Table_NVNGX_DX11::LoadDLL(HMODULE hModule, bool popula
 
 #define CyDLLLoadLog(name) \
 	do { \
-		const bool found = (name == nullptr); \
+		const bool found = (name != nullptr); \
 		if(found){ \
-			CyberLOGi(#name, " found"); \
+			CyberLOGi(#name, " found", name); \
 		} \
 		else { \
 			CyberLOGi(#name, " not found"); \
@@ -49,8 +49,6 @@ bool CyberInterposer::PFN_Table_NVNGX_DX11::LoadDLL(HMODULE hModule, bool popula
 		foundFunctions = false; \
 	} while(false)
 
-	CyDLLLoadLog(pfn_SetD3d11Resource);
-	CyDLLLoadLog(pfn_GetD3d11Resource);
 	CyDLLLoadLog(pfn_D3D11_Init);
 	CyDLLLoadLog(pfn_D3D11_Init_Ext);
 	CyDLLLoadLog(pfn_D3D11_Init_ProjectID);
@@ -71,18 +69,22 @@ bool CyberInterposer::PFN_Table_NVNGX_DX11::LoadDLL(HMODULE hModule, bool popula
 	return foundFunctions;
 }
 
+
 NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_Init(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath, ID3D11Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion)
 {
-	CyberLogArgs(InApplicationId, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion);
+	const CyberTypes::RTC start = CyberTypes::RTC(true);
+	WaitForLoading();
+	CyberLogArgs(InApplicationId, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion, start);
 
-	auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX11.pfn_D3D11_Init;
+	const auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX11.pfn_D3D11_Init;
 
 	if (ptr != nullptr) {
 		auto result = ptr(InApplicationId, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion);
-		CyberLOGvi(result);
+		CyberLOGvi("NVSDK_NGX_D3D11_Init", result);
 		return result;
 	}
 
+	CyberLOGvi("NVSDK_NGX_D3D11_Init: pfn_D3D11_Init is nullptr");
 	return NVSDK_NGX_Result_Fail;
 }
 
@@ -90,7 +92,9 @@ NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_Init_Ext(unsigned long long InApplic
 	ID3D11Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion,
 	unsigned long long unknown0)
 {
-	CyberLogArgs(InApplicationId, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion, unknown0);
+	const CyberTypes::RTC start = CyberTypes::RTC(true);
+	WaitForLoading();
+	CyberLogArgs(InApplicationId, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion, unknown0, start);
 
 	auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX11.pfn_D3D11_Init_Ext;
 
@@ -108,7 +112,9 @@ NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_Init_Ext(unsigned long long InApplic
 
 NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_Shutdown(void)
 {
-	CyberLogArgs();
+	const CyberTypes::RTC start = CyberTypes::RTC(true);
+	WaitForLoading();
+	CyberLogArgs(start);
 
 	auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX11.pfn_D3D11_Shutdown;
 
@@ -124,7 +130,9 @@ NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_Shutdown(void)
 
 NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_GetParameters(NVSDK_NGX_Parameter** OutParameters)
 {
-	CyberLogArgs(OutParameters);
+	const CyberTypes::RTC start = CyberTypes::RTC(true);
+	WaitForLoading();
+	CyberLogArgs(OutParameters, start);
 
 	auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX11.pfn_D3D11_GetParameters;
 
@@ -143,7 +151,9 @@ NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_GetParameters(NVSDK_NGX_Parameter** 
 
 NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_GetScratchBufferSize(NVSDK_NGX_Feature InFeatureId, const NVSDK_NGX_Parameter* InParameters, size_t* OutSizeInBytes)
 {
-	CyberLogArgs(InFeatureId, InParameters, OutSizeInBytes);
+	const CyberTypes::RTC start = CyberTypes::RTC(true);
+	WaitForLoading();
+	CyberLogArgs(InFeatureId, InParameters, OutSizeInBytes, start);
 
 	auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX11.pfn_D3D11_GetScratchBufferSize;
 
@@ -159,7 +169,9 @@ NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_GetScratchBufferSize(NVSDK_NGX_Featu
 
 NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_CreateFeature(ID3D11DeviceContext *InDevCtx, NVSDK_NGX_Feature InFeatureID, NVSDK_NGX_Parameter *InParameters, NVSDK_NGX_Handle **OutHandle)
 {
-	CyberLogArgs(InDevCtx, InFeatureID, InParameters, OutHandle);
+	const CyberTypes::RTC start = CyberTypes::RTC(true);
+	WaitForLoading();
+	CyberLogArgs(InDevCtx, InFeatureID, InParameters, OutHandle, start);
 
 	auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX11.pfn_D3D11_CreateFeature;
 
@@ -175,7 +187,9 @@ NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_CreateFeature(ID3D11DeviceContext *I
 
 NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_ReleaseFeature(NVSDK_NGX_Handle* InHandle)
 {
-	CyberLogArgs(InHandle);
+	const CyberTypes::RTC start = CyberTypes::RTC(true);
+	WaitForLoading();
+	CyberLogArgs(InHandle, start);
 
 	auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX11.pfn_D3D11_ReleaseFeature;
 
@@ -191,7 +205,9 @@ NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_ReleaseFeature(NVSDK_NGX_Handle* InH
 
 NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_EvaluateFeature(ID3D11DeviceContext* InDevCtx, const NVSDK_NGX_Handle* InFeatureHandle, const NVSDK_NGX_Parameter* InParameters, PFN_NVSDK_NGX_ProgressCallback InCallback)
 {
-	CyberLogArgs(InDevCtx, InFeatureHandle, InParameters, InCallback);
+	const CyberTypes::RTC start = CyberTypes::RTC(true);
+	WaitForLoading();
+	CyberLogArgs(InDevCtx, InFeatureHandle, InParameters, InCallback, start);
 
 	auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX11.pfn_D3D11_EvaluateFeature;
 
@@ -205,10 +221,29 @@ NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_EvaluateFeature(ID3D11DeviceContext*
 	return NVSDK_NGX_Result_Fail;
 }
 
+NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_EvaluateFeature_C(ID3D11DeviceContext* InDevCtx, const NVSDK_NGX_Handle* InFeatureHandle, const NVSDK_NGX_Parameter* InParameters, PFN_NVSDK_NGX_ProgressCallback_C InCallback)
+{
+	const CyberTypes::RTC start = CyberTypes::RTC(true);
+	WaitForLoading();
+	CyberLogArgs(InDevCtx, InFeatureHandle, InParameters, InCallback, start);
+
+	auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX11.pfn_D3D11_EvaluateFeature_C;
+
+	if (ptr != nullptr)
+	{
+		auto result = ptr(InDevCtx, InFeatureHandle, InParameters, InCallback);
+		CyberLOGvi(result);
+		return result;
+	}
+	return NVSDK_NGX_Result_Fail;
+}
+
 
 NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_Init_ProjectID(const char* InProjectId, NVSDK_NGX_EngineType InEngineType, const char* InEngineVersion, const wchar_t* InApplicationDataPath, ID3D11Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion)
 {
-	CyberLogArgs(InProjectId, InEngineType, InEngineVersion, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion);
+	const CyberTypes::RTC start = CyberTypes::RTC(true);
+	WaitForLoading();
+	CyberLogArgs(InProjectId, InEngineType, InEngineVersion, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion, start);
 
 	auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX11.pfn_D3D11_Init_ProjectID;
 
@@ -224,7 +259,9 @@ NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_Init_ProjectID(const char* InProject
 
 NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_Shutdown1(ID3D11Device* InDevice)
 {
-	CyberLogArgs(InDevice);
+	const CyberTypes::RTC start = CyberTypes::RTC(true);
+	WaitForLoading();
+	CyberLogArgs(InDevice, start);
 
 	auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX11.pfn_D3D11_Shutdown1;
 
@@ -241,16 +278,21 @@ NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_Shutdown1(ID3D11Device* InDevice)
 
 NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_GetCapabilityParameters(NVSDK_NGX_Parameter** OutParameters)
 {
-	CyberLogArgs(OutParameters);
+	const CyberTypes::RTC start = CyberTypes::RTC(true);
+	WaitForLoading();
+	CyberLogArgs(OutParameters, start);
 
-	auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX11.pfn_D3D11_GetCapabilityParameters;
+	const auto& ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX11.pfn_D3D11_GetCapabilityParameters;
 
 	if (ptr != nullptr)
 	{
 		CyberInterposer::CI_NGX_Parameter* internalParam = CI_MGX_Parameter_StaticAlloc::AllocateParameters.claim();
-		NVSDK_NGX_Result result = ptr(OutParameters);
-		internalParam->wrapped.param = *OutParameters;
+		NVSDK_NGX_Parameter** interim = OutParameters;
+		NVSDK_NGX_Result result = ptr(interim);
+		internalParam->wrapped.param = *interim;
+
 		*OutParameters = internalParam;
+
 		CyberLOGvi(result);
 		return result;
 	}
@@ -260,7 +302,9 @@ NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_GetCapabilityParameters(NVSDK_NGX_Pa
 
 NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_AllocateParameters(NVSDK_NGX_Parameter** OutParameters)
 {
-	CyberLogArgs(OutParameters);
+	const CyberTypes::RTC start = CyberTypes::RTC(true);
+	WaitForLoading();
+	CyberLogArgs(OutParameters, start);
 
 	auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX11.pfn_D3D11_AllocateParameters;
 
@@ -279,7 +323,9 @@ NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_AllocateParameters(NVSDK_NGX_Paramet
 
 NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_DestroyParameters(NVSDK_NGX_Parameter* InParameters)
 {
-	CyberLogArgs(InParameters);
+	const CyberTypes::RTC start = CyberTypes::RTC(true);
+	WaitForLoading();
+	CyberLogArgs(InParameters, start);
 
 	auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX11.pfn_D3D11_DestroyParameters;
 
@@ -298,3 +344,5 @@ NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_DestroyParameters(NVSDK_NGX_Paramete
 
 	return NVSDK_NGX_Result_Fail;
 }
+
+#endif

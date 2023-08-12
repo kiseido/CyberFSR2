@@ -110,20 +110,30 @@ void CI_NGX_Parameter::Set(const char* InName, int InValue)
 
 void CI_NGX_Parameter::Set(const char* InName, ID3D11Resource* InValue)
 {
+#ifdef CyberInterposer_DO_DX11
     CyberLogArgs(InName, InValue);
 
     wrapped.param->Set(InName, InValue);
 
     return;
+#endif
+#ifndef CyberInterposer_DO_DX11
+    return;
+#endif
 }
 
 void CI_NGX_Parameter::Set(const char* InName, ID3D12Resource* InValue)
 {
+#ifdef CyberInterposer_DO_DX12
     CyberLogArgs(InName, InValue);
 
     wrapped.param->Set(InName, InValue);
 
     return;
+#endif
+#ifndef CyberInterposer_DO_DX12
+        return;
+#endif
 }
 
 void CI_NGX_Parameter::Set(const char* InName, void* InValue)
@@ -172,22 +182,62 @@ NVSDK_NGX_Result CI_NGX_Parameter::Get(const char* InName, int* OutValue) const
 
 NVSDK_NGX_Result CI_NGX_Parameter::Get(const char* InName, ID3D11Resource** OutValue) const
 {
-    CyberLogArgs(InName, OutValue);
+#ifdef CyberInterposer_DO_DX11
+    //CyberLogArgs(InName, OutValue);
 
-    return wrapped.param->Get(InName, OutValue);
+    auto result = wrapped.param->Get(InName, OutValue);
+
+    CyberLOGvi(InName, OutValue, result);
+
+    return result;
+#endif
+#ifndef CyberInterposer_DO_DX11
+    return NVSDK_NGX_Result_Fail;
+#endif
 }
 
 NVSDK_NGX_Result CI_NGX_Parameter::Get(const char* InName, ID3D12Resource** OutValue) const
 {
-    CyberLogArgs(InName, OutValue);
+#ifdef CyberInterposer_DO_DX12
+    //CyberLogArgs(InName, OutValue);
 
-    return wrapped.param->Get(InName, OutValue);
+    auto result = wrapped.param->Get(InName, OutValue);
+
+    CyberLOGvi(InName, OutValue, result);
+
+    return result;
+#endif
+#ifndef CyberInterposer_DO_DX12
+    return NVSDK_NGX_Result_Fail;
+#endif
 }
 
 NVSDK_NGX_Result CI_NGX_Parameter::Get(const char* InName, void** OutValue) const
 {
     CyberLogArgs(InName, OutValue);
 
+    constexpr const char* OptimalCallbaskStr = NGX_Strings::NGX_Strings_macrocontent[(int)NGX_Strings::NVSDK_NGX_Parameter_DLSSOptimalSettingsCallback_enum].data();
+
+    constexpr const char* StatsCallbaskStr = NGX_Strings::NGX_Strings_macrocontent[(int)NGX_Strings::NVSDK_NGX_Parameter_DLSSGetStatsCallback_enum].data();
+
+    const auto isOptimalSettingsCallback = strcmp(InName, OptimalCallbaskStr);
+
+    if (isOptimalSettingsCallback == 0) {
+        void** interim = nullptr;
+        auto result = wrapped.param->Get(InName, interim);
+        this->wrapped_GetOptimalSettingsCallback = (GetOptimalSettingsCallbackType*) *interim;
+        return result;
+    }
+
+    const auto isStatsCallback = strcmp(InName, StatsCallbaskStr);
+
+    if (isStatsCallback == 0) {
+        void** interim = nullptr;
+        auto result = wrapped.param->Get(InName, interim);
+        this->wrapped_GetStatsCallback = (GetStatsCallbackType*) *interim;
+        return result;
+    }
+    
     return wrapped.param->Get(InName, OutValue);
 }
 
@@ -198,11 +248,32 @@ void CI_NGX_Parameter::Reset()
     wrapped.param->Reset();
 }
 
-CyberInterposer::CI_NGX_Parameter::CI_NGX_Parameter() : wrapped(nullptr) {}
+NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_DLSS_GetOptimalSettingsCallback(NVSDK_NGX_Parameter* InParams)
+{
+    return ((CI_NGX_Parameter*)InParams)->GetOptimalSettingsCallback();
+}
 
-CyberInterposer::CI_NGX_Parameter::CI_NGX_Parameter(NVSDK_NGX_Parameter* other) : wrapped(other){}
+NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_DLSS_GetStatsCallback(NVSDK_NGX_Parameter* InParams)
+{
+    return ((CI_NGX_Parameter*)InParams)->GetStatsCallback();
+}
 
-CyberInterposer::PFN_Table_NVNGX_Parameter_Union_P::PFN_Table_NVNGX_Parameter_Union_P(NVSDK_NGX_Parameter* other) : param(other){}
+NVSDK_NGX_Result CyberInterposer::CI_NGX_Parameter::GetOptimalSettingsCallback() {
+    const GetOptimalSettingsCallbackType* callback = this->wrapped_GetOptimalSettingsCallback;
+    return (*callback)(this->wrapped.param);
+}
+NVSDK_NGX_Result CyberInterposer::CI_NGX_Parameter::GetStatsCallback() {
+    const GetStatsCallbackType* callback = this->wrapped_GetStatsCallback;
+    return (*callback)(this->wrapped.param);
+}
+
+CyberInterposer::CI_NGX_Parameter::CI_NGX_Parameter() {}
+
+CyberInterposer::CI_NGX_Parameter::CI_NGX_Parameter(NVSDK_NGX_Parameter* other) : wrapped(other) {}
+
+CyberInterposer::PFN_Table_NVNGX_Parameter_Union_P::PFN_Table_NVNGX_Parameter_Union_P(NVSDK_NGX_Parameter* other) : param(other) {}
+
+CyberInterposer::PFN_Table_NVNGX_Parameter_Union_P::PFN_Table_NVNGX_Parameter_Union_P() : param(nullptr) {};
 
 CI_MGX_Parameter_StaticAlloc CI_MGX_Parameter_StaticAlloc::GetParameters_depreciated = {};
 CI_MGX_Parameter_StaticAlloc CI_MGX_Parameter_StaticAlloc::AllocateParameters = {};
@@ -210,66 +281,77 @@ CI_MGX_Parameter_StaticAlloc CI_MGX_Parameter_StaticAlloc::AllocateParameters = 
 CI_NGX_Parameter* CI_MGX_Parameter_StaticAlloc::claim() noexcept(false) {
     std::lock_guard<std::mutex> lock(allocatorMutex);
 
-    if (freeSlots.empty()) {
-        throw std::runtime_error("No available memory slots!");
+    for (std::size_t i = 0; i < PoolSize; ++i) {
+        if (!freeSlots.test(i)) {
+            freeSlots.set(i);
+            return &memoryPool[i];
+        }
     }
 
-    auto slot = *freeSlots.begin();
-    freeSlots.erase(freeSlots.begin());
-
-    return &memoryPool[slot];
+    throw std::runtime_error("No free slots available.");
 }
 
 CI_NGX_Parameter* CI_MGX_Parameter_StaticAlloc::claim(std::size_t number) noexcept(false) {
-    if (number == 0 || number > PoolSize)
-        throw std::invalid_argument("Invalid number requested");
+    if (number == 0 || number > PoolSize) {
+        throw std::invalid_argument("Invalid number to claim.");
+    }
 
     std::lock_guard<std::mutex> lock(allocatorMutex);
 
-    auto it = freeSlots.begin();
-    while (it != freeSlots.end()) {
-        auto start = it;
-        std::size_t count = 0;
-        while (it != freeSlots.end() && *it - *start == count) {
-            ++count;
-            ++it;
-            if (count == number) {
-                CI_NGX_Parameter* result = &memoryPool[*start];
-                while (count--) {
-                    freeSlots.erase(start++);
-                }
-                return result;
+    for (std::size_t i = 0; i <= PoolSize - number; ++i) {
+        bool canAllocate = true;
+
+        for (std::size_t j = 0; j < number; ++j) {
+            if (freeSlots.test(i + j)) {
+                canAllocate = false;
+                break;
             }
         }
-        if (it != freeSlots.end()) {
-            ++it;
+
+        if (canAllocate) {
+            for (std::size_t j = 0; j < number; ++j) {
+                freeSlots.set(i + j);
+            }
+
+            return &memoryPool[i];
         }
     }
 
-    throw std::runtime_error("No contiguous memory slots available for the requested number");
+    throw std::runtime_error("No contiguous slots of the requested size available.");
 }
 
 bool CI_MGX_Parameter_StaticAlloc::release(CI_NGX_Parameter* p) noexcept(false) {
     std::lock_guard<std::mutex> lock(allocatorMutex);
 
-    std::size_t index = p - &memoryPool[0];
-    if (index >= PoolSize) {
-        return false;
-    }
-    freeSlots.insert(index);
+    std::ptrdiff_t index = p - memoryPool.data();
 
+    if (index < 0 || index >= static_cast<std::ptrdiff_t>(PoolSize) || !freeSlots.test(index)) {
+        throw std::invalid_argument("Invalid pointer or not currently claimed.");
+    }
+
+    freeSlots.reset(index);
     return true;
 }
 
 bool CI_MGX_Parameter_StaticAlloc::release(CI_NGX_Parameter* p, std::size_t number) noexcept(false) {
+    if (number == 0 || number > PoolSize) {
+        throw std::invalid_argument("Invalid number to release.");
+    }
+
     std::lock_guard<std::mutex> lock(allocatorMutex);
 
-    std::size_t index = p - &memoryPool[0];
-    if (index >= PoolSize || index + number > PoolSize) {
-        return false;
+    std::ptrdiff_t index = p - memoryPool.data();
+
+    if (index < 0 || index + number > static_cast<std::ptrdiff_t>(PoolSize)) {
+        throw std::invalid_argument("Invalid pointer range.");
     }
-    for (std::size_t i = 0; i < number; i++) {
-        freeSlots.insert(index + i);
+
+    for (std::size_t i = 0; i < number; ++i) {
+        if (!freeSlots.test(index + i)) {
+            throw std::invalid_argument("Some of the pointers are not currently claimed.");
+        }
+
+        freeSlots.reset(index + i);
     }
 
     return true;
@@ -277,7 +359,5 @@ bool CI_MGX_Parameter_StaticAlloc::release(CI_NGX_Parameter* p, std::size_t numb
 
 // Initialization of the free slots
 CI_MGX_Parameter_StaticAlloc::CI_MGX_Parameter_StaticAlloc() {
-    for (std::size_t i = 0; i < PoolSize; i++) {
-        freeSlots.insert(i);
-    }
+    freeSlots.reset();
 }
