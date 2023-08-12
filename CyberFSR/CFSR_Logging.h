@@ -7,6 +7,10 @@ namespace CyberFSR{
     extern CyberLogger::Logger logger;
 }
 
+#define doCFSRLogging
+
+#ifdef doCFSRLogging
+
 #define CyberLOG() CyberFSR::logger.logVerboseInfo(__FUNCTIONW__, L"")
 
 #define CyberLOGvi(...) \
@@ -41,5 +45,27 @@ namespace CyberFSR{
 
 
 #define CyberLogArgs(...) CyberLOGvi(__VA_ARGS__)
+
+#endif // doCFSRLogging
+
+
+#ifndef doCFSRLogging
+
+#define CyberLOG() 
+
+#define CyberLOGvi(...) 
+
+#define CyberLOGi(...) 
+
+#define CyberLOGw(...) 
+
+#define CyberLOGe(...) 
+
+#define CyberLogLots(...) 
+
+
+#define CyberLogArgs(...) 
+
+#endif // doCFSRLogging
 
 #endif

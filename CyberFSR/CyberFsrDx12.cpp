@@ -4,14 +4,22 @@
 #include "DirectXHooks.h"
 #include "Util.h"
 
+#ifdef CyberFSR_DO_DX12
+
+#ifdef _DEBUG
+FILE* fDummy;
+
+#endif // _DEBUG
+
 NVSDK_NGX_API NVSDK_NGX_Result NVSDK_NGX_D3D12_Init_Ext(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath,
 	ID3D12Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion,
 	unsigned long long unknown0)
 {
-	CyberLOG();
+	CyberLogArgs(InApplicationId, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion, unknown0);
+
 #ifdef _DEBUG
 	AllocConsole();
-	FILE* fDummy;
+
 	freopen_s(&fDummy, "CONIN$", "r", stdin);
 	freopen_s(&fDummy, "CONOUT$", "w", stderr);
 	freopen_s(&fDummy, "CONOUT$", "w", stdout);
@@ -23,25 +31,56 @@ NVSDK_NGX_API NVSDK_NGX_Result NVSDK_NGX_D3D12_Init_Ext(unsigned long long InApp
 
 NVSDK_NGX_Result NVSDK_NGX_D3D12_Init(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath, ID3D12Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion)
 {
-	CyberLOG();
-	return NVSDK_NGX_D3D12_Init_Ext(InApplicationId, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion, 0);
+	CyberLogArgs(InApplicationId, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion);
+
+#ifdef _DEBUG
+	AllocConsole();
+
+	freopen_s(&fDummy, "CONIN$", "r", stdin);
+	freopen_s(&fDummy, "CONOUT$", "w", stderr);
+	freopen_s(&fDummy, "CONOUT$", "w", stdout);
+#endif // _DEBUG
+
+
+	return NVSDK_NGX_Result_Success;
 }
 
 NVSDK_NGX_API NVSDK_NGX_Result NVSDK_NGX_D3D12_Init_ProjectID(const char* InProjectId, NVSDK_NGX_EngineType InEngineType, const char* InEngineVersion, const wchar_t* InApplicationDataPath, ID3D12Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion)
 {
-	CyberLOG();
-	return NVSDK_NGX_D3D12_Init_Ext(0x1337, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion, 0);
+	CyberLogArgs(InProjectId, InEngineType, InDevice, InEngineVersion, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion);
+
+#ifdef _DEBUG
+	AllocConsole();
+
+	freopen_s(&fDummy, "CONIN$", "r", stdin);
+	freopen_s(&fDummy, "CONOUT$", "w", stderr);
+	freopen_s(&fDummy, "CONOUT$", "w", stdout);
+#endif // _DEBUG
+
+
+	return NVSDK_NGX_Result_Success;
 }
 
 NVSDK_NGX_Result NVSDK_NGX_D3D12_Init_with_ProjectID(const char* InProjectId, NVSDK_NGX_EngineType InEngineType, const char* InEngineVersion, const wchar_t* InApplicationDataPath, ID3D12Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion)
 {
-	CyberLOG();
-	return NVSDK_NGX_D3D12_Init_Ext(0x1337, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion, 0);
+	CyberLogArgs(InProjectId, InEngineType, InEngineVersion, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion);
+
+#ifdef _DEBUG
+	AllocConsole();
+
+	freopen_s(&fDummy, "CONIN$", "r", stdin);
+	freopen_s(&fDummy, "CONOUT$", "w", stderr);
+	freopen_s(&fDummy, "CONOUT$", "w", stdout);
+#endif // _DEBUG
+
+
+	return NVSDK_NGX_Result_Success;
 }
 
 NVSDK_NGX_Result NVSDK_NGX_D3D12_Shutdown(void)
 {
-	CyberLOG();
+	CyberLogArgs();
+
 	CyberFsrContext::instance()->NvParameterInstance->Params.clear();
 	CyberFsrContext::instance()->Contexts.clear();
 	return NVSDK_NGX_Result_Success;
@@ -49,7 +88,8 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_Shutdown(void)
 
 NVSDK_NGX_Result NVSDK_NGX_D3D12_Shutdown1(ID3D12Device* InDevice)
 {
-	CyberLOG();
+	CyberLogArgs(InDevice);
+
 	CyberFsrContext::instance()->NvParameterInstance->Params.clear();
 	CyberFsrContext::instance()->Contexts.clear();
 	return NVSDK_NGX_Result_Success;
@@ -58,23 +98,28 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_Shutdown1(ID3D12Device* InDevice)
 //currently it's kind of hack but better than what it was previously -- External Memory Tracking
 NVSDK_NGX_Result NVSDK_NGX_D3D12_GetParameters(NVSDK_NGX_Parameter** OutParameters)
 {
-	CyberLOG();
+	CyberLogArgs(OutParameters);
+
 	*OutParameters = CyberFsrContext::instance()->NvParameterInstance->AllocateParameters();
+	((NvParameter*)*OutParameters)->EvaluateRenderScale();
 	return NVSDK_NGX_Result_Success;
 }
 
 //currently it's kind of hack still needs a proper implementation 
 NVSDK_NGX_Result NVSDK_NGX_D3D12_GetCapabilityParameters(NVSDK_NGX_Parameter** OutParameters)
 {
-	CyberLOG();
+	CyberLogArgs(OutParameters);
+
 	*OutParameters = NvParameter::instance()->AllocateParameters();
+	((NvParameter*)*OutParameters)->EvaluateRenderScale();
 	return NVSDK_NGX_Result_Success;
 }
 
 //currently it's kind of hack still needs a proper implementation
 NVSDK_NGX_Result NVSDK_NGX_D3D12_AllocateParameters(NVSDK_NGX_Parameter** OutParameters)
 {
-	CyberLOG();
+	CyberLogArgs(OutParameters);
+
 	*OutParameters = NvParameter::instance()->AllocateParameters();
 	return NVSDK_NGX_Result_Success;
 }
@@ -82,22 +127,24 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_AllocateParameters(NVSDK_NGX_Parameter** OutPar
 //currently it's kind of hack still needs a proper implementation
 NVSDK_NGX_Result NVSDK_NGX_D3D12_DestroyParameters(NVSDK_NGX_Parameter* InParameters)
 {
-	CyberLOG();
+	CyberLogArgs(InParameters);
+
 	NvParameter::instance()->DeleteParameters((NvParameter*)InParameters);
 	return NVSDK_NGX_Result_Success;
 }
 
-NVSDK_NGX_Result NVSDK_NGX_D3D12_GetScratchBufferSize(NVSDK_NGX_Feature InFeatureId,
-	const NVSDK_NGX_Parameter* InParameters, size_t* OutSizeInBytes)
+NVSDK_NGX_Result NVSDK_NGX_D3D12_GetScratchBufferSize(NVSDK_NGX_Feature InFeatureId, const NVSDK_NGX_Parameter* InParameters, size_t* OutSizeInBytes)
 {
-	CyberLOG();
+	CyberLogArgs(InFeatureId, InParameters, OutSizeInBytes);
+
 	*OutSizeInBytes = ffxFsr2GetScratchMemorySizeDX12();
 	return NVSDK_NGX_Result_Success;
 }
 
 void Fsr2MessageCallback(FfxFsr2MsgType type, const wchar_t* message)
 {
-	CyberLOG();
+	CyberLogArgs(type, message);
+
 	switch (type) {
 	case FFX_FSR2_MESSAGE_TYPE_ERROR:
 		printf("[ERROR] %ls\n", message);
@@ -112,7 +159,8 @@ void Fsr2MessageCallback(FfxFsr2MsgType type, const wchar_t* message)
 NVSDK_NGX_Result NVSDK_NGX_D3D12_CreateFeature(ID3D12GraphicsCommandList* InCmdList, NVSDK_NGX_Feature InFeatureID,
 	NVSDK_NGX_Parameter* InParameters, NVSDK_NGX_Handle** OutHandle)
 {
-	CyberLOG();
+	CyberLogArgs(InCmdList, InFeatureID, InParameters, OutHandle);
+
 	const auto inParams = static_cast<const NvParameter*>(InParameters);
 
 	ID3D12Device* device;
@@ -184,7 +232,8 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_CreateFeature(ID3D12GraphicsCommandList* InCmdL
 
 NVSDK_NGX_Result NVSDK_NGX_D3D12_ReleaseFeature(NVSDK_NGX_Handle* InHandle)
 {
-	CyberLOG();
+	CyberLogArgs(InHandle);
+
 	auto deviceContext = CyberFsrContext::instance()->Contexts[InHandle->Id].get();
 	FfxErrorCode errorCode = ffxFsr2ContextDestroy(&deviceContext->FsrContext);
 	FFX_ASSERT(errorCode == FFX_OK);
@@ -194,7 +243,8 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_ReleaseFeature(NVSDK_NGX_Handle* InHandle)
 
 NVSDK_NGX_Result NVSDK_NGX_D3D12_GetFeatureRequirements(IDXGIAdapter *Adapter, const NVSDK_NGX_FeatureDiscoveryInfo *FeatureDiscoveryInfo, NVSDK_NGX_FeatureRequirement *OutSupported)
 {
-	CyberLOG();
+	CyberLogArgs(Adapter, FeatureDiscoveryInfo, OutSupported);
+
 	*OutSupported = NVSDK_NGX_FeatureRequirement();
 	OutSupported->FeatureSupported = NVSDK_NGX_FeatureSupportResult_Supported;
 	OutSupported->MinHWArchitecture = 0;
@@ -205,7 +255,8 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_GetFeatureRequirements(IDXGIAdapter *Adapter, c
 
 NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCmdList, const NVSDK_NGX_Handle* InFeatureHandle, const NVSDK_NGX_Parameter* InParameters, PFN_NVSDK_NGX_ProgressCallback InCallback)
 {
-	CyberLOG();
+	CyberLogArgs(InCmdList, InFeatureHandle, InParameters, InCallback);
+
 	ID3D12RootSignature* orgRootSig = nullptr;
 
 	rootSigMutex.lock();
@@ -292,6 +343,8 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCm
 
 NVSDK_NGX_Result NVSDK_NGX_UpdateFeature(const NVSDK_NGX_Application_Identifier *ApplicationId, const NVSDK_NGX_Feature FeatureID)
 {
-	CyberLOG();
+	CyberLogArgs(ApplicationId, FeatureID);
 	return NVSDK_NGX_Result_Success;
 }
+
+#endif //  #define CyberFSR_DO_DX12

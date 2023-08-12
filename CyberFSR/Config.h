@@ -1,6 +1,11 @@
 #pragma once
 #include "pch.h"
 
+#define CyberFSR_DO_DX11
+#define CyberFSR_DO_DX12
+//#define CyberFSR_DO_CUDA
+#define CyberFSR_DO_VULKAN
+
 enum class SharpnessRangeModifier
 {
 	Normal,

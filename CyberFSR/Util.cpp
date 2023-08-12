@@ -82,7 +82,7 @@ float Util::ConvertSharpness(float sharpness, std::optional<SharpnessRangeModifi
 
 Util::NvParameter Util::NvParameterToEnum(const char* name)
 {
-	CyberLOG();
+	//CyberLOG();
 	static ankerl::unordered_dense::map<std::string, NvParameter> NvParamTranslation = {
 		{"SuperSampling.ScaleFactor", NvParameter::SuperSampling_ScaleFactor},
 		{"SuperSampling.Available", NvParameter::SuperSampling_Available},
