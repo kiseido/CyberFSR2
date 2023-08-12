@@ -5,8 +5,8 @@ const LPCWSTR CFSR_LogFilename = L"CyberFSR.log";
 
 HMODULE dllModule;
 
-bool LoggerLoaded = false;
-std::mutex startupMutex;
+static bool LoggerLoaded = false;
+static std::mutex startupMutex;
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
@@ -18,9 +18,9 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 
     if (!LoggerLoaded)
     {
-        LoggerLoaded = true;
         //CyberInterposer::logger.config(LogFilename, true, true, true);
         CyberFSR::logger.start();
+        LoggerLoaded = true;
         CyberLOG();
         CyberLOGvi(L"CyberLOGvi test");
         CyberLOGi(L"CyberLOGi test");

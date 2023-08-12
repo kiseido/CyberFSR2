@@ -71,8 +71,9 @@ struct NvParameter : NVSDK_NGX_Parameter
 
 	__declspec(noinline) NvParameter* AllocateParameters()
 	{
-		Params.push_back(std::make_shared<NvParameter>());
-		return Params.back().get();
+		const auto ptr = std::make_shared<NvParameter>();
+		Params.push_back(ptr);
+		return ptr.get();
 	}
 
 	__declspec(noinline) void DeleteParameters(NvParameter* param)

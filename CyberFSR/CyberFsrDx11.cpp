@@ -35,7 +35,6 @@ void logFunctionCall(const std::string& functionName)
 
 #include "CFSR_Logging.h"
 
-
 struct FenceInfo
 {
     ID3D12Fence* fence;
@@ -46,7 +45,7 @@ std::map<const NVSDK_NGX_Handle*, FenceInfo*> syncObjects;
 
 void dx11Fsr2MessageCallback(FfxFsr2MsgType type, const wchar_t* message)
 {
-    CyberLOG();
+    CyberLogArgs(type, message);
 
     switch (type) {
     case FFX_FSR2_MESSAGE_TYPE_ERROR:
@@ -58,7 +57,7 @@ void dx11Fsr2MessageCallback(FfxFsr2MsgType type, const wchar_t* message)
     }
 }
 
-NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_Init(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath, ID3D11Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion)
+NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_Init(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath, ID3D11Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion)
 {
 	return NVSDK_NGX_D3D11_Init_Ext(0x1337, InApplicationDataPath, nullptr, InFeatureInfo, InSDKVersion, 0);
 }
@@ -75,7 +74,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D11_Init_with_ProjectID(const char* InProjectId, NV
 
 
 
-NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_Shutdown(void)
+NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_Shutdown(void)
 {
 	CyberFsrContext::instance()->NvParameterInstance->Params.clear();
 	CyberFsrContext::instance()->Contexts.clear();
@@ -106,7 +105,7 @@ NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_Shutdown1(ID3D11Device* InDevice)
 // with NGX capabilities and available features.
 // 
 //Deprecated Parameter Function - Internal Memory Tracking
-NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_GetParameters(NVSDK_NGX_Parameter** OutParameters)
+NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_GetParameters(NVSDK_NGX_Parameter** OutParameters)
 {
 	*OutParameters = CyberFsrContext::instance()->NvParameterInstance->AllocateParameters();
 	return NVSDK_NGX_Result_Success;
@@ -242,7 +241,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D11_GetFeatureRequirements(IDXGIAdapter* Adapter, c
 	return NVSDK_NGX_Result_Success;
 }
 
-NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_EvaluateFeature(ID3D11DeviceContext* InDevCtx, const NVSDK_NGX_Handle* InFeatureHandle, const NVSDK_NGX_Parameter* InParameters, PFN_NVSDK_NGX_ProgressCallback InCallback)
+NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_EvaluateFeature(ID3D11DeviceContext* InDevCtx, const NVSDK_NGX_Handle* InFeatureHandle, const NVSDK_NGX_Parameter* InParameters, PFN_NVSDK_NGX_ProgressCallback InCallback)
 {
 	ID3D11Device* device;
 	InDevCtx->GetDevice(&device);
@@ -392,9 +391,10 @@ NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_EvaluateFeature(ID3D11
 //	return output;
 //}
 
-NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_Init_ProjectID(const char* InProjectId, NVSDK_NGX_EngineType InEngineType, const char* InEngineVersion, const wchar_t* InApplicationDataPath, ID3D11Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion)
+NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_Init_ProjectID(const char* InProjectId, NVSDK_NGX_EngineType InEngineType, const char* InEngineVersion, const wchar_t* InApplicationDataPath, ID3D11Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion)
 {
-    CyberLOG();
+    CyberLogArgs(InProjectId, InEngineType, InEngineVersion, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion);
+    return NVSDK_NGX_Result_Success;
 
     // InFeatureInfo has important info!!!?!
 
@@ -403,34 +403,38 @@ NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_Init_ProjectID(const c
     return output;
 }
 
-NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_Shutdown1(ID3D11Device* InDevice)
+NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_Shutdown1(ID3D11Device* InDevice)
 {
-    CyberLOG();
+    CyberLogArgs();
 
     return NVSDK_NGX_Result_Success;
 }
 
 
 //TODO External Memory Tracking
-NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_GetCapabilityParameters(NVSDK_NGX_Parameter** OutParameters)
+NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_GetCapabilityParameters(NVSDK_NGX_Parameter** OutParameters)
 {
-    CyberLOG();
+    CyberLogArgs(OutParameters);
 
+    *OutParameters = CyberFsrContext::instance()->NvParameterInstance->AllocateParameters();
     return NVSDK_NGX_Result_Success;
 }
 
 //TODO
-NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_AllocateParameters(NVSDK_NGX_Parameter** OutParameters)
+NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_AllocateParameters(NVSDK_NGX_Parameter** OutParameters)
 {
-    CyberLOG();
+    CyberLogArgs(OutParameters);
 
+    *OutParameters = CyberFsrContext::instance()->NvParameterInstance->AllocateParameters();
     return NVSDK_NGX_Result_Success;
 }
 
 //TODO
-NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_DestroyParameters(NVSDK_NGX_Parameter* InParameters)
+NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_DestroyParameters(NVSDK_NGX_Parameter* InParameters)
 {
-    CyberLOG();
+    CyberLogArgs();
+    return NVSDK_NGX_Result_Success;
 
     return NVSDK_NGX_Result_Success;
 }
+#endif // CyberFSR_DO_DX11

@@ -6,116 +6,125 @@
 
 void NvParameter::Set(const char* InName, unsigned long long InValue)
 {
-	CyberLOG();
+	CyberLogArgs(InName, InValue);
 	auto value = (unsigned long long*) & InValue;
 	Set_Internal(InName, *value, NvULL);
 }
 
 void NvParameter::Set(const char* InName, float InValue)
 {
-	CyberLOG();
+	CyberLogArgs(InName, InValue);
 	auto value = (unsigned long long*) & InValue;
 	Set_Internal(InName, *value, NvFloat);
 }
 
 void NvParameter::Set(const char* InName, double InValue)
 {
-	CyberLOG();
+	CyberLogArgs(InName, InValue);
 	auto value = (unsigned long long*) & InValue;
 	Set_Internal(InName, *value, NvDouble);
 }
 
 void NvParameter::Set(const char* InName, unsigned int InValue)
 {
-	CyberLOG();
+	CyberLogArgs(InName, InValue);
 	auto value = (unsigned long long*) & InValue;
 	Set_Internal(InName, *value, NvUInt);
 }
 
 void NvParameter::Set(const char* InName, int InValue)
 {
-	CyberLOG();
+	CyberLogArgs(InName, InValue);
 	auto value = (unsigned long long*) & InValue;
 	Set_Internal(InName, *value, NvInt);
 }
 
 void NvParameter::Set(const char* InName, ID3D11Resource* InValue)
 {
-	CyberLOG();
+	CyberLOG(InName, InValue);
 	auto value = (unsigned long long*) & InValue;
 	Set_Internal(InName, *value, NvD3D11Resource);
 }
 
 void NvParameter::Set(const char* InName, ID3D12Resource* InValue)
 {
-	CyberLOG();
+	CyberLogArgs(InName, InValue);
 	auto value = (unsigned long long*) & InValue;
 	Set_Internal(InName, *value, NvD3D12Resource);
 }
 
 void NvParameter::Set(const char* InName, void* InValue)
 {
-	CyberLOG();
+	CyberLogArgs(InName, InValue);
 	auto value = (unsigned long long*) & InValue;
 	Set_Internal(InName, *value, NvVoidPtr);
 }
 
 NVSDK_NGX_Result NvParameter::Get(const char* InName, unsigned long long* OutValue) const
 {
-	CyberLOG();
-	return Get_Internal(InName, (unsigned long long*)OutValue, NvULL);
+	const auto result = Get_Internal(InName, (unsigned long long*)OutValue, NvULL);
+	CyberLogArgs(InName, OutValue, *OutValue);
+	return result;
 }
 
 NVSDK_NGX_Result NvParameter::Get(const char* InName, float* OutValue) const
 {
-	CyberLOG();
-	return Get_Internal(InName, (unsigned long long*)OutValue, NvFloat);
+	const auto result = Get_Internal(InName, (unsigned long long*)OutValue, NvFloat);
+	CyberLogArgs(InName, OutValue, *OutValue);
+	return result;
 }
 
 NVSDK_NGX_Result NvParameter::Get(const char* InName, double* OutValue) const
 {
-	CyberLOG();
-	return Get_Internal(InName, (unsigned long long*)OutValue, NvDouble);
+	const auto result = Get_Internal(InName, (unsigned long long*)OutValue, NvDouble);
+	CyberLogArgs(InName, OutValue, *OutValue);
+	return result;
 }
 
 NVSDK_NGX_Result NvParameter::Get(const char* InName, unsigned int* OutValue) const
 {
-	CyberLOG();
-	return Get_Internal(InName, (unsigned long long*)OutValue, NvUInt);
+	const auto result = Get_Internal(InName, (unsigned long long*)OutValue, NvUInt);
+	CyberLogArgs(InName, OutValue, *OutValue);
+	return result;
 }
 
 NVSDK_NGX_Result NvParameter::Get(const char* InName, int* OutValue) const
 {
-	CyberLOG();
-	return Get_Internal(InName, (unsigned long long*)OutValue, NvInt);
+	const auto result = Get_Internal(InName, (unsigned long long*)OutValue, NvInt);
+	CyberLogArgs(InName, OutValue, *OutValue);
+	return result;
 }
 
 NVSDK_NGX_Result NvParameter::Get(const char* InName, ID3D11Resource** OutValue) const
 {
-	CyberLOG();
-	return Get_Internal(InName, (unsigned long long*)OutValue, NvD3D11Resource);
+	const auto result = Get_Internal(InName, (unsigned long long*)OutValue, NvD3D11Resource);
+	CyberLogArgs(InName, OutValue, *OutValue);
+	return result;
 }
 
 NVSDK_NGX_Result NvParameter::Get(const char* InName, ID3D12Resource** OutValue) const
 {
-	CyberLOG();
-	return Get_Internal(InName, (unsigned long long*)OutValue, NvD3D12Resource);
+	const auto result = Get_Internal(InName, (unsigned long long*)OutValue, NvD3D12Resource);
+	CyberLogArgs(InName, OutValue, *OutValue);
+	return result;
 }
 
 NVSDK_NGX_Result NvParameter::Get(const char* InName, void** OutValue) const
 {
-	CyberLOG();
-	return Get_Internal(InName, (unsigned long long*)OutValue, NvVoidPtr);
+	const auto result = Get_Internal(InName, (unsigned long long*)OutValue, NvVoidPtr);
+	CyberLogArgs(InName, OutValue, *OutValue);
+	return result;
 }
 
 void NvParameter::Reset()
 {
-	CyberLOG();
+	CyberLogArgs();
 }
 
 void NvParameter::Set_Internal(const char* InName, unsigned long long InValue, NvParameterType ParameterType)
 {
-	CyberLOG();
+	//CyberLogArgs(InName, InValue, ParameterType);
+
 	auto inValueFloat = (float*)&InValue;
 	auto inValueInt = (int*)&InValue;
 	auto inValueDouble = (double*)&InValue;
@@ -227,7 +236,8 @@ NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_DLSS_GetStatsCallback(NVSDK_NGX_Parameter*
 
 NVSDK_NGX_Result NvParameter::Get_Internal(const char* InName, unsigned long long* OutValue, NvParameterType ParameterType) const
 {
-	CyberLOG();
+	//CyberLogArgs(InName, OutValue, ParameterType);
+
 	auto outValueFloat = (float*)OutValue;
 	auto outValueInt = (int*)OutValue;
 	auto outValueDouble = (double*)OutValue;
@@ -293,6 +303,9 @@ NVSDK_NGX_Result NvParameter::Get_Internal(const char* InName, unsigned long lon
 	case Util::NvParameter::IsDevSnippetBranch:
 		*outValueInt = 0; //Dummy value
 		break;
+	case Util::NvParameter::RTXValue:
+		*outValueInt = RTXValue;
+		break;
 	default:
 		return NVSDK_NGX_Result_Fail;
 	}
@@ -303,7 +316,7 @@ NVSDK_NGX_Result NvParameter::Get_Internal(const char* InName, unsigned long lon
 // EvaluateRenderScale helper
 inline FfxFsr2QualityMode DLSS2FSR2QualityTable(const NVSDK_NGX_PerfQuality_Value input)
 {
-	CyberLOG();
+	//CyberLogArgs(input);
 	FfxFsr2QualityMode output;
 
 	switch (input)
@@ -332,10 +345,10 @@ inline FfxFsr2QualityMode DLSS2FSR2QualityTable(const NVSDK_NGX_PerfQuality_Valu
 // EvaluateRenderScale helper
 inline std::optional<float> GetQualityOverrideRatio(const NVSDK_NGX_PerfQuality_Value input, const std::shared_ptr<const Config> config)
 {
-	CyberLOG();
+	//CyberLogArgs(input);
 	std::optional<float> output;
 
-	if (!(config->QualityRatioOverrideEnabled.has_value() && config->QualityRatioOverrideEnabled))
+	if (!(config->QualityRatioOverrideEnabled.has_value() && config->QualityRatioOverrideEnabled.value()))
 		return output; // override not enabled
 
 	switch (input)
@@ -364,10 +377,17 @@ inline std::optional<float> GetQualityOverrideRatio(const NVSDK_NGX_PerfQuality_
 
 void NvParameter::EvaluateRenderScale()
 {
-	CyberLOG();
+	//CyberLogArgs();
 	const std::shared_ptr<Config> config = CyberFsrContext::instance()->MyConfig;
 
 	const std::optional<float> QualityRatio = GetQualityOverrideRatio(PerfQualityValue, config);
+
+	RTXValue = 1;
+
+	if (Width == 0 || Height == 0) {
+		Width = GetSystemMetrics(SM_CXSCREEN);
+		Height = GetSystemMetrics(SM_CYSCREEN);
+	}
 
 	if (QualityRatio.has_value()) {
 		OutHeight = (unsigned int)((float)Height / QualityRatio.value());
@@ -389,7 +409,7 @@ void NvParameter::EvaluateRenderScale()
 
 NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_DLSS_GetOptimalSettingsCallback(NVSDK_NGX_Parameter* InParams)
 {
-	CyberLOG();
+	CyberLogArgs(InParams);
 	auto params = static_cast<NvParameter*>(InParams);
 	params->EvaluateRenderScale();
 	return NVSDK_NGX_Result_Success;
@@ -397,7 +417,7 @@ NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_DLSS_GetOptimalSettingsCallback(NVSDK_NGX_
 
 NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_DLSS_GetStatsCallback(NVSDK_NGX_Parameter* InParams)
 {
-	CyberLOG();
+	CyberLogArgs(InParams);
 	//Somehow check for allocated memory
 	//Then set values: SizeInBytes, OptLevel, IsDevSnippetBranch
 	return NVSDK_NGX_Result_Success;

@@ -35,7 +35,7 @@ class FeatureContext
 {
 public:
 	std::unique_ptr<ViewMatrixHook> ViewMatrix;
-	NVSDK_NGX_Handle Handle;
+	NVSDK_NGX_Handle Handle{0};
 	ID3D12Device* DxDevice;
 	FfxFsr2Context FsrContext;
 	FfxFsr2ContextDescription FsrContextDescription;
