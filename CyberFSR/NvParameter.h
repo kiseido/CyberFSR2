@@ -14,7 +14,16 @@ enum NvParameterType {
 
 struct NvParameter : NVSDK_NGX_Parameter
 {
-	unsigned int Width{}, Height{}, OutWidth{}, OutHeight{};
+	NVSDK_NGX_Dimensions screenSize;
+
+	NVSDK_NGX_Dimensions windowSize;
+
+	NVSDK_NGX_Dimensions renderSize;
+
+	NVSDK_NGX_Dimensions renderSizeMax;
+
+	NVSDK_NGX_Dimensions renderSizeMin;
+
 	NVSDK_NGX_PerfQuality_Value PerfQualityValue = NVSDK_NGX_PerfQuality_Value_Balanced;
 	bool RTXValue{}, FreeMemOnReleaseFeature{};
 	int CreationNodeMask{}, VisibilityNodeMask{}, OptLevel{}, IsDevSnippetBranch{};
@@ -54,8 +63,8 @@ struct NvParameter : NVSDK_NGX_Parameter
 	virtual NVSDK_NGX_Result Get(const char* InName, void** OutValue) const override;
 	virtual void Reset() override;
 
-	void Set_Internal(const char* InName, unsigned long long InValue, NvParameterType ParameterType);
-	NVSDK_NGX_Result Get_Internal(const char* InName, unsigned long long* OutValue, NvParameterType ParameterType) const;
+	inline void Set_Internal(const char* InName, unsigned long long InValue, NvParameterType ParameterType);
+	inline NVSDK_NGX_Result Get_Internal(const char* InName, unsigned long long* OutValue, NvParameterType ParameterType) const;
 
 	void EvaluateRenderScale();
 

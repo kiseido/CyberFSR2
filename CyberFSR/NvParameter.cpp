@@ -121,7 +121,7 @@ void NvParameter::Reset()
 	CyberLogArgs();
 }
 
-void NvParameter::Set_Internal(const char* InName, unsigned long long InValue, NvParameterType ParameterType)
+inline void NvParameter::Set_Internal(const char* InName, unsigned long long InValue, NvParameterType ParameterType)
 {
 	//CyberLogArgs(InName, InValue, ParameterType);
 
@@ -150,16 +150,16 @@ void NvParameter::Set_Internal(const char* InName, unsigned long long InValue, N
 		Sharpness = *inValueFloat;
 		break;
 	case Util::NvParameter::Width:
-		Width = *inValueInt;
+		windowSize.Width = *inValueInt;
 		break;
 	case Util::NvParameter::Height:
-		Height = *inValueInt;
+		windowSize.Height = *inValueInt;
 		break;
 	case Util::NvParameter::DLSS_Render_Subrect_Dimensions_Width:
-		Width = *inValueInt;
+		renderSize.Width = *inValueInt;
 		break;
 	case Util::NvParameter::DLSS_Render_Subrect_Dimensions_Height:
-		Height = *inValueInt;
+		renderSize.Height = *inValueInt;
 		break;
 	case Util::NvParameter::PerfQualityValue:
 		PerfQualityValue = static_cast<NVSDK_NGX_PerfQuality_Value>(*inValueInt);
@@ -180,10 +180,10 @@ void NvParameter::Set_Internal(const char* InName, unsigned long long InValue, N
 		ResetRender = *inValueInt;
 		break;
 	case Util::NvParameter::OutWidth:
-		OutWidth = *inValueInt;
+		renderSize.Width = *inValueInt;
 		break;
 	case Util::NvParameter::OutHeight:
-		OutHeight = *inValueInt;
+		renderSize.Height = *inValueInt;
 		break;
 	case Util::NvParameter::DLSS_Feature_Create_Flags:
 		Hdr = *inValueInt & NVSDK_NGX_DLSS_Feature_Flags_IsHDR;
@@ -234,7 +234,7 @@ void NvParameter::Set_Internal(const char* InName, unsigned long long InValue, N
 NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_DLSS_GetOptimalSettingsCallback(NVSDK_NGX_Parameter* InParams);
 NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_DLSS_GetStatsCallback(NVSDK_NGX_Parameter* InParams);
 
-NVSDK_NGX_Result NvParameter::Get_Internal(const char* InName, unsigned long long* OutValue, NvParameterType ParameterType) const
+inline NVSDK_NGX_Result NvParameter::Get_Internal(const char* InName, unsigned long long* OutValue, NvParameterType ParameterType) const
 {
 	//CyberLogArgs(InName, OutValue, ParameterType);
 
@@ -265,28 +265,28 @@ NVSDK_NGX_Result NvParameter::Get_Internal(const char* InName, unsigned long lon
 		*outValueInt = 0;
 		break;
 	case Util::NvParameter::DLSS_Render_Subrect_Dimensions_Width:
-		*outValueInt = Width;
+		*outValueInt = renderSize.Width;
 		break;
 	case Util::NvParameter::DLSS_Render_Subrect_Dimensions_Height:
-		*outValueInt = Height;
+		*outValueInt = renderSize.Height;
 		break;
 	case Util::NvParameter::OutWidth:
-		*outValueInt = OutWidth;
+		*outValueInt = renderSize.Width;
 		break;
 	case Util::NvParameter::OutHeight:
-		*outValueInt = OutHeight;
+		*outValueInt = renderSize.Height;
 		break;
 	case Util::NvParameter::DLSS_Get_Dynamic_Max_Render_Width:
-		*outValueInt = Width;
+		*outValueInt = renderSizeMax.Width;
 		break;
 	case Util::NvParameter::DLSS_Get_Dynamic_Max_Render_Height:
-		*outValueInt = Height;
+		*outValueInt = renderSizeMax.Height;
 		break;
 	case Util::NvParameter::DLSS_Get_Dynamic_Min_Render_Width:
-		*outValueInt = OutWidth;
+		*outValueInt = renderSizeMin.Width;
 		break;
 	case Util::NvParameter::DLSS_Get_Dynamic_Min_Render_Height:
-		*outValueInt = OutHeight;
+		*outValueInt = renderSizeMin.Height;
 		break;
 	case Util::NvParameter::DLSSOptimalSettingsCallback:
 		*outValuePtr = NVSDK_NGX_DLSS_GetOptimalSettingsCallback;
@@ -375,35 +375,59 @@ inline std::optional<float> GetQualityOverrideRatio(const NVSDK_NGX_PerfQuality_
 	return output;
 }
 
+inline void ScaleDimensionsToRatios(NvParameter* parameter, float xRatio, float yRatio) {
+	parameter->renderSize.Width = static_cast<unsigned int>(parameter->windowSize.Width / xRatio);
+	parameter->renderSize.Height = static_cast<unsigned int>(parameter->windowSize.Height / yRatio);
+}
+
+inline void ScaleDimensionsToRatio(NvParameter* parameter, float ratio) {
+	ScaleDimensionsToRatios(parameter, ratio, ratio);
+}
+
+
 void NvParameter::EvaluateRenderScale()
 {
+
 	//CyberLogArgs();
 	const std::shared_ptr<Config> config = CyberFsrContext::instance()->MyConfig;
 
+	if (screenSize.Height == 0 || screenSize.Width == 0) {
+		screenSize.Width = GetSystemMetrics(SM_CXSCREEN);
+		screenSize.Height = GetSystemMetrics(SM_CYSCREEN);
+	}
+
+	if (windowSize.Height == 0 || windowSize.Width == 0) {
+		windowSize.Width = screenSize.Width;
+		windowSize.Height = screenSize.Height;
+	}
+
+	renderSizeMin = {16,9};
+	renderSizeMax = windowSize;
+
+	//Static Upscale Ratio Override
+	if (config->UpscaleRatioOverrideEnabled.value_or(false) && config->UpscaleRatioOverrideValue.has_value()) {
+		ScaleDimensionsToRatio(this, *config->UpscaleRatioOverrideValue);
+		return;
+	}
+
 	const std::optional<float> QualityRatio = GetQualityOverrideRatio(PerfQualityValue, config);
 
-	RTXValue = 1;
-
-	if (Width == 0 || Height == 0) {
-		Width = GetSystemMetrics(SM_CXSCREEN);
-		Height = GetSystemMetrics(SM_CYSCREEN);
-	}
+	//RTXValue = 1;
 
 	if (QualityRatio.has_value()) {
-		OutHeight = (unsigned int)((float)Height / QualityRatio.value());
-		OutWidth = (unsigned int)((float)Width / QualityRatio.value());
+		ScaleDimensionsToRatio(this, *QualityRatio);
+		return;
+	}
+
+	const FfxFsr2QualityMode fsrQualityMode = DLSS2FSR2QualityTable(PerfQualityValue);
+
+	if (fsrQualityMode < 5) {
+		ffxFsr2GetRenderResolutionFromQualityMode(&renderSize.Width, &renderSize.Height, windowSize.Width, windowSize.Height, fsrQualityMode);
 	}
 	else {
-		const FfxFsr2QualityMode fsrQualityMode = DLSS2FSR2QualityTable(PerfQualityValue);
-
-		if (fsrQualityMode < 5) {
-			ffxFsr2GetRenderResolutionFromQualityMode(&OutWidth, &OutHeight, Width, Height, fsrQualityMode);
-		}
-		else {
-			//Ultra Quality Mode
-			OutHeight = Height;
-			OutWidth = Width;
-		}
+		//Ultra Quality Mode
+		renderSize.Width = windowSize.Width;
+		renderSize.Height = windowSize.Height;
 	}
 }
 

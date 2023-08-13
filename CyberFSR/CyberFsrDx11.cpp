@@ -416,7 +416,11 @@ NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_GetCapabilityParameters(NVSDK_NGX_Pa
 {
     CyberLogArgs(OutParameters);
 
-    *OutParameters = CyberFsrContext::instance()->NvParameterInstance->AllocateParameters();
+    auto a = CyberFsrContext::instance()->NvParameterInstance->AllocateParameters();
+
+    a->EvaluateRenderScale();
+
+    *OutParameters = a;
     return NVSDK_NGX_Result_Success;
 }
 

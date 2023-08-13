@@ -75,6 +75,10 @@
     <IncludePath>$(SolutionDir)external\nvngx_dlss_sdk\include;$(SolutionDir)external\unordered_dense\include;$(SolutionDir)external\FidelityFX-FSR2\src;$(VULKAN_SDK)\Include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)$(Platform)\$(Configuration)\;$(SolutionDir)external\FidelityFX-FSR2\bin\ffx_fsr2_api;$(VULKAN_SDK)\Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(SolutionDir)external\nvngx_dlss_sdk\include;$(SolutionDir)external\unordered_dense\include;$(SolutionDir)external\FidelityFX-FSR2\src;$(VULKAN_SDK)\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)$(Platform)\$(Configuration)\;$(SolutionDir)external\FidelityFX-FSR2\bin\ffx_fsr2_api;$(VULKAN_SDK)\Lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -136,6 +140,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>
