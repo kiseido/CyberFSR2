@@ -1,19 +1,22 @@
 #include "pch.h"
 #include "CFSR_logging.h"
 
-const LPCWSTR CFSR_LogFilename = L"CyberFSR.log";
 
-HMODULE dllModule;
+#ifdef doCFSRLogging
+const LPCWSTR CFSR_LogFilename = L"CyberFSR.log";
 
 static bool LoggerLoaded = false;
 static std::mutex startupMutex;
+#endif
+
+HMODULE dllModule;
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
+#ifdef doCFSRLogging
     //CyberFSR::logger.config(LogFilename, true, true, true);
     //CyberFSR::logger.start(LogFilename, true, true, true);
     //CyberFSR::logger.start(LogFilename, true, true, true);
-
     std::lock_guard<std::mutex> lock(startupMutex);
 
     if (!LoggerLoaded)
@@ -29,7 +32,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
         CyberLogLots(L"CyberLogLots test", L"");
         CyberLogArgs(L"CyberLogArgs test", L"");
     }
-    
+#endif
     switch (ul_reason_for_call)
     {
     case DLL_PROCESS_ATTACH:
@@ -45,7 +48,9 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
         break;
     case DLL_PROCESS_DETACH:
         CyberLOGvi(L"CyberFSR_DLL_PROCESS_DETACH");
+#ifdef doCFSRLogging
         CyberFSR::logger.stop();
+#endif
         break;
     }
     return TRUE;
