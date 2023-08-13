@@ -128,15 +128,10 @@ NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_VULKAN_CreateFeature1(VkDevi
 	FFX_ASSERT(errorCode == FFX_OK);
 
 	initParams.device = ffxGetDeviceVK(InDevice);
-	initParams.maxRenderSize.width = inParams->Width;
-	initParams.maxRenderSize.height = inParams->Height;
-	initParams.displaySize.width = inParams->OutWidth;
-	initParams.displaySize.height = inParams->OutHeight;
-	initParams.flags = ((inParams->DepthInverted) ? FFX_FSR2_ENABLE_DEPTH_INVERTED : 0)
-		| ((inParams->AutoExposure) ? FFX_FSR2_ENABLE_AUTO_EXPOSURE : 0)
-		| ((inParams->Hdr) ? FFX_FSR2_ENABLE_HIGH_DYNAMIC_RANGE : 0)
-		| ((inParams->JitterMotion) ? FFX_FSR2_ENABLE_MOTION_VECTORS_JITTER_CANCELLATION : 0)
-		| ((!inParams->LowRes) ? FFX_FSR2_ENABLE_DISPLAY_RESOLUTION_MOTION_VECTORS : 0);
+	initParams.maxRenderSize.width = inParams->renderSizeMax.Width;
+	initParams.maxRenderSize.height = inParams->renderSizeMax.Height;
+	initParams.displaySize.width = inParams->windowSize.Width;
+	initParams.displaySize.height = inParams->windowSize.Height;
 
 	initParams.flags = 0;
 	if (config->DepthInverted.value_or(inParams->DepthInverted))
@@ -229,8 +224,8 @@ NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_VULKAN_EvaluateFeature(VkCom
 
 	dispatchParameters.frameTimeDelta = (float)deltaTime;
 	dispatchParameters.preExposure = 1.0f;
-	dispatchParameters.renderSize.width = inParams->Width;
-	dispatchParameters.renderSize.height = inParams->Height;
+	dispatchParameters.renderSize.width = inParams->renderSize.Width;
+	dispatchParameters.renderSize.height = inParams->renderSize.Height;
 
 	dispatchParameters.cameraFar = deviceContext->ViewMatrix->GetFarPlane();
 	dispatchParameters.cameraNear = deviceContext->ViewMatrix->GetNearPlane();
