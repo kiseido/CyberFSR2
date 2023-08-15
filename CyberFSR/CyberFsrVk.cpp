@@ -113,7 +113,7 @@ NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_VULKAN_CreateFeature1(VkDevi
 	auto deviceContext = instance->CreateContext();
 	deviceContext->ViewMatrix = ViewMatrixHook::Create(*config);
 #ifdef _DEBUG
-	deviceContext->DebugLayer = std::make_unique<DebugOverlay>(InDevice, InCmdList);
+	deviceContext->DebugLayer = std::make_unique<DebugOverlay>();
 #endif
 
 	* OutHandle = &deviceContext->Handle;
@@ -232,8 +232,9 @@ NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_VULKAN_EvaluateFeature(VkCom
 	dispatchParameters.cameraFovAngleVertical = DirectX::XMConvertToRadians(deviceContext->ViewMatrix->GetFov());
 	FfxErrorCode errorCode = ffxFsr2ContextDispatch(fsrContext, &dispatchParameters);
 	FFX_ASSERT(errorCode == FFX_OK);
+
 #ifdef _DEBUG
-	deviceContext->DebugLayer->Render(InCmdList);
+	deviceContext->DebugLayer->Render();
 #endif
 
 	return NVSDK_NGX_Result_Success;

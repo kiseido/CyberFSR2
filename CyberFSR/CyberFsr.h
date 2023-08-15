@@ -39,8 +39,11 @@ public:
 	ID3D12Device* DxDevice;
 	FfxFsr2Context FsrContext;
 	FfxFsr2ContextDescription FsrContextDescription;
-	std::unique_ptr<DebugOverlay> DebugLayer;
 	std::vector<unsigned char> ScratchBuffer;
+
+#ifdef CyberFSR_DO_OVERLAY1
+	std::unique_ptr<DebugOverlay> DebugLayer;
+#endif
 
 	unsigned int Width{}, Height{}, RenderWidth{}, RenderHeight{};
 	NVSDK_NGX_PerfQuality_Value PerfQualityValue = NVSDK_NGX_PerfQuality_Value_Balanced;
