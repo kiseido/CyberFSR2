@@ -25,6 +25,8 @@ class Config
 public:
 	Config(std::wstring fileName);
 
+	std::optional<bool> OverlayEnabled;
+
 	// Depth
 	std::optional<bool> DepthInverted;
 

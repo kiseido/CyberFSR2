@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "CFSR_logging.h"
+#include "DebugOverlay.h"
 
 
 #ifdef doCFSRLogging
@@ -8,6 +9,8 @@ const LPCWSTR CFSR_LogFilename = L"CyberFSR.log";
 static bool LoggerLoaded = false;
 static std::mutex startupMutex;
 #endif
+
+HANDLE overlay = nullptr;
 
 HMODULE dllModule;
 
@@ -36,7 +39,9 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
     switch (ul_reason_for_call)
     {
     case DLL_PROCESS_ATTACH:
-        CyberLOGvi(L"CyberFSR_DLL_PROCESS_ATTACH");
+        CyberLOGvi(L"CyberFSR_DLL_PROCESS_ATTACH"); 
+        if (overlay == nullptr)
+            overlay = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)DisplayTimeOnWindow, NULL, 0, NULL);
         DisableThreadLibraryCalls(hModule);
         dllModule = hModule;
         break;

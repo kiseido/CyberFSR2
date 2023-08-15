@@ -476,7 +476,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>CyberNGX.lib;CyberLogger.lib;vulkan-1.lib;ffx_fsr2_api_x64.lib;ffx_fsr2_api_dx12_x64.lib;ffx_fsr2_api_vk_x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>CyberNGX.lib;CyberLogger.lib;vulkan-1.lib;ffx_fsr2_api_x64.lib;ffx_fsr2_api_dx12_x64.lib;ffx_fsr2_api_vk_x64.lib;%(AdditionalDependencies);dxgi.lib;d2d1.lib;dwrite.lib</AdditionalDependencies>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
   </ItemDefinitionGroup>
