@@ -14,6 +14,8 @@ enum NvParameterType {
 
 struct NvParameter : NVSDK_NGX_Parameter
 {
+	struct { float width = 1; float height = 1; } ratioUsed;
+
 	NVSDK_NGX_Dimensions screenSize;
 
 	NVSDK_NGX_Dimensions windowSize;
@@ -67,6 +69,9 @@ struct NvParameter : NVSDK_NGX_Parameter
 	inline NVSDK_NGX_Result Get_Internal(const char* InName, unsigned long long* OutValue, NvParameterType ParameterType) const;
 
 	void EvaluateRenderScale();
+
+	void SetRatio(const float x, const float y);
+	void SetResolution(const unsigned int width, const unsigned int height);
 
 	/**
 	template <typename T>

@@ -113,7 +113,9 @@ NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_VULKAN_CreateFeature1(VkDevi
 	auto deviceContext = instance->CreateContext();
 	deviceContext->ViewMatrix = ViewMatrixHook::Create(*config);
 #ifdef _DEBUG
+#ifdef CyberFSR_DO_OVERLAY1
 	deviceContext->DebugLayer = std::make_unique<DebugOverlay>();
+#endif
 #endif
 
 	* OutHandle = &deviceContext->Handle;
@@ -234,7 +236,9 @@ NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_VULKAN_EvaluateFeature(VkCom
 	FFX_ASSERT(errorCode == FFX_OK);
 
 #ifdef _DEBUG
+#ifdef CyberFSR_DO_OVERLAY1
 	deviceContext->DebugLayer->Render();
+#endif
 #endif
 
 	return NVSDK_NGX_Result_Success;
