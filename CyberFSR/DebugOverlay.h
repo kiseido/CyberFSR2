@@ -1,7 +1,7 @@
 #pragma once
 
-//#define CyberFSR_DO_OVERLAY
-#define CyberFSR_DO_OVERLAY2
+#define CyberFSR_DO_OVERLAY1
+//#define CyberFSR_DO_OVERLAY2
 
 #ifdef CyberFSR_DO_OVERLAY2
 #include <windows.h>
@@ -10,13 +10,17 @@
 #include <thread>
 #include <iomanip>
 
-LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+namespace CyberFSROverlay {
+    extern HANDLE overlay;
 
-void DisplayTimeOnWindow();
+    LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+
+    void DisplayTimeOnWindow();
+}
 #endif
 
 
-#ifdef CyberFSR_DO_OVERLAY
+#ifdef CyberFSR_DO_OVERLAY1
 #include <Windows.h>
 #include <d2d1.h>
 #include <dwrite.h>

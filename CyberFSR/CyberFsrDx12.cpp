@@ -4,7 +4,11 @@
 #include "DirectXHooks.h"
 #include "Util.h"
 
+#include "DebugOverlay.h"
+
 #ifdef CyberFSR_DO_DX12
+
+//#define CyberFSR_DX12_DUMP
 
 #ifdef _DEBUG
 FILE* fDummy;
@@ -170,8 +174,11 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_CreateFeature(ID3D12GraphicsCommandList* InCmdL
 	auto& config = instance->MyConfig;
 	auto deviceContext = CyberFsrContext::instance()->CreateContext();
 	deviceContext->ViewMatrix = ViewMatrixHook::Create(*config);
-#ifdef DEBUG_FEATURES
-	deviceContext->DebugLayer = std::make_unique<DebugOverlay>(device, InCmdList);
+
+#ifdef _DEBUG
+#ifdef CyberFSR_DO_OVERLAY1
+	deviceContext->DebugLayer = std::make_unique<DebugOverlay>();
+#endif
 #endif
 
 	* OutHandle = &deviceContext->Handle;
@@ -188,8 +195,8 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_CreateFeature(ID3D12GraphicsCommandList* InCmdL
 	initParams.device = ffxGetDeviceDX12(device);
 	initParams.maxRenderSize.width = inParams->renderSizeMax.Width;
 	initParams.maxRenderSize.height = inParams->renderSizeMax.Height;
-	initParams.displaySize.width = inParams->renderSizeMax.Width;
-	initParams.displaySize.height = inParams->renderSizeMax.Height;
+	initParams.displaySize.width = inParams->renderSize.Width;
+	initParams.displaySize.height = inParams->renderSize.Height;
 
 	initParams.flags = 0;
 	if (config->DepthInverted.value_or(inParams->DepthInverted))
@@ -253,6 +260,100 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_GetFeatureRequirements(IDXGIAdapter *Adapter, c
 	return NVSDK_NGX_Result_Success;
 }
 
+#ifdef CyberFSR_DX12_DUMP
+#include <dxgi1_4.h>
+#include <d3d12.h>
+
+std::wofstream outputFile("CyberFSR_Dx12Dump.log");
+
+
+void DumpCmdListInfo(ID3D12GraphicsCommandList* InCmdList) {
+	D3D12_COMMAND_LIST_TYPE cmdListType = InCmdList->GetType();
+	outputFile << L"Command List Type: " << (cmdListType == D3D12_COMMAND_LIST_TYPE_DIRECT ? L"DIRECT" :
+		cmdListType == D3D12_COMMAND_LIST_TYPE_BUNDLE ? L"BUNDLE" :
+		cmdListType == D3D12_COMMAND_LIST_TYPE_COMPUTE ? L"COMPUTE" :
+		L"OTHER") << std::endl;
+	outputFile.flush();
+}
+
+void DumpResourceDetails(ID3D12Resource* resource, const std::string& resourceName) {
+	if (resource) {
+		D3D12_RESOURCE_DESC desc = resource->GetDesc();
+		outputFile << CyberTypes::CyString(resourceName) << L" Details: " << std::endl;
+		outputFile << L"  Dimension: " << desc.Dimension << std::endl;
+		outputFile << L"  Width: " << desc.Width << std::endl;
+		outputFile << L"  Height: " << desc.Height << std::endl;
+		outputFile << L"  DepthOrArraySize: " << desc.DepthOrArraySize << std::endl;
+		outputFile << L"  Format: " << desc.Format << std::endl;
+		// ... any other details you might want
+	}
+	else {
+		outputFile << CyberTypes::CyString(resourceName) << " is NULL" << std::endl;
+	}
+	outputFile.flush();
+}
+
+void DumpDeviceInformation(ID3D12GraphicsCommandList* InCmdList, ID3D12Device* device) {
+
+	// Dump some basic information about the device itself
+	D3D12_FEATURE_DATA_D3D12_OPTIONS options = {};
+	HRESULT hr = device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS, &options, sizeof(options));
+	if (SUCCEEDED(hr)) {
+		outputFile << L"Resource Binding Tier: " << static_cast<int>(options.ResourceBindingTier) << std::endl;
+		outputFile << L"Conservative Rasterization Tier: " << static_cast<int>(options.ConservativeRasterizationTier) << std::endl;
+	}
+	else {
+		outputFile << L"Failed to get D3D12_OPTIONS." << std::endl;
+	}
+
+	// Try direct method to get DXGI adapter
+	IDXGIAdapter* adapter = nullptr;
+	hr = InCmdList->QueryInterface(IID_PPV_ARGS(&adapter));
+	if (SUCCEEDED(hr) && adapter) {
+		// Get the adapter's description
+		DXGI_ADAPTER_DESC desc;
+		adapter->GetDesc(&desc);
+		outputFile << L"Adapter:" << std::endl;
+		outputFile << L"  Description: " << std::wstring(desc.Description) << std::endl;
+		outputFile << L"  Dedicated Video Memory: " << desc.DedicatedVideoMemory << L" bytes" << std::endl;
+		outputFile << L"  Dedicated System Memory: " << desc.DedicatedSystemMemory << L" bytes" << std::endl;
+		outputFile << L"  Shared System Memory: " << desc.SharedSystemMemory << L" bytes" << std::endl;
+
+		adapter->Release();
+	}
+	else {
+		// Create a DXGI Factory to enumerate adapters
+		IDXGIFactory4* factory = nullptr;
+		hr = CreateDXGIFactory1(IID_PPV_ARGS(&factory));
+		if (SUCCEEDED(hr) && factory) {
+			IDXGIAdapter* adapter = nullptr;
+			for (UINT i = 0; factory->EnumAdapters(i, &adapter) != DXGI_ERROR_NOT_FOUND; ++i) {
+				// Get the adapter's description
+				DXGI_ADAPTER_DESC desc;
+				adapter->GetDesc(&desc);
+				outputFile << L"Adapter:" << std::endl;
+				outputFile << L"  Description: " << std::wstring(desc.Description) << std::endl;
+				outputFile << L"  Dedicated Video Memory: " << desc.DedicatedVideoMemory << L" bytes" << std::endl;
+				outputFile << L"  Dedicated System Memory: " << desc.DedicatedSystemMemory << L" bytes" << std::endl;
+				outputFile << L"  Shared System Memory: " << desc.SharedSystemMemory << L" bytes" << std::endl;
+
+				adapter->Release();
+			}
+			factory->Release();
+		}
+		else {
+			outputFile << L"Failed to create DXGI factory or enumerate adapters." << std::endl;
+		}
+	}
+
+	// ... Add more dumps as needed ...
+
+	outputFile.flush();
+}
+
+#endif 
+
+
 NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCmdList, const NVSDK_NGX_Handle* InFeatureHandle, const NVSDK_NGX_Parameter* InParameters, PFN_NVSDK_NGX_ProgressCallback InCallback)
 {
 	CyberLogArgs(InCmdList, InFeatureHandle, InParameters, InCallback);
@@ -276,31 +377,75 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCm
 	auto& config = instance->MyConfig;
 	auto deviceContext = CyberFsrContext::instance()->Contexts[InFeatureHandle->Id].get();
 
+
+
 	if (orgRootSig)
 	{
 		const auto inParams = static_cast<const NvParameter*>(InParameters);
 
+#ifdef CyberFSR_DX12_DUMP
+		if (device) {
+			DumpDeviceInformation(InCmdList, device);
+			DumpCmdListInfo(InCmdList);
+			DumpResourceDetails((ID3D12Resource*)inParams->Color, "Color");
+			DumpResourceDetails((ID3D12Resource*)inParams->Depth, "Depth");
+			DumpResourceDetails((ID3D12Resource*)inParams->MotionVectors, "MotionVectors");
+			DumpResourceDetails((ID3D12Resource*)inParams->ExposureTexture, "Exposure");
+			//device->Release();
+		}
+#endif
+
 		auto* fsrContext = &deviceContext->FsrContext;
 
 		FfxFsr2DispatchDescription dispatchParameters = {};
+
 		dispatchParameters.commandList = ffxGetCommandListDX12(InCmdList);
+
 		dispatchParameters.color = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->Color, (wchar_t*)L"FSR2_InputColor");
 		dispatchParameters.depth = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->Depth, (wchar_t*)L"FSR2_InputDepth");
+
 		dispatchParameters.motionVectors = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->MotionVectors, (wchar_t*)L"FSR2_InputMotionVectors");
+
 		if (!config->AutoExposure)
 			dispatchParameters.exposure = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->ExposureTexture, (wchar_t*)L"FSR2_InputExposure");
 
-		//Not sure if these two actually work
-		if (!config->DisableReactiveMask.value_or(false))
+		if (false && inParams->InputBiasCurrentColorMask == nullptr && inParams->InputBiasCurrentColorMask == nullptr) {
+			// Enable automatic generation of the Reactive mask and Transparency & composition mask
+			dispatchParameters.enableAutoReactive = true;
+
+			// TODO: Provide the correct opaque-only portion of the backbuffer. For now, this is an imitation.
+			dispatchParameters.colorOpaqueOnly = dispatchParameters.color;
+
+			// Set the required values for the automatic generation feature
+			dispatchParameters.autoTcThreshold = 0.01f;  // Recommended default value
+			dispatchParameters.autoTcScale = 1.0f;      // Recommended default value
+			dispatchParameters.autoReactiveScale = 10.00f;  // Recommended default value
+			dispatchParameters.autoReactiveMax = 0.50f;  // Recommended default value
+		}
+		else if (!config->DisableReactiveMask.value_or(false))
 		{
 			dispatchParameters.reactive = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->InputBiasCurrentColorMask, (wchar_t*)L"FSR2_InputReactiveMap");
 			dispatchParameters.transparencyAndComposition = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->TransparencyMask, (wchar_t*)L"FSR2_TransparencyAndCompositionMap");
 		}
 
+
+		if (inParams->InputBiasCurrentColorMask == nullptr) {
+			
+		}
+
+
 		dispatchParameters.output = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->Output, (wchar_t*)L"FSR2_OutputUpscaledColor", FFX_RESOURCE_STATE_UNORDERED_ACCESS);
 
 		dispatchParameters.jitterOffset.x = inParams->JitterOffsetX;
 		dispatchParameters.jitterOffset.y = inParams->JitterOffsetY;
+
+		if (dispatchParameters.jitterOffset.x == 0) {
+			dispatchParameters.jitterOffset.x = 0.00000000000000000000000005f;
+		}
+		if (dispatchParameters.jitterOffset.y == 0) {
+			dispatchParameters.jitterOffset.y = 0.00000000000000000000000005f;
+
+		}
 
 		dispatchParameters.motionVectorScale.x = (float)inParams->MVScaleX;
 		dispatchParameters.motionVectorScale.y = (float)inParams->MVScaleY;
@@ -316,24 +461,46 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCm
 		double currentTime = Util::MillisecondsNow();
 		double deltaTime = (currentTime - lastFrameTime);
 		lastFrameTime = currentTime;
-
-		dispatchParameters.frameTimeDelta = (float)deltaTime;
+		
+		dispatchParameters.frameTimeDelta = (float)deltaTime * 100;
 		dispatchParameters.preExposure = 1.0f;
 		dispatchParameters.renderSize.width = inParams->renderSize.Width;
 		dispatchParameters.renderSize.height = inParams->renderSize.Height;
 
+		
+
 		//Hax Zone
-		dispatchParameters.cameraFar = deviceContext->ViewMatrix->GetFarPlane();
-		dispatchParameters.cameraNear = deviceContext->ViewMatrix->GetNearPlane();
+		auto low = deviceContext->ViewMatrix->GetFarPlane();
+		auto high = deviceContext->ViewMatrix->GetNearPlane();
+
+		if (low > high) {
+			auto temp = low;
+			high = low;
+			low = temp;
+		}
+
+		CyberLogArgs(deltaTime, low, high);
+
+		dispatchParameters.cameraFar = high;
+		dispatchParameters.cameraNear = low;
 		dispatchParameters.cameraFovAngleVertical = DirectX::XMConvertToRadians(deviceContext->ViewMatrix->GetFov());
+
 		FfxErrorCode errorCode = ffxFsr2ContextDispatch(fsrContext, &dispatchParameters);
+
 		FFX_ASSERT(errorCode == FFX_OK);
 
 		InCmdList->SetComputeRootSignature(orgRootSig);
 	}
-#ifdef DEBUG_FEATURES
-	deviceContext->DebugLayer->AddText(L"DLSS2FSR", DirectX::XMFLOAT2(1.0, 1.0));
-	deviceContext->DebugLayer->Render(InCmdList);
+
+#ifdef CyberFSR_DO_OVERLAY1
+	//deviceContext->DebugLayer->AddText(L"DLSS2FSR", DirectX::XMFLOAT2(1.0, 1.0));
+	deviceContext->DebugLayer->Render();
+#endif // CyberFSR_DO_OVERLAY
+
+#ifdef CyberFSR_DO_OVERLAY2
+	if (CyberFSROverlay::overlay == nullptr) {
+		CyberFSROverlay::overlay = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)CyberFSROverlay::DisplayTimeOnWindow, NULL, 0, NULL);
+	}
 #endif
 
 	myCommandList = InCmdList;

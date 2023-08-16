@@ -6,56 +6,56 @@
 
 void NvParameter::Set(const char* InName, unsigned long long InValue)
 {
-	CyberLogArgs(InName, InValue);
+	CyberLogArgs(this, InName, InValue);
 	auto value = (unsigned long long*) & InValue;
 	Set_Internal(InName, *value, NvULL);
 }
 
 void NvParameter::Set(const char* InName, float InValue)
 {
-	CyberLogArgs(InName, InValue);
+	CyberLogArgs(this, InName, InValue);
 	auto value = (unsigned long long*) & InValue;
 	Set_Internal(InName, *value, NvFloat);
 }
 
 void NvParameter::Set(const char* InName, double InValue)
 {
-	CyberLogArgs(InName, InValue);
+	CyberLogArgs(this, InName, InValue);
 	auto value = (unsigned long long*) & InValue;
 	Set_Internal(InName, *value, NvDouble);
 }
 
 void NvParameter::Set(const char* InName, unsigned int InValue)
 {
-	CyberLogArgs(InName, InValue);
+	CyberLogArgs(this, InName, InValue);
 	auto value = (unsigned long long*) & InValue;
 	Set_Internal(InName, *value, NvUInt);
 }
 
 void NvParameter::Set(const char* InName, int InValue)
 {
-	CyberLogArgs(InName, InValue);
+	CyberLogArgs(this, InName, InValue);
 	auto value = (unsigned long long*) & InValue;
 	Set_Internal(InName, *value, NvInt);
 }
 
 void NvParameter::Set(const char* InName, ID3D11Resource* InValue)
 {
-	CyberLOG(InName, InValue);
+	CyberLogArgs(this, InName, InValue);
 	auto value = (unsigned long long*) & InValue;
 	Set_Internal(InName, *value, NvD3D11Resource);
 }
 
 void NvParameter::Set(const char* InName, ID3D12Resource* InValue)
 {
-	CyberLogArgs(InName, InValue);
+	CyberLogArgs(this, InName, InValue);
 	auto value = (unsigned long long*) & InValue;
 	Set_Internal(InName, *value, NvD3D12Resource);
 }
 
 void NvParameter::Set(const char* InName, void* InValue)
 {
-	CyberLogArgs(InName, InValue);
+	CyberLogArgs(this, InName, InValue);
 	auto value = (unsigned long long*) & InValue;
 	Set_Internal(InName, *value, NvVoidPtr);
 }
@@ -63,62 +63,62 @@ void NvParameter::Set(const char* InName, void* InValue)
 NVSDK_NGX_Result NvParameter::Get(const char* InName, unsigned long long* OutValue) const
 {
 	const auto result = Get_Internal(InName, (unsigned long long*)OutValue, NvULL);
-	CyberLogArgs(InName, OutValue, *OutValue);
+	CyberLogArgs(this, InName, OutValue, *OutValue);
 	return result;
 }
 
 NVSDK_NGX_Result NvParameter::Get(const char* InName, float* OutValue) const
 {
 	const auto result = Get_Internal(InName, (unsigned long long*)OutValue, NvFloat);
-	CyberLogArgs(InName, OutValue, *OutValue);
+	CyberLogArgs(this, InName, OutValue, *OutValue);
 	return result;
 }
 
 NVSDK_NGX_Result NvParameter::Get(const char* InName, double* OutValue) const
 {
 	const auto result = Get_Internal(InName, (unsigned long long*)OutValue, NvDouble);
-	CyberLogArgs(InName, OutValue, *OutValue);
+	CyberLogArgs(this, InName, OutValue, *OutValue);
 	return result;
 }
 
 NVSDK_NGX_Result NvParameter::Get(const char* InName, unsigned int* OutValue) const
 {
 	const auto result = Get_Internal(InName, (unsigned long long*)OutValue, NvUInt);
-	CyberLogArgs(InName, OutValue, *OutValue);
+	CyberLogArgs(this, InName, OutValue, *OutValue);
 	return result;
 }
 
 NVSDK_NGX_Result NvParameter::Get(const char* InName, int* OutValue) const
 {
 	const auto result = Get_Internal(InName, (unsigned long long*)OutValue, NvInt);
-	CyberLogArgs(InName, OutValue, *OutValue);
+	CyberLogArgs(this, InName, OutValue, *OutValue);
 	return result;
 }
 
 NVSDK_NGX_Result NvParameter::Get(const char* InName, ID3D11Resource** OutValue) const
 {
 	const auto result = Get_Internal(InName, (unsigned long long*)OutValue, NvD3D11Resource);
-	CyberLogArgs(InName, OutValue, *OutValue);
+	CyberLogArgs(this, InName, OutValue, *OutValue);
 	return result;
 }
 
 NVSDK_NGX_Result NvParameter::Get(const char* InName, ID3D12Resource** OutValue) const
 {
 	const auto result = Get_Internal(InName, (unsigned long long*)OutValue, NvD3D12Resource);
-	CyberLogArgs(InName, OutValue, *OutValue);
+	CyberLogArgs(this, InName, OutValue, *OutValue);
 	return result;
 }
 
 NVSDK_NGX_Result NvParameter::Get(const char* InName, void** OutValue) const
 {
 	const auto result = Get_Internal(InName, (unsigned long long*)OutValue, NvVoidPtr);
-	CyberLogArgs(InName, OutValue, *OutValue);
+	CyberLogArgs(this, InName, OutValue, *OutValue);
 	return result;
 }
 
 void NvParameter::Reset()
 {
-	CyberLogArgs();
+	CyberLogArgs(this);
 }
 
 inline void NvParameter::Set_Internal(const char* InName, unsigned long long InValue, NvParameterType ParameterType)
@@ -374,18 +374,18 @@ inline std::optional<float> GetQualityOverrideRatio(const NVSDK_NGX_PerfQuality_
 	return output;
 }
 
-inline void ScaleDimensionsToRatios(NvParameter* parameter, float xRatio, float yRatio) {
-	parameter->renderSize.Width = static_cast<unsigned int>(parameter->windowSize.Width / xRatio);
-	parameter->renderSize.Height = static_cast<unsigned int>(parameter->windowSize.Height / yRatio);
-}
-
-inline void ScaleDimensionsToRatio(NvParameter* parameter, float ratio) {
-	ScaleDimensionsToRatios(parameter, ratio, ratio);
-}
-
 
 void NvParameter::EvaluateRenderScale()
 {
+	enum RenderScalePriorityPreference { ratio, resolution } priority = ratio;
+
+	float ratioX = 0;
+	float ratioY = 0;
+
+	unsigned int finalResX = 0;
+	unsigned int finalResY = 0;
+
+	constexpr NVSDK_NGX_Dimensions supermin = { 160,90 };
 
 	//CyberLogArgs();
 	const std::shared_ptr<Config> config = CyberFsrContext::instance()->MyConfig;
@@ -399,42 +399,104 @@ void NvParameter::EvaluateRenderScale()
 		windowSize.Width = screenSize.Width;
 		windowSize.Height = screenSize.Height;
 	}
-
-	renderSizeMin = {16,9};
-	renderSizeMax = windowSize;
+	
+	//RTXValue = 1;
 
 	//Static Upscale Ratio Override
 	if (config->UpscaleRatioOverrideEnabled.value_or(false) && config->UpscaleRatioOverrideValue.has_value()) {
-		ScaleDimensionsToRatio(this, *config->UpscaleRatioOverrideValue);
-		return;
-	}
-
-	const std::optional<float> QualityRatio = GetQualityOverrideRatio(PerfQualityValue, config);
-
-	//RTXValue = 1;
-
-	if (QualityRatio.has_value()) {
-		ScaleDimensionsToRatio(this, *QualityRatio);
-		return;
-	}
-
-	const FfxFsr2QualityMode fsrQualityMode = DLSS2FSR2QualityTable(PerfQualityValue);
-
-	if (fsrQualityMode < 5) {
-		ffxFsr2GetRenderResolutionFromQualityMode(&renderSize.Width, &renderSize.Height, windowSize.Width, windowSize.Height, fsrQualityMode);
+		const auto& value = *config->UpscaleRatioOverrideValue;
+		ratioX = value;
+		ratioY = value;
 	}
 	else {
-		//Ultra Quality Mode
-		renderSize.Width = windowSize.Width;
-		renderSize.Height = windowSize.Height;
+		if (float qualityOverrideRatio = *GetQualityOverrideRatio(PerfQualityValue, config)) {
+			ratioX = qualityOverrideRatio;
+			ratioY = qualityOverrideRatio;
+		}
+		else {
+			const FfxFsr2QualityMode fsrQualityMode = DLSS2FSR2QualityTable(PerfQualityValue);
+
+			if (fsrQualityMode < 5) {
+				ffxFsr2GetRenderResolutionFromQualityMode(&finalResX, &finalResY, windowSize.Width, windowSize.Height, fsrQualityMode);
+			}
+			else {
+				finalResX = windowSize.Width;
+				finalResY = windowSize.Height;
+			}
+		}
 	}
+	switch (priority) {
+		case ratio: {
+			if (ratioX != 0 || ratioY != 0) {
+				SetRatio(ratioX, ratioY);
+				break;
+			}
+			else 
+				if (finalResX != 0 || finalResY != 0) {
+				SetResolution(finalResX, finalResY);
+				break;
+			}
+			else
+				SetResolution(supermin.Width, supermin.Height);
+			break;
+		}
+		case resolution: {
+			if (finalResX != 0 || finalResY != 0) {
+				SetResolution(finalResX, finalResY);
+				break;
+			}
+			else 
+				if (ratioX != 0 || ratioY != 0) {
+				SetRatio(ratioX, ratioY);
+				break;
+			}
+			else
+				SetResolution(supermin.Width, supermin.Height);
+			break;
+	
+		}
+		default:
+			SetResolution(supermin.Width, supermin.Height);
+			break;
+	}
+
+	renderSizeMin = supermin;
+	renderSizeMax = windowSize;
 }
+
+void NvParameter::SetRatio(const float x, float y)
+{
+	this->ratioUsed = { x , y };
+	this->renderSize.Width = (unsigned int) ( (double) windowSize.Width / (double) x );
+	this->renderSize.Height = (unsigned int) ( (double) windowSize.Height / (double) y );
+}
+
+void NvParameter::SetResolution(const unsigned int width, const unsigned int height)
+{
+	this->renderSize = { width, height };
+	this->ratioUsed.width = (float) ( (double) windowSize.Width / (double) width );
+	this->ratioUsed.height = (float) ( (double) windowSize.Height / (double) height );
+}
+
 
 NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_DLSS_GetOptimalSettingsCallback(NVSDK_NGX_Parameter* InParams)
 {
+	/*
+	static const int limit = 6;
+	static int num = 6;
+	*/
+
 	CyberLogArgs(InParams);
 	auto params = static_cast<NvParameter*>(InParams);
 	params->EvaluateRenderScale();
+	/*
+	if (num != 0) {
+		float x = (float) ( (double) params->ratioUsed.width * (1.0 - (0.1 * num)) );
+		float y = (float) ( (double) params->ratioUsed.height * (1.0 - (0.1 * num)) );
+		params->SetRatio( x, y);
+	}
+	num = (num + 1) % limit;
+	*/
 	return NVSDK_NGX_Result_Success;
 }
 
