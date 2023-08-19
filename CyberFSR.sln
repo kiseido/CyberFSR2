@@ -39,6 +39,8 @@ Global
 		DebugCyberPunk|x86 = DebugCyberPunk|x86
 		DebugGodofWar|x64 = DebugGodofWar|x64
 		DebugGodofWar|x86 = DebugGodofWar|x86
+		DebugHZD|x64 = DebugHZD|x64
+		DebugHZD|x86 = DebugHZD|x86
 		DebugRiseofTombRaider|x64 = DebugRiseofTombRaider|x64
 		DebugRiseofTombRaider|x86 = DebugRiseofTombRaider|x86
 		MinSizeRel|x64 = MinSizeRel|x64
@@ -65,6 +67,10 @@ Global
 		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.DebugGodofWar|x64.Build.0 = DebugGodofWar|x64
 		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.DebugGodofWar|x86.ActiveCfg = DebugGodofWar|Win32
 		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.DebugGodofWar|x86.Build.0 = DebugGodofWar|Win32
+		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.DebugHZD|x64.ActiveCfg = DebugHZD|x64
+		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.DebugHZD|x64.Build.0 = DebugHZD|x64
+		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.DebugHZD|x86.ActiveCfg = DebugHZD|Win32
+		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.DebugHZD|x86.Build.0 = DebugHZD|Win32
 		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.DebugRiseofTombRaider|x64.ActiveCfg = DebugRiseofTombRaider|x64
 		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.DebugRiseofTombRaider|x64.Build.0 = DebugRiseofTombRaider|x64
 		{8D2B73FB-EECD-45CE-B8E5-335610462F58}.DebugRiseofTombRaider|x86.ActiveCfg = DebugRiseofTombRaider|Win32
@@ -96,6 +102,10 @@ Global
 		{66688C84-ECBD-4E74-8EB0-1A9CA7EC2D47}.DebugGodofWar|x64.Build.0 = Debug|x64
 		{66688C84-ECBD-4E74-8EB0-1A9CA7EC2D47}.DebugGodofWar|x86.ActiveCfg = Debug|Win32
 		{66688C84-ECBD-4E74-8EB0-1A9CA7EC2D47}.DebugGodofWar|x86.Build.0 = Debug|Win32
+		{66688C84-ECBD-4E74-8EB0-1A9CA7EC2D47}.DebugHZD|x64.ActiveCfg = Debug|x64
+		{66688C84-ECBD-4E74-8EB0-1A9CA7EC2D47}.DebugHZD|x64.Build.0 = Debug|x64
+		{66688C84-ECBD-4E74-8EB0-1A9CA7EC2D47}.DebugHZD|x86.ActiveCfg = Debug|Win32
+		{66688C84-ECBD-4E74-8EB0-1A9CA7EC2D47}.DebugHZD|x86.Build.0 = Debug|Win32
 		{66688C84-ECBD-4E74-8EB0-1A9CA7EC2D47}.DebugRiseofTombRaider|x64.ActiveCfg = Debug|x64
 		{66688C84-ECBD-4E74-8EB0-1A9CA7EC2D47}.DebugRiseofTombRaider|x64.Build.0 = Debug|x64
 		{66688C84-ECBD-4E74-8EB0-1A9CA7EC2D47}.DebugRiseofTombRaider|x86.ActiveCfg = Debug|Win32
@@ -127,6 +137,10 @@ Global
 		{73102B0B-11A4-43D4-B345-CC4BD95B7296}.DebugGodofWar|x64.Build.0 = Debug|x64
 		{73102B0B-11A4-43D4-B345-CC4BD95B7296}.DebugGodofWar|x86.ActiveCfg = Debug|Win32
 		{73102B0B-11A4-43D4-B345-CC4BD95B7296}.DebugGodofWar|x86.Build.0 = Debug|Win32
+		{73102B0B-11A4-43D4-B345-CC4BD95B7296}.DebugHZD|x64.ActiveCfg = Debug|x64
+		{73102B0B-11A4-43D4-B345-CC4BD95B7296}.DebugHZD|x64.Build.0 = Debug|x64
+		{73102B0B-11A4-43D4-B345-CC4BD95B7296}.DebugHZD|x86.ActiveCfg = Debug|Win32
+		{73102B0B-11A4-43D4-B345-CC4BD95B7296}.DebugHZD|x86.Build.0 = Debug|Win32
 		{73102B0B-11A4-43D4-B345-CC4BD95B7296}.DebugRiseofTombRaider|x64.ActiveCfg = Debug|x64
 		{73102B0B-11A4-43D4-B345-CC4BD95B7296}.DebugRiseofTombRaider|x64.Build.0 = Debug|x64
 		{73102B0B-11A4-43D4-B345-CC4BD95B7296}.DebugRiseofTombRaider|x86.ActiveCfg = Debug|Win32
@@ -159,6 +173,10 @@ Global
 		{D54D9E59-FE94-45A1-A9E1-EDFAD8E5AA78}.DebugGodofWar|x64.Build.0 = Debug|x64
 		{D54D9E59-FE94-45A1-A9E1-EDFAD8E5AA78}.DebugGodofWar|x86.ActiveCfg = Debug|Win32
 		{D54D9E59-FE94-45A1-A9E1-EDFAD8E5AA78}.DebugGodofWar|x86.Build.0 = Debug|Win32
+		{D54D9E59-FE94-45A1-A9E1-EDFAD8E5AA78}.DebugHZD|x64.ActiveCfg = Debug|x64
+		{D54D9E59-FE94-45A1-A9E1-EDFAD8E5AA78}.DebugHZD|x64.Build.0 = Debug|x64
+		{D54D9E59-FE94-45A1-A9E1-EDFAD8E5AA78}.DebugHZD|x86.ActiveCfg = Debug|Win32
+		{D54D9E59-FE94-45A1-A9E1-EDFAD8E5AA78}.DebugHZD|x86.Build.0 = Debug|Win32
 		{D54D9E59-FE94-45A1-A9E1-EDFAD8E5AA78}.DebugRiseofTombRaider|x64.ActiveCfg = Debug|x64
 		{D54D9E59-FE94-45A1-A9E1-EDFAD8E5AA78}.DebugRiseofTombRaider|x64.Build.0 = Debug|x64
 		{D54D9E59-FE94-45A1-A9E1-EDFAD8E5AA78}.DebugRiseofTombRaider|x86.ActiveCfg = Debug|Win32
@@ -191,6 +209,10 @@ Global
 		{45EB66A8-E3BB-4D69-AE35-DFB0D4DB79BC}.DebugGodofWar|x64.Build.0 = Debug|x64
 		{45EB66A8-E3BB-4D69-AE35-DFB0D4DB79BC}.DebugGodofWar|x86.ActiveCfg = Debug|Win32
 		{45EB66A8-E3BB-4D69-AE35-DFB0D4DB79BC}.DebugGodofWar|x86.Build.0 = Debug|Win32
+		{45EB66A8-E3BB-4D69-AE35-DFB0D4DB79BC}.DebugHZD|x64.ActiveCfg = Debug|x64
+		{45EB66A8-E3BB-4D69-AE35-DFB0D4DB79BC}.DebugHZD|x64.Build.0 = Debug|x64
+		{45EB66A8-E3BB-4D69-AE35-DFB0D4DB79BC}.DebugHZD|x86.ActiveCfg = Debug|Win32
+		{45EB66A8-E3BB-4D69-AE35-DFB0D4DB79BC}.DebugHZD|x86.Build.0 = Debug|Win32
 		{45EB66A8-E3BB-4D69-AE35-DFB0D4DB79BC}.DebugRiseofTombRaider|x64.ActiveCfg = Debug|x64
 		{45EB66A8-E3BB-4D69-AE35-DFB0D4DB79BC}.DebugRiseofTombRaider|x64.Build.0 = Debug|x64
 		{45EB66A8-E3BB-4D69-AE35-DFB0D4DB79BC}.DebugRiseofTombRaider|x86.ActiveCfg = Debug|Win32

@@ -4,6 +4,165 @@
 #include "DebugOverlay.h"
 
 
+#ifdef CyberFSR_DO_OVERLAY3
+#include <windows.h>
+#include <string>
+#include <chrono>
+#include <thread>
+#include <iomanip>
+#include <dxgi1_4.h>
+#include <wrl/client.h>
+
+
+std::wstring GetTimeString() {
+    std::time_t t = std::time(nullptr);
+    std::tm tm;
+    localtime_s(&tm, &t);
+    std::wostringstream wos;
+    wos << std::put_time(&tm, L"%Y-%m-%d %H:%M:%S");
+    return wos.str();
+}
+
+namespace CyberFSROverlay {
+    bool Overlay::setupWindow() {
+        if (!parentWindow) {
+            parentWindow = GetActiveWindow();
+
+            if (parentWindow) {
+                windowClass.lpfnWndProc = WndProc;
+                windowClass.hInstance = GetModuleHandle(NULL);
+                windowClass.lpszClassName = L"TimeDisplayWindow";
+
+                if (!RegisterClass(&windowClass)) {
+                    CyberLOGe("RegisterClass failed");
+                    return false;
+                }
+
+                ourWindow = CreateWindowEx(
+                    WS_EX_TOPMOST | WS_EX_TOOLWINDOW,
+                    L"TimeDisplayWindow",
+                    L"TimeDisplayWindow",
+                    WS_POPUPWINDOW | WS_VISIBLE,
+                    CW_USEDEFAULT, CW_USEDEFAULT, 200, 30,
+                    NULL, NULL, GetModuleHandle(NULL), this
+                );
+
+                if (!ourWindow) {
+                    CyberLOGe("CreateWindowEx failed");
+                    return false;
+                }
+
+                return true;
+            }
+            else {
+                CyberLOGe("getting parent window failed");
+            }
+        }
+        else {
+            CyberLOGvi("parentWindow already set");
+        }
+        return false;
+    }
+
+
+
+    Overlay::Overlay() {
+    };
+
+    bool Overlay::Draw() {
+        if (ourWindow && parentWindow) {
+            RECT parentDimensions;
+            GetWindowRect(parentWindow, &parentDimensions);
+            SetWindowPos(ourWindow, NULL, parentDimensions.left + 10, parentDimensions.top + 10, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+
+            std::wstring timeStr = GetTimeString();
+
+            HDC hdc = GetDC(ourWindow);
+            TextOut(hdc, 10, 10, timeStr.c_str(), static_cast<int>(timeStr.size()));
+            ReleaseDC(ourWindow, hdc);
+
+            return true;
+        }
+    }
+
+    LRESULT Overlay::NonStaticWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
+        switch (message) {
+        case WM_DESTROY:
+            PostQuitMessage(0);
+            break;
+        case WM_NCHITTEST:
+            return HTTRANSPARENT;
+        case WM_NCPAINT:
+            Draw();
+            break;
+        default:
+            return DefWindowProcW(hWnd, message, wParam, lParam);
+        }
+        return 0;
+    }
+
+    LRESULT CALLBACK Overlay::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
+        Overlay* pThis;
+
+        switch (message) {
+        case WM_NCCREATE: {
+            pThis = static_cast<Overlay*>(reinterpret_cast<CREATESTRUCT*>(lParam)->lpCreateParams);
+            SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pThis));
+        }
+            break;
+        default:
+            pThis = reinterpret_cast<Overlay*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+            if (pThis) {
+                return pThis->NonStaticWndProc(hWnd, message, wParam, lParam);
+            }
+            else {
+                return DefWindowProc(hWnd, message, wParam, lParam);
+            }
+        }
+        return 0;
+    }
+
+    bool CyberFSROverlay::Overlay::setupWindowDX(ID3D12GraphicsCommandList* InCmdList) {
+        using Microsoft::WRL::ComPtr;
+
+        if (parentWindow != NULL) {
+            CyberLOGvi("parentWindow already set in setupWindowDX");
+            return false; // It's already set up.
+        }
+
+        // Obtain the device first.
+        ID3D12Device* device;
+        InCmdList->GetDevice(IID_PPV_ARGS(&device));
+
+        // Assuming you have access to the swap chain somehow.
+        ComPtr<IDXGISwapChain3> swapChain;
+        // Retrieve your swap chain here.
+
+        if (!swapChain) {
+            CyberLOGe("swapChain is null in setupWindowDX");
+            return false; // Failed to obtain swap chain.
+        }
+
+        HWND tempParentWindow = nullptr;
+        HRESULT hr = swapChain->GetHwnd(&tempParentWindow);
+
+        if (SUCCEEDED(hr) && tempParentWindow) {
+            parentWindow = tempParentWindow;
+            return setupWindow();
+        }
+        else {
+            CyberLOGe("Failed to get HWND from swap chain in setupWindowDX");
+            return false; // Failed to obtain HWND.
+        }
+    }
+
+}
+
+
+
+
+#endif
+
 #ifdef CyberFSR_DO_OVERLAY2
 #pragma comment(lib, "d2d1.lib")
 #pragma comment(lib, "d3d11.lib")

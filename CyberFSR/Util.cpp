@@ -57,6 +57,10 @@ double Util::MillisecondsNow()
 float Util::ConvertSharpness(float sharpness, std::optional<SharpnessRangeModifier> range)
 {
 	CyberLOG();
+
+	if (!range.has_value())
+		return sharpness;
+
 	if (range == SharpnessRangeModifier::Extended)
 	{
 		// normalize sharpness value to [0, 1] range

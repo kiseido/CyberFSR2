@@ -3,13 +3,15 @@
 #ifndef CyberFSRLogging
 #define CyberFSRLogging
 
-namespace CyberFSR{
-    extern CyberLogger::Logger logger;
-}
 
-#define doCFSRLogging
+
+//#define doCFSRLogging
 
 #ifdef doCFSRLogging
+
+namespace CyberFSR {
+    extern CyberLogger::Logger logger;
+}
 
 #define CyberLOG() CyberFSR::logger.logVerboseInfo(__FUNCTIONW__, L"")
 
