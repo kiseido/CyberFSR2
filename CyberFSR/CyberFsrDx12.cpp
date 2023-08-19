@@ -428,7 +428,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCm
 		}
 		else 
 		*/
-		if (!config->DisableReactiveMask.value_or(true))
+		if (!config->DisableReactiveMask.has_value() && !config->DisableReactiveMask.value())
 		{
 			if (inParams->InputBiasCurrentColorMask != nullptr) {
 				dispatchParameters.colorOpaqueOnly = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->InputBiasCurrentColorMask, L"FSR2_InputReactiveMap");
@@ -445,12 +445,17 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCm
 				dispatchParameters.reactive = ffxGetResourceDX12(fsrContext, nullptr, L"FSR2_EmptyInputReactiveMap");
 			}
 
-			if (inParams->TransparencyMask != nullptr)
+			if (inParams->TransparencyMask != nullptr) {
 				dispatchParameters.transparencyAndComposition = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->TransparencyMask, L"FSR2_TransparencyAndCompositionMap");
-
-
+			}
+			else {
+				dispatchParameters.transparencyAndComposition = ffxGetResourceDX12(fsrContext, nullptr, L"FSR2_EmptyTransparencyAndCompositionMap");
+			}
 		}
 		else {
+
+			dispatchParameters.reactive = ffxGetResourceDX12(fsrContext, nullptr, L"FSR2_EmptyInputReactiveMap");
+			dispatchParameters.transparencyAndComposition = ffxGetResourceDX12(fsrContext, nullptr, L"FSR2_EmptyTransparencyAndCompositionMap");
 			/*
 			// Enable automatic generation of the Reactive mask and Transparency & composition mask
 			dispatchParameters.enableAutoReactive = true;
@@ -462,12 +467,6 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCm
 			dispatchParameters.autoReactiveMax = 0.50f;  // Recommended default value
 			*/
 		}
-
-
-		if (inParams->InputBiasCurrentColorMask == nullptr) {
-			
-		}
-
 
 		dispatchParameters.output = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->Output, (wchar_t*)L"FSR2_OutputUpscaledColor", FFX_RESOURCE_STATE_UNORDERED_ACCESS);
 
