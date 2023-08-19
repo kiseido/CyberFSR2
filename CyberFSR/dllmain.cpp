@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "CFSR_logging.h"
 
+#include "DebugOverlay.h"
+
 #ifdef doCFSRLogging
 
 const LPCWSTR CFSR_LogFilename = L"CyberFSR.log";
@@ -9,6 +11,7 @@ static bool LoggerLoaded = false;
 static std::mutex startupMutex;
 
 #endif
+
 
 HMODULE dllModule;
 

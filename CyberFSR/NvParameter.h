@@ -14,7 +14,9 @@ enum NvParameterType {
 
 struct NvParameter : NVSDK_NGX_Parameter
 {
-	struct { float width = 1; float height = 1; } ratioUsed;
+	const static unsigned int CLAMPING_VALUE = 2;
+
+	struct { float width = 1; float height = 1; } scaleRatio;
 
 	NVSDK_NGX_Dimensions screenSize;
 

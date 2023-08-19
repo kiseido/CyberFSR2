@@ -15,6 +15,10 @@ FILE* fDummy;
 
 #endif // _DEBUG
 
+#ifdef CyberFSR_DO_OVERLAY3
+	CyberFSROverlay::Overlay overlay;
+#endif
+
 NVSDK_NGX_API NVSDK_NGX_Result NVSDK_NGX_D3D12_Init_Ext(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath,
 	ID3D12Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion,
 	unsigned long long unknown0)
@@ -408,8 +412,8 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCm
 
 		if (!config->AutoExposure)
 			dispatchParameters.exposure = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->ExposureTexture, (wchar_t*)L"FSR2_InputExposure");
-
-		if (false && inParams->InputBiasCurrentColorMask == nullptr && inParams->InputBiasCurrentColorMask == nullptr) {
+		/*
+		if (inParams->InputBiasCurrentColorMask == nullptr && inParams->InputBiasCurrentColorMask == nullptr) {
 			// Enable automatic generation of the Reactive mask and Transparency & composition mask
 			dispatchParameters.enableAutoReactive = true;
 
@@ -417,15 +421,46 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCm
 			dispatchParameters.colorOpaqueOnly = dispatchParameters.color;
 
 			// Set the required values for the automatic generation feature
+			dispatchParameters.autoTcThreshold = 0.05f;  // Recommended default value
+			dispatchParameters.autoTcScale = 1.0f;      // Recommended default value
+			dispatchParameters.autoReactiveScale = 5.00f;  // Recommended default value
+			dispatchParameters.autoReactiveMax = 0.90f;  // Recommended default value
+		}
+		else 
+		*/
+		if (!config->DisableReactiveMask.value_or(false))
+		{
+			if (inParams->InputBiasCurrentColorMask != nullptr) {
+				dispatchParameters.colorOpaqueOnly = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->InputBiasCurrentColorMask, L"FSR2_InputReactiveMap");
+
+				dispatchParameters.enableAutoReactive = true;
+
+				// Set the required values for the automatic generation feature
+				dispatchParameters.autoTcThreshold = 0.01f;  // Recommended default value
+				dispatchParameters.autoTcScale = 1.0f;      // Recommended default value
+				dispatchParameters.autoReactiveScale = 10.00f;  // Recommended default value
+				dispatchParameters.autoReactiveMax = 0.50f;  // Recommended default value
+			}
+			else {
+				dispatchParameters.reactive = ffxGetResourceDX12(fsrContext, nullptr, L"FSR2_EmptyInputReactiveMap");
+			}
+
+			if (inParams->TransparencyMask != nullptr)
+				dispatchParameters.transparencyAndComposition = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->TransparencyMask, L"FSR2_TransparencyAndCompositionMap");
+
+
+		}
+		else {
+			/*
+			// Enable automatic generation of the Reactive mask and Transparency & composition mask
+			dispatchParameters.enableAutoReactive = true;
+
+			// Set the required values for the automatic generation feature
 			dispatchParameters.autoTcThreshold = 0.01f;  // Recommended default value
 			dispatchParameters.autoTcScale = 1.0f;      // Recommended default value
 			dispatchParameters.autoReactiveScale = 10.00f;  // Recommended default value
 			dispatchParameters.autoReactiveMax = 0.50f;  // Recommended default value
-		}
-		else if (!config->DisableReactiveMask.value_or(false))
-		{
-			dispatchParameters.reactive = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->InputBiasCurrentColorMask, (wchar_t*)L"FSR2_InputReactiveMap");
-			dispatchParameters.transparencyAndComposition = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->TransparencyMask, (wchar_t*)L"FSR2_TransparencyAndCompositionMap");
+			*/
 		}
 
 
@@ -438,14 +473,6 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCm
 
 		dispatchParameters.jitterOffset.x = inParams->JitterOffsetX;
 		dispatchParameters.jitterOffset.y = inParams->JitterOffsetY;
-
-		if (dispatchParameters.jitterOffset.x == 0) {
-			dispatchParameters.jitterOffset.x = 0.00000000000000000000000005f;
-		}
-		if (dispatchParameters.jitterOffset.y == 0) {
-			dispatchParameters.jitterOffset.y = 0.00000000000000000000000005f;
-
-		}
 
 		dispatchParameters.motionVectorScale.x = (float)inParams->MVScaleX;
 		dispatchParameters.motionVectorScale.y = (float)inParams->MVScaleY;
@@ -470,6 +497,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCm
 		
 
 		//Hax Zone
+		/*
 		auto low = deviceContext->ViewMatrix->GetFarPlane();
 		auto high = deviceContext->ViewMatrix->GetNearPlane();
 
@@ -483,6 +511,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCm
 
 		dispatchParameters.cameraFar = high;
 		dispatchParameters.cameraNear = low;
+		*/
 		dispatchParameters.cameraFovAngleVertical = DirectX::XMConvertToRadians(deviceContext->ViewMatrix->GetFov());
 
 		FfxErrorCode errorCode = ffxFsr2ContextDispatch(fsrContext, &dispatchParameters);
@@ -501,6 +530,10 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCm
 	if (CyberFSROverlay::overlay == nullptr) {
 		CyberFSROverlay::overlay = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)CyberFSROverlay::DisplayTimeOnWindow, NULL, 0, NULL);
 	}
+#endif
+
+#ifdef CyberFSR_DO_OVERLAY3
+	overlay.setupWindowDX(InCmdList);
 #endif
 
 	myCommandList = InCmdList;

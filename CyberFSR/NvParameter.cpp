@@ -4,6 +4,9 @@
 #include "NvParameter.h"
 #include "CyberFsr.h"
 
+#include <numeric>
+#include <algorithm>
+
 void NvParameter::Set(const char* InName, unsigned long long InValue)
 {
 	CyberLogArgs(this, InName, InValue);
@@ -380,8 +383,8 @@ void NvParameter::EvaluateRenderScale()
 {
 	enum RenderScalePriorityPreference { ratio, resolution } priority = ratio;
 
-	float ratioX = 0;
-	float ratioY = 0;
+	float scaleRatioX = 0;
+	float scaleRatioY = 0;
 
 	unsigned int finalResX = 0;
 	unsigned int finalResY = 0;
@@ -406,13 +409,14 @@ void NvParameter::EvaluateRenderScale()
 	//Static Upscale Ratio Override
 	if (config->UpscaleRatioOverrideEnabled.value_or(false) && config->UpscaleRatioOverrideValue.has_value()) {
 		const auto& value = *config->UpscaleRatioOverrideValue;
-		ratioX = value;
-		ratioY = value;
+		scaleRatioX = value;
+		scaleRatioY = value;
 	}
 	else {
-		if (float qualityOverrideRatio = *GetQualityOverrideRatio(PerfQualityValue, config)) {
-			ratioX = qualityOverrideRatio;
-			ratioY = qualityOverrideRatio;
+		float overrideRatio = GetQualityOverrideRatio(PerfQualityValue, config).value_or(0);
+		if (overrideRatio != 0) {
+			scaleRatioX = overrideRatio;
+			scaleRatioY = overrideRatio;
 		}
 		else {
 			const FfxFsr2QualityMode fsrQualityMode = DLSS2FSR2QualityTable(PerfQualityValue);
@@ -426,10 +430,11 @@ void NvParameter::EvaluateRenderScale()
 			}
 		}
 	}
+
 	switch (priority) {
 		case ratio: {
-			if (ratioX != 0 || ratioY != 0) {
-				SetRatio(ratioX, ratioY);
+			if (scaleRatioX != 0 || scaleRatioY != 0) {
+				SetRatio(scaleRatioX, scaleRatioY);
 				break;
 			}
 			else 
@@ -447,8 +452,8 @@ void NvParameter::EvaluateRenderScale()
 				break;
 			}
 			else 
-				if (ratioX != 0 || ratioY != 0) {
-				SetRatio(ratioX, ratioY);
+				if (scaleRatioX != 0 || scaleRatioY != 0) {
+				SetRatio(scaleRatioX, scaleRatioY);
 				break;
 			}
 			else
@@ -461,23 +466,106 @@ void NvParameter::EvaluateRenderScale()
 			break;
 	}
 
-	renderSizeMin = supermin;
-	renderSizeMax = windowSize;
+	//renderSizeMin = supermin;
+	renderSizeMin = renderSize;
+	renderSizeMax = renderSize;
 }
 
-void NvParameter::SetRatio(const float x, float y)
-{
-	this->ratioUsed = { x , y };
-	this->renderSize.Width = (unsigned int) ( (double) windowSize.Width / (double) x );
-	this->renderSize.Height = (unsigned int) ( (double) windowSize.Height / (double) y );
+std::vector<NVSDK_NGX_Dimensions> generateResolutions(unsigned int maxWidth, unsigned int maxHeight, unsigned int ratioX, unsigned int ratioY) {
+	CyberLogArgs(maxWidth, maxHeight, ratioX, ratioY);
+	std::vector<NVSDK_NGX_Dimensions> resolutions;
+
+	unsigned int factor = std::gcd(ratioX, ratioY);
+	unsigned int ratioX1 = ratioX / factor;
+	unsigned int ratioY1 = ratioY / factor;
+
+	const unsigned int xIncrease = ratioX1;
+	const unsigned int yIncrease = ratioY1;
+
+	for (unsigned int w = ratioX1, h = ratioY1; w <= maxWidth && h <= maxHeight; w += xIncrease, h += yIncrease) {
+		if (w % NvParameter::CLAMPING_VALUE == 0 && h % NvParameter::CLAMPING_VALUE == 0) {
+			resolutions.push_back({ w, h });
+			CyberLOGvi("Valid Resoltuion Calculated: ", w, h);
+		}
+	}
+
+	return resolutions;
 }
 
-void NvParameter::SetResolution(const unsigned int width, const unsigned int height)
-{
-	this->renderSize = { width, height };
-	this->ratioUsed.width = (float) ( (double) windowSize.Width / (double) width );
-	this->ratioUsed.height = (float) ( (double) windowSize.Height / (double) height );
+class ResolutionCache {
+private:
+	std::map<std::pair< long, long>, std::vector<NVSDK_NGX_Dimensions>> aspectRatioResolutions;
+
+public:
+	const std::vector<NVSDK_NGX_Dimensions>& getResolutions(long screenWidth, long screenHeight, long ratioX, long ratioY) {
+		CyberLogArgs(screenWidth, screenHeight, ratioX, ratioY);
+
+
+		long factor = std::gcd(ratioX, ratioY);
+		long ratioX1 = ratioX / factor;
+		long ratioY1 = ratioY / factor;
+
+		std::pair<long, long> key = { ratioX1 , ratioY1 };
+
+		auto needToGenerate = (aspectRatioResolutions.contains({ ratioX1, ratioY1}) == false);
+
+		if (needToGenerate) {
+			auto resList = generateResolutions(screenWidth * 2, screenHeight * 2, ratioX1, ratioY1);
+			aspectRatioResolutions.emplace(key, resList);
+		}
+
+		return aspectRatioResolutions.at({ ratioX1, ratioY1 });
+	}
+
+
+};
+
+ResolutionCache resolutionCache;
+
+NVSDK_NGX_Dimensions findClosestResolution(const std::vector<NVSDK_NGX_Dimensions>& resolutions, long targetWidth, long targetHeight) {
+	CyberLogArgs(targetWidth, targetHeight);
+	NVSDK_NGX_Dimensions closestResolution = { 0, 0 };
+	long minDifference = std::numeric_limits<long>::max();
+
+
+	for (const auto& resolution : resolutions) {
+		long inwidth = resolution.Width;
+		long inheight = resolution.Height;
+
+		long currentDifference = std::abs( targetWidth - inwidth) + std::abs( targetHeight - inheight);
+
+		if (currentDifference < minDifference) {
+			minDifference = currentDifference;
+			closestResolution = resolution;
+		}
+	}
+
+	return closestResolution;
 }
+
+void NvParameter::SetRatio(const float ScaleRatioX, float ScaleRatioY) {
+	CyberLogArgs(ScaleRatioX, ScaleRatioY);
+	long requestedWidth = windowSize.Width / ScaleRatioX;
+	long requestedHeight = windowSize.Height / ScaleRatioY;
+
+	// Calculate closest even resolutions
+	long closestWidth = (requestedWidth % 2 == 0) ? requestedWidth : requestedWidth + 1;
+	long closestHeight = (requestedHeight % 2 == 0) ? requestedHeight : requestedHeight + 1;
+
+	SetResolution(requestedWidth, requestedHeight);
+}
+
+void NvParameter::SetResolution(const unsigned int width, const unsigned int height) {
+	CyberLogArgs(width, height);
+
+	// Update renderSize and scaleRatio with the closest even resolution
+	renderSize.Width = width;
+	renderSize.Height = height;
+	scaleRatio.width = static_cast<float>(width) / windowSize.Width;
+	scaleRatio.height = static_cast<float>(height) / windowSize.Height;
+}
+
+
 
 
 NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_DLSS_GetOptimalSettingsCallback(NVSDK_NGX_Parameter* InParams)

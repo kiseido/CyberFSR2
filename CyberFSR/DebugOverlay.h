@@ -1,7 +1,26 @@
 #pragma once
 
-#define CyberFSR_DO_OVERLAY1
+//#define CyberFSR_DO_OVERLAY1
 //#define CyberFSR_DO_OVERLAY2
+//#define CyberFSR_DO_OVERLAY3
+
+#ifdef CyberFSR_DO_OVERLAY3
+namespace CyberFSROverlay {
+    class Overlay {
+    private:
+        HWND parentWindow = NULL;
+        HWND ourWindow = NULL;
+        WNDCLASS windowClass = { 0 };
+        static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+        LRESULT NonStaticWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+    public:
+        Overlay();
+        bool setupWindowDX(ID3D12GraphicsCommandList* InCmdList);
+        bool setupWindow();
+        bool Draw();
+    };
+}
+#endif
 
 #ifdef CyberFSR_DO_OVERLAY2
 #include <windows.h>
