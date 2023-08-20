@@ -431,6 +431,8 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCm
 		if (!config->DisableReactiveMask.has_value() || (config->DisableReactiveMask.has_value() && (config->DisableReactiveMask.value() == false)))
 		{
 			if (inParams->InputBiasCurrentColorMask != nullptr) {
+				dispatchParameters.reactive = ffxGetResourceDX12(fsrContext, nullptr, L"FSR2_EmptyInputReactiveMap");
+
 				dispatchParameters.colorOpaqueOnly = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->InputBiasCurrentColorMask, L"FSR2_InputReactiveMap");
 
 				dispatchParameters.enableAutoReactive = true;
