@@ -552,17 +552,28 @@ void NvParameter::SetRatio(const float ScaleRatioX, float ScaleRatioY) {
 	long closestWidth = (requestedWidth % 2 == 0) ? requestedWidth : requestedWidth + 1;
 	long closestHeight = (requestedHeight % 2 == 0) ? requestedHeight : requestedHeight + 1;
 
-	SetResolution(requestedWidth, requestedHeight);
+	// Update renderSize and scaleRatio with the closest even resolution
+	renderSize.Width = closestWidth;
+	renderSize.Height = closestHeight;
+	scaleRatio.width = static_cast<float>(closestWidth) / windowSize.Width;
+	scaleRatio.height = static_cast<float>(closestHeight) / windowSize.Height;
 }
 
 void NvParameter::SetResolution(const unsigned int width, const unsigned int height) {
 	CyberLogArgs(width, height);
 
+	long requestedWidth = width;
+	long requestedHeight = height;
+
+	// Calculate closest even resolutions
+	long closestWidth = (requestedWidth % 2 == 0) ? requestedWidth : requestedWidth + 1;
+	long closestHeight = (requestedHeight % 2 == 0) ? requestedHeight : requestedHeight + 1;
+
 	// Update renderSize and scaleRatio with the closest even resolution
-	renderSize.Width = width;
-	renderSize.Height = height;
-	scaleRatio.width = static_cast<float>(width) / windowSize.Width;
-	scaleRatio.height = static_cast<float>(height) / windowSize.Height;
+	renderSize.Width = closestWidth;
+	renderSize.Height = closestHeight;
+	scaleRatio.width = static_cast<float>(closestWidth) / windowSize.Width;
+	scaleRatio.height = static_cast<float>(closestHeight) / windowSize.Height;
 }
 
 

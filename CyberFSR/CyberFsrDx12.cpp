@@ -428,7 +428,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCm
 		}
 		else 
 		*/
-		if (!config->DisableReactiveMask.has_value() && !config->DisableReactiveMask.value())
+		if (!config->DisableReactiveMask.has_value() || (config->DisableReactiveMask.has_value() && (config->DisableReactiveMask.value() == false)))
 		{
 			if (inParams->InputBiasCurrentColorMask != nullptr) {
 				dispatchParameters.colorOpaqueOnly = ffxGetResourceDX12(fsrContext, (ID3D12Resource*)inParams->InputBiasCurrentColorMask, L"FSR2_InputReactiveMap");
@@ -436,10 +436,10 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCm
 				dispatchParameters.enableAutoReactive = true;
 
 				// Set the required values for the automatic generation feature
-				dispatchParameters.autoTcThreshold = 0.01f;  // Recommended default value
-				dispatchParameters.autoTcScale = 1.0f;      // Recommended default value
-				dispatchParameters.autoReactiveScale = 10.00f;  // Recommended default value
-				dispatchParameters.autoReactiveMax = 0.50f;  // Recommended default value
+				dispatchParameters.autoTcThreshold = 0.01f;  // Recommended default value 0.05f
+				dispatchParameters.autoTcScale = 1.0f;      // Recommended default value 1.00
+				dispatchParameters.autoReactiveScale = 10.00f;  // Recommended default value 5.00
+				dispatchParameters.autoReactiveMax = 0.50f;  // Recommended default value 0.90
 			}
 			else {
 				dispatchParameters.reactive = ffxGetResourceDX12(fsrContext, nullptr, L"FSR2_EmptyInputReactiveMap");
@@ -488,7 +488,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCm
 		double deltaTime = (currentTime - lastFrameTime);
 		lastFrameTime = currentTime;
 		
-		dispatchParameters.frameTimeDelta = (float)deltaTime * 100;
+		dispatchParameters.frameTimeDelta = (float)deltaTime;
 		dispatchParameters.preExposure = 1.0f;
 		dispatchParameters.renderSize.width = inParams->renderSize.Width;
 		dispatchParameters.renderSize.height = inParams->renderSize.Height;
