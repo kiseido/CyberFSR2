@@ -466,8 +466,8 @@ void NvParameter::EvaluateRenderScale()
 			break;
 	}
 
-	renderSizeMin = supermin;
-	//renderSizeMin = renderSize;
+	//renderSizeMin = supermin;
+	renderSizeMin = renderSize;
 	renderSizeMax = renderSize;
 }
 
