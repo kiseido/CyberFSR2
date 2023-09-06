@@ -268,10 +268,10 @@ inline NVSDK_NGX_Result NvParameter::Get_Internal(const char* InName, unsigned l
 		*outValueInt = 0;
 		break;
 	case Util::NvParameter::DLSS_Render_Subrect_Dimensions_Width:
-		*outValueInt = renderSize.Width;
+		*outValueInt = 0;
 		break;
 	case Util::NvParameter::DLSS_Render_Subrect_Dimensions_Height:
-		*outValueInt = renderSize.Height;
+		*outValueInt = 0;
 		break;
 	case Util::NvParameter::OutWidth:
 		*outValueInt = renderSize.Width;
@@ -280,16 +280,16 @@ inline NVSDK_NGX_Result NvParameter::Get_Internal(const char* InName, unsigned l
 		*outValueInt = renderSize.Height;
 		break;
 	case Util::NvParameter::DLSS_Get_Dynamic_Max_Render_Width:
-		*outValueInt = renderSizeMax.Width;
+		*outValueInt = 0;
 		break;
 	case Util::NvParameter::DLSS_Get_Dynamic_Max_Render_Height:
-		*outValueInt = renderSizeMax.Height;
+		*outValueInt = 0;
 		break;
 	case Util::NvParameter::DLSS_Get_Dynamic_Min_Render_Width:
-		*outValueInt = renderSizeMin.Width;
+		*outValueInt = 0;
 		break;
 	case Util::NvParameter::DLSS_Get_Dynamic_Min_Render_Height:
-		*outValueInt = renderSizeMin.Height;
+		*outValueInt = 0;
 		break;
 	case Util::NvParameter::DLSSOptimalSettingsCallback:
 		*outValuePtr = NVSDK_NGX_DLSS_GetOptimalSettingsCallback;
