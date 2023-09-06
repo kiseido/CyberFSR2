@@ -173,6 +173,55 @@ NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_VULKAN_ReleaseFeature(NVSDK_
 	return NVSDK_NGX_Result_Success;
 }
 
+#define  CyberFSR_VK_DUMP
+
+#ifdef CyberFSR_VK_DUMP
+
+std::wstring string_to_wstring(const std::string& str) {
+	int size_needed = MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), NULL, 0);
+	std::wstring wstr(size_needed, 0);
+	MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), &wstr[0], size_needed);
+	return wstr;
+}
+
+void DumpImageViewInfo(NVSDK_NGX_ImageViewInfo_VK* imageViewInfo, const std::string& resourceName) {
+	std::wstring wResourceName = string_to_wstring(resourceName);
+	std::wstring dump;
+
+	if (imageViewInfo) {
+		dump += wResourceName + L" Image View Info:\n";
+		dump += L"  Width: " + std::to_wstring(imageViewInfo->Width) + L"\n";
+		dump += L"  Height: " + std::to_wstring(imageViewInfo->Height) + L"\n";
+		dump += L"  Format: " + std::to_wstring(imageViewInfo->Format) + L"\n";
+		dump += L"  Subresource Range Aspect Mask: " + std::to_wstring(imageViewInfo->SubresourceRange.aspectMask) + L"\n";
+		// ... any other details you might want
+	}
+	else {
+		dump += wResourceName + L" is NULL\n";
+	}
+
+	CyberLOGvi(wResourceName, dump);
+}
+
+void DumpBufferInfo(NVSDK_NGX_BufferInfo_VK* bufferInfo, const std::string& resourceName) {
+	std::wstring wResourceName = string_to_wstring(resourceName);
+	std::wstring dump;
+
+	if (bufferInfo) {
+		dump += wResourceName + L" Buffer Info:\n";
+		dump += L"  SizeInBytes: " + std::to_wstring(bufferInfo->SizeInBytes) + L"\n";
+		// ... any other details you might want
+	}
+	else {
+		dump += wResourceName + L" is NULL\n";
+	}
+
+	CyberLOGvi(wResourceName, dump);
+}
+
+#endif 
+
+
 NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_VULKAN_EvaluateFeature(VkCommandBuffer InCmdList, const NVSDK_NGX_Handle* InFeatureHandle, const NVSDK_NGX_Parameter* InParameters, PFN_NVSDK_NGX_ProgressCallback InCallback)
 {
 	CyberLogArgs(InCmdList, InFeatureHandle, InParameters, InCallback);
@@ -193,18 +242,37 @@ NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_VULKAN_EvaluateFeature(VkCom
 	auto* fsrContext = &deviceContext->FsrContext;
 	FfxFsr2DispatchDescription dispatchParameters = {};
 	dispatchParameters.commandList = ffxGetCommandListVK(InCmdList);
+
+#ifdef CyberFSR_VK_DUMP
+	DumpImageViewInfo(&color->Resource.ImageViewInfo, "Color");
+	DumpImageViewInfo(&depth->Resource.ImageViewInfo, "Depth");
+	DumpImageViewInfo(&motionVectors->Resource.ImageViewInfo, "MotionVectors");
+	DumpImageViewInfo(&exposureTexture->Resource.ImageViewInfo, "ExposureTexture");
+	DumpImageViewInfo(&inputBiasColorMask->Resource.ImageViewInfo, "InputBiasColorMask");
+	DumpImageViewInfo(&transparencyMask->Resource.ImageViewInfo, "TransparencyMask");
+	DumpImageViewInfo(&output->Resource.ImageViewInfo, "Output");
+
+#endif
+
+
 	if (color)
 		dispatchParameters.color = ffxGetTextureResourceVK(fsrContext, color->Resource.ImageViewInfo.Image, color->Resource.ImageViewInfo.ImageView, color->Resource.ImageViewInfo.Width, color->Resource.ImageViewInfo.Height, color->Resource.ImageViewInfo.Format, (wchar_t*)L"FSR2_InputColor");
+
 	if (depth)
 		dispatchParameters.depth = ffxGetTextureResourceVK(fsrContext, depth->Resource.ImageViewInfo.Image, depth->Resource.ImageViewInfo.ImageView, depth->Resource.ImageViewInfo.Width, depth->Resource.ImageViewInfo.Height, depth->Resource.ImageViewInfo.Format, (wchar_t*)L"FSR2_InputDepth");
+
 	if (motionVectors)
 		dispatchParameters.motionVectors = ffxGetTextureResourceVK(fsrContext, motionVectors->Resource.ImageViewInfo.Image, motionVectors->Resource.ImageViewInfo.ImageView, motionVectors->Resource.ImageViewInfo.Width, motionVectors->Resource.ImageViewInfo.Height, motionVectors->Resource.ImageViewInfo.Format, (wchar_t*)L"FSR2_InputMotionVectors");
+
 	if (exposureTexture)
 		dispatchParameters.exposure = ffxGetTextureResourceVK(fsrContext, exposureTexture->Resource.ImageViewInfo.Image, exposureTexture->Resource.ImageViewInfo.ImageView, exposureTexture->Resource.ImageViewInfo.Width, exposureTexture->Resource.ImageViewInfo.Height, exposureTexture->Resource.ImageViewInfo.Format, (wchar_t*)L"FSR2_InputExposure");
+
 	if (inputBiasColorMask)
 		dispatchParameters.reactive = ffxGetTextureResourceVK(fsrContext, inputBiasColorMask->Resource.ImageViewInfo.Image, inputBiasColorMask->Resource.ImageViewInfo.ImageView, inputBiasColorMask->Resource.ImageViewInfo.Width, inputBiasColorMask->Resource.ImageViewInfo.Height, inputBiasColorMask->Resource.ImageViewInfo.Format, (wchar_t*)L"FSR2_InputReactiveMap");
+
 	if (transparencyMask)
 		dispatchParameters.transparencyAndComposition = ffxGetTextureResourceVK(fsrContext, transparencyMask->Resource.ImageViewInfo.Image, transparencyMask->Resource.ImageViewInfo.ImageView, transparencyMask->Resource.ImageViewInfo.Width, transparencyMask->Resource.ImageViewInfo.Height, transparencyMask->Resource.ImageViewInfo.Format, (wchar_t*)L"FSR2_TransparencyAndCompositionMap");
+
 	if (output)
 		dispatchParameters.output = ffxGetTextureResourceVK(fsrContext, output->Resource.ImageViewInfo.Image, output->Resource.ImageViewInfo.ImageView, output->Resource.ImageViewInfo.Width, output->Resource.ImageViewInfo.Height, output->Resource.ImageViewInfo.Format, (wchar_t*)L"FSR2_OutputUpscaledColor", FFX_RESOURCE_STATE_UNORDERED_ACCESS);
 
