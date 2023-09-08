@@ -408,7 +408,7 @@ void NvParameter::EvaluateRenderScale()
 
 	//Static Upscale Ratio Override
 	if (config->UpscaleRatioOverrideEnabled.value_or(false) && config->UpscaleRatioOverrideValue.has_value()) {
-		const auto& value = *config->UpscaleRatioOverrideValue;
+		const auto value = config->UpscaleRatioOverrideValue.value();
 		scaleRatioX = value;
 		scaleRatioY = value;
 	}
