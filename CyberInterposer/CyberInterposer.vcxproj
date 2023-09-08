@@ -73,7 +73,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LibraryPath>$(SolutionDir)$(Platform)\$(Configuration)\;$(SolutionDir)external\FidelityFX-FSR2\bin\ffx_fsr2_api;$(VULKAN_SDK)\Lib;$(LibraryPath);$(SolutionDir)CyberLogger\$(Platform)\$(Configuration)\;$(SolutionDir)CyberNGX\$(Platform)\$(Configuration)\;</LibraryPath>
     <IncludePath>$(SolutionDir)CyberNGX;$(SolutionDir)CyberLogger;$(SolutionDir)external\simpleini;$(SolutionDir)external\nvngx_dlss_sdk\include;$(SolutionDir)external\unordered_dense\include;$(SolutionDir)external\FidelityFX-FSR2\src;$(VULKAN_SDK)\Include;$(IncludePath)</IncludePath>
-    <TargetName>nvngx</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LibraryPath>$(SolutionDir)$(Platform)\$(Configuration)\;$(SolutionDir)external\FidelityFX-FSR2\bin\ffx_fsr2_api;$(VULKAN_SDK)\Lib;$(LibraryPath);$(SolutionDir)CyberLogger\$(Platform)\$(Configuration)\</LibraryPath>

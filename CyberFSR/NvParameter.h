@@ -116,11 +116,11 @@ typedef DLSSResources<NVSDK_NGX_Resource_VK*> VK_DLSSResources;
 
 
 struct DLSS_Settings {
-	NVSDK_NGX_Dimensions renderSize;
+	NVSDK_NGX_Dimensions renderSize{};
 
-	NVSDK_NGX_Dimensions renderSizeMax;
+	NVSDK_NGX_Dimensions renderSizeMax{};
 
-	NVSDK_NGX_Dimensions renderSizeMin;
+	NVSDK_NGX_Dimensions renderSizeMin{};
 
 	bool RTXValue{}, FreeMemOnReleaseFeature{};
 	int CreationNodeMask{}, VisibilityNodeMask{}, OptLevel{}, IsDevSnippetBranch{};
