@@ -66,56 +66,66 @@ void NvParameter::Set(const char* InName, void* InValue)
 NVSDK_NGX_Result NvParameter::Get(const char* InName, unsigned long long* OutValue) const
 {
 	const auto result = Get_Internal(InName, (unsigned long long*)OutValue, NvULL);
-	CyberLogArgs(this, InName, OutValue, *OutValue);
+	CyberLogArgs(this, result, InName, OutValue, *OutValue);
 	return result;
 }
 
 NVSDK_NGX_Result NvParameter::Get(const char* InName, float* OutValue) const
 {
 	const auto result = Get_Internal(InName, (unsigned long long*)OutValue, NvFloat);
-	CyberLogArgs(this, InName, OutValue, *OutValue);
+	CyberLogArgs(this, result, InName, OutValue, *OutValue);
 	return result;
 }
 
 NVSDK_NGX_Result NvParameter::Get(const char* InName, double* OutValue) const
 {
 	const auto result = Get_Internal(InName, (unsigned long long*)OutValue, NvDouble);
-	CyberLogArgs(this, InName, OutValue, *OutValue);
+	CyberLogArgs(this, result, InName, OutValue, *OutValue);
 	return result;
 }
 
 NVSDK_NGX_Result NvParameter::Get(const char* InName, unsigned int* OutValue) const
 {
 	const auto result = Get_Internal(InName, (unsigned long long*)OutValue, NvUInt);
-	CyberLogArgs(this, InName, OutValue, *OutValue);
+	CyberLogArgs(this, result, InName, OutValue, *OutValue);
+	if (result != 1)
+		*OutValue = 0;
 	return result;
 }
 
 NVSDK_NGX_Result NvParameter::Get(const char* InName, int* OutValue) const
 {
 	const auto result = Get_Internal(InName, (unsigned long long*)OutValue, NvInt);
-	CyberLogArgs(this, InName, OutValue, *OutValue);
+	CyberLogArgs(this, result, InName, OutValue, *OutValue);
+	if (result != 1)
+		*OutValue = 0;
 	return result;
 }
 
 NVSDK_NGX_Result NvParameter::Get(const char* InName, ID3D11Resource** OutValue) const
 {
 	const auto result = Get_Internal(InName, (unsigned long long*)OutValue, NvD3D11Resource);
-	CyberLogArgs(this, InName, OutValue, *OutValue);
+	CyberLogArgs(this, result, InName, OutValue, *OutValue);
+	if (result != 1)
+		*OutValue = 0;
 	return result;
 }
 
 NVSDK_NGX_Result NvParameter::Get(const char* InName, ID3D12Resource** OutValue) const
 {
 	const auto result = Get_Internal(InName, (unsigned long long*)OutValue, NvD3D12Resource);
-	CyberLogArgs(this, InName, OutValue, *OutValue);
+	CyberLogArgs(this, result, InName, OutValue, *OutValue);
+	if (result != 1)
+		*OutValue = 0;
 	return result;
 }
 
 NVSDK_NGX_Result NvParameter::Get(const char* InName, void** OutValue) const
 {
 	const auto result = Get_Internal(InName, (unsigned long long*)OutValue, NvVoidPtr);
-	CyberLogArgs(this, InName, OutValue, *OutValue);
+	CyberLogArgs(this, result, InName, OutValue, *OutValue);
+	if (result != 1)
+		*OutValue = 0;
 	return result;
 }
 
@@ -279,6 +289,7 @@ inline NVSDK_NGX_Result NvParameter::Get_Internal(const char* InName, unsigned l
 	case Util::NvParameter::OutHeight:
 		*outValueInt = renderSize.Height;
 		break;
+		/*
 	case Util::NvParameter::DLSS_Get_Dynamic_Max_Render_Width:
 		*outValueInt = 0;
 		break;
@@ -291,6 +302,7 @@ inline NVSDK_NGX_Result NvParameter::Get_Internal(const char* InName, unsigned l
 	case Util::NvParameter::DLSS_Get_Dynamic_Min_Render_Height:
 		*outValueInt = 0;
 		break;
+		*/
 	case Util::NvParameter::DLSSOptimalSettingsCallback:
 		*outValuePtr = NVSDK_NGX_DLSS_GetOptimalSettingsCallback;
 		break;
