@@ -111,10 +111,10 @@ NVSDK_NGX_Result NVSDK_NGX_D3D11_CreateFeature(ID3D11DeviceContext* InDevCtx, NV
 	FFX_ASSERT(errorCode == FFX_OK);
 
 	initParams.device = ffxGetDeviceDX11(device);
-	initParams.maxRenderSize.width = inParams->Width;
-	initParams.maxRenderSize.height = inParams->Height;
-	initParams.displaySize.width = inParams->OutWidth;
-	initParams.displaySize.height = inParams->OutHeight;
+	initParams.maxRenderSize.width = inParams->renderSize.Width;
+	initParams.maxRenderSize.height = inParams->renderSize.Height;
+	initParams.displaySize.width = inParams->windowSize.Height;
+	initParams.displaySize.height = inParams->windowSize.Width;
 
 	initParams.flags = 0;
 	if (config->DepthInverted.value_or(inParams->DepthInverted))
@@ -223,8 +223,8 @@ NVSDK_NGX_Result NVSDK_NGX_D3D11_EvaluateFeature(ID3D11DeviceContext* InDevCtx, 
 
 	dispatchParameters.frameTimeDelta = (float)deltaTime;
 	dispatchParameters.preExposure = 1.0f;
-	dispatchParameters.renderSize.width = inParams->Width;
-	dispatchParameters.renderSize.height = inParams->Height;
+	dispatchParameters.renderSize.width = inParams->renderSize.Width;
+	dispatchParameters.renderSize.height = inParams->renderSize.Height;
 
 	//Hax Zone
 	dispatchParameters.cameraFar = deviceContext->ViewMatrix->GetFarPlane();
