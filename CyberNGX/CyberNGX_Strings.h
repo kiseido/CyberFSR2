@@ -273,30 +273,37 @@
 
 #define CyberNGX_Strings_Headers(name) \
         enum CyberNGX_Strings_CONCATENATE(name, _enum) { CyberNGX_Strings_Macros(CyberNGX_Strings_ENUM_NAME), COUNT_enum }; \
-        constexpr std::string_view CyberNGX_Strings_CONCATENATE(name, _macroname)[]( CyberNGX_Strings_Macros(CyberNGX_Strings_MacroNameString) ); \
-        constexpr std::string_view CyberNGX_Strings_CONCATENATE(name, _macrocontent)[]( CyberNGX_Strings_Macros(CyberNGX_Strings_MacroContentsString) );
+        constexpr static std::string_view CyberNGX_Strings_CONCATENATE(name, _macroname)[] { ( CyberNGX_Strings_Macros(CyberNGX_Strings_MacroNameString) ) } ; \
+        constexpr static std::string_view CyberNGX_Strings_CONCATENATE(name, _macrocontent)[] { ( CyberNGX_Strings_Macros(CyberNGX_Strings_MacroContentsString) ) };
 
+
+
+#include <unordered_map>
 
 namespace NGX_Strings {
-    CyberNGX_Strings_Headers(NGX_Strings);
+    static struct NGX_Enum_Strings {
+        CyberNGX_Strings_Headers(NGX_Strings);
 
-    constexpr NGX_Strings_enum getEnumFromMacroName(const std::string_view& value) {
-        for (std::size_t i = 0; i < COUNT_enum; i++) {
-            if (NGX_Strings_macroname[i] == value) {
-                return static_cast<NGX_Strings_enum>(i);
-            }
-        }
-        return COUNT_enum;  // Not found
-    }
+        enum InitStatus { cold, warming, hot};
 
-    constexpr NGX_Strings_enum getEnumFromMacroContents(const std::string_view& value) {
-        for (std::size_t i = 0; i < COUNT_enum; i++) {
-            if (NGX_Strings_macrocontent[i] == value) {
-                return static_cast<NGX_Strings_enum>(i);
-            }
-        }
-        return COUNT_enum;  // Not found
-    }
+        InitStatus initstatus{cold};
+
+        std::unordered_map<std::string_view, NGX_Strings_enum> map_macroname_to_enum;
+
+        std::unordered_map<std::string_view, NGX_Strings_enum> map_macrocontent_to_enum;
+
+        void populate_maps();
+
+        NGX_Enum_Strings();
+
+        NGX_Strings_enum getEnumFromMacroName(const std::string_view& value);
+
+        NGX_Strings_enum getEnumFromMacroContents(const std::string_view& value);
+
+        std::string_view getMacroNameFromEnum(NGX_Strings_enum value);
+
+        std::string_view getMacroContentFromEnum(NGX_Strings_enum value);
+    } Strings_Converter;
 
 
 }

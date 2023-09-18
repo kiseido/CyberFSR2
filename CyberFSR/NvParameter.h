@@ -1,183 +1,101 @@
 #pragma once
 #include "pch.h"
 
-enum NvParameterType {
-	NvInt,
-	NvFloat,
-	NvDouble,
-	NvUInt,
-	NvULL,
-	NvD3D11Resource,
-	NvD3D12Resource,
-	NvVoidPtr
-};
-
 #include <stdexcept>
 #include <array>
+#include <variant>
+#include <limits>
 
-template <typename ResourceType>
-struct DLSSResources {
-	enum Field {
-		Color_enum,
-		Output_enum,
-		Depth_enum,
-		MotionVectors_enum,
-		TransparencyMask_enum,
-		ExposureTexture_enum,
-		BiasCurrentColorMask_enum,
-		GBufferAlbedo_enum,
-		GBufferRoughness_enum,
-		GBufferMetallic_enum,
-		GBufferSpecular_enum,
-		GBufferSubsurface_enum,
-		GBufferNormals_enum,
-		GBufferShadingModelId_enum,
-		GBufferMaterialId_enum,
-		GBufferAttrib0_enum, 
-		GBufferAttrib1_enum,
-		GBufferAttrib2_enum,
-		GBufferAttrib3_enum,
-		GBufferAttrib4_enum,
-		GBufferAttrib5_enum,
-		GBufferAttrib6_enum,
-		GBufferAttrib7_enum,
-		GBufferAttrib8_enum,
-		GBufferAttrib9_enum,
-		GBufferAttrib10_enum,
-		GBufferAttrib11_enum,
-		GBufferAttrib12_enum,
-		GBufferAttrib13_enum,
-		GBufferAttrib14_enum,
-		GBufferAttrib15_enum,
-		MotionVectors3D_enum,
-		IsParticleMask_enum,
-		AnimatedTextureMask_enum,
-		DepthHighRes_enum,
-		MotionVectorsReflection_enum,
-		length_enum
+struct FSR2_Settings {
+	enum ReactiveMaskState {
+		Game_Defined,
+		Auto_Mask,
+		Disabled
+	};
+	ReactiveMaskState ReactiveMaskState;
+
+};
+
+namespace Hyper_NGX_DB {
+
+	struct TickerCode {
+		size_t external_ticker = 0;
+		size_t internal_ticker = 0;
 	};
 
-	std::array<ResourceType, length_enum> resources;
+	using NGX_Strings_enum = NGX_Strings::NGX_Enum_Strings::NGX_Strings_enum;
 
-	ResourceType& Color() { return resources[Field::Color_enum]; }
-	ResourceType& Output() { return resources[Field::Output_enum]; }
-	ResourceType& Depth() { return resources[Field::Depth_enum]; }
-	ResourceType& MotionVectors() { return resources[Field::MotionVectors_enum]; }
-	ResourceType& TransparencyMask() { return resources[Field::TransparencyMask_enum]; }
-	ResourceType& ExposureTexture() { return resources[Field::ExposureTexture_enum]; }
-	ResourceType& BiasCurrentColorMask() { return resources[Field::BiasCurrentColorMask_enum]; }
-	ResourceType& GBufferAlbedo() { return resources[Field::GBufferAlbedo_enum]; }
-	ResourceType& GBufferRoughness() { return resources[Field::GBufferRoughness_enum]; }
-	ResourceType& GBufferMetallic() { return resources[Field::GBufferMetallic_enum]; }
-	ResourceType& GBufferSpecular() { return resources[Field::GBufferSpecular_enum]; }
-	ResourceType& GBufferSubsurface() { return resources[Field::GBufferSubsurface_enum]; }
-	ResourceType& GBufferNormals() { return resources[Field::GBufferNormals_enum]; }
-	ResourceType& GBufferShadingModelId() { return resources[Field::GBufferShadingModelId_enum]; }
-	ResourceType& GBufferMaterialId() { return resources[Field::GBufferMaterialId_enum]; }
-	ResourceType& GBufferAttrib0() { return resources[Field::GBufferAttrib0_enum]; }
-	ResourceType& GBufferAttrib1() { return resources[Field::GBufferAttrib1_enum]; }
-	ResourceType& GBufferAttrib2() { return resources[Field::GBufferAttrib2_enum]; }
-	ResourceType& GBufferAttrib3() { return resources[Field::GBufferAttrib3_enum]; }
-	ResourceType& GBufferAttrib4() { return resources[Field::GBufferAttrib4_enum]; }
-	ResourceType& GBufferAttrib5() { return resources[Field::GBufferAttrib5_enum]; }
-	ResourceType& GBufferAttrib6() { return resources[Field::GBufferAttrib6_enum]; }
-	ResourceType& GBufferAttrib7() { return resources[Field::GBufferAttrib7_enum]; }
-	ResourceType& GBufferAttrib8() { return resources[Field::GBufferAttrib8_enum]; }
-	ResourceType& GBufferAttrib9() { return resources[Field::GBufferAttrib9_enum]; }
-	ResourceType& GBufferAttrib10() { return resources[Field::GBufferAttrib10_enum]; }
-	ResourceType& GBufferAttrib11() { return resources[Field::GBufferAttrib11_enum]; }
-	ResourceType& GBufferAttrib12() { return resources[Field::GBufferAttrib12_enum]; }
-	ResourceType& GBufferAttrib13() { return resources[Field::GBufferAttrib13_enum]; }
-	ResourceType& GBufferAttrib14() { return resources[Field::GBufferAttrib14_enum]; }
-	ResourceType& GBufferAttrib15() { return resources[Field::GBufferAttrib15_enum]; }
-	ResourceType& MotionVectors3D() { return resources[Field::MotionVectors3D_enum]; }
-	ResourceType& IsParticleMask() { return resources[Field::IsParticleMask_enum]; }
-	ResourceType& AnimatedTextureMask() { return resources[Field::AnimatedTextureMask_enum]; }
-	ResourceType& DepthHighRes() { return resources[Field::DepthHighRes_enum]; }
-	ResourceType& MotionVectorsReflection() { return resources[Field::MotionVectorsReflection_enum]; }
+	using NvParameterValue = std::variant<int, unsigned int, float, double, long, long long, unsigned long, unsigned long long, long double, void*, ID3D11Resource*, ID3D12Resource*>;
 
-	ResourceType& operator[](size_t index) {
-		if (index >= Field::length_enum) {
-			throw std::out_of_range("Invalid index");
-		}
-		return resources[index];
-	}
+	struct ParameterCall {
+		enum call_type {
+			error = 0, set = 8, get = 32
+		} callType;
+		NGX_Strings_enum key;
+		NvParameterValue value;
+		TickerCode request_timestep;
+	};
 
-	const ResourceType& operator[](size_t index) const {
-		if (index >= Field::length_enum) {
-			throw std::out_of_range("Invalid index");
-		}
-		return resources[index];
-	}
-};
+	class ParamStrategy {
+	public:
+		enum StrategyAction { error, consumed, unconsumed, send_to_db };
+		virtual StrategyAction Set(Hyper_NGX_ParameterDB&, ParameterCall&) = 0;
+		virtual StrategyAction Get(Hyper_NGX_ParameterDB&, ParameterCall&) = 0;
+	};
 
-typedef DLSSResources<ID3D12Resource*> D3D_DLSSResources;
-typedef DLSSResources<NVSDK_NGX_Resource_VK*> VK_DLSSResources;
+	class StrategyDB {
+	public:
+		std::multimap<NGX_Strings::NGX_Enum_Strings::NGX_Strings_enum, ParamStrategy> strategies;
+
+		void addStrat(NGX_Strings::NGX_Enum_Strings::NGX_Strings_enum, ParamStrategy*);
+
+		ParamStrategy::StrategyAction Set(Hyper_NGX_ParameterDB&, ParameterCall&);
+		ParamStrategy::StrategyAction Get(Hyper_NGX_ParameterDB&, ParameterCall&);
+	};
+
+	class Hyper_NGX_ParameterDB {
+	public:
 
 
-struct DLSS_Settings {
-	NVSDK_NGX_Dimensions renderSize{};
+		struct ScribedValue {
+			NvParameterValue value;
+			TickerCode tick;
+		};
+		using ParameterCallHistory = std::vector<ParameterCall>;
 
-	NVSDK_NGX_Dimensions renderSizeMax{};
+		using ValueCurrent = std::unordered_map<NGX_Strings_enum, ScribedValue>;
+		using ValueHistory = std::multimap<NGX_Strings_enum, ScribedValue>;
 
-	NVSDK_NGX_Dimensions renderSizeMin{};
+		struct incrementTimeStepHelper {
+			TickerCode oldStep;
+			TickerCode newStep;
+		};
+	private:
+		ValueHistory value_history;
+		ValueCurrent value_current;
+		mutable std::mutex mtx;
+		TickerCode currentTimeStep;
+		ParameterCallHistory requestHistory;
 
-	bool RTXValue{}, FreeMemOnReleaseFeature{};
-	int CreationNodeMask{}, VisibilityNodeMask{}, OptLevel{}, IsDevSnippetBranch{};
-	float Sharpness = 1.0f;
-	bool ResetRender{};
-	float MVScaleX = 1.0, MVScaleY = 1.0;
-	float JitterOffsetX{}, JitterOffsetY{};
+		incrementTimeStepHelper incrementInternalTimeStep();
 
-	bool DepthInverted{}, AutoExposure{}, Hdr{}, EnableSharpening{}, JitterMotion{}, LowRes{};
-};
+	public:
+		Hyper_NGX_ParameterDB();
+		TickerCode getCurrentTimeStep() const;
+		incrementTimeStepHelper incrementExternalTimeStep();
 
-enum ReactiveMaskState {
-	Game_Defined,
-	Auto_Mask,
-	Disabled
-};
+		void Set(const char* name, const NvParameterValue value);
+		std::optional<NvParameterValue> Get(const char* name);
+	};
 
-struct NvParameter : NVSDK_NGX_Parameter
+}
+
+
+
+
+
+struct Hyper_NGX_Parameter : NVSDK_NGX_Parameter
 {
-	const static unsigned int CLAMPING_VALUE = 2;
-
-	struct { float width = 1; float height = 1; } scaleRatio;
-
-	NVSDK_NGX_Dimensions screenSize;
-
-	NVSDK_NGX_Dimensions windowSize;
-
-	NVSDK_NGX_Dimensions renderSize;
-
-	NVSDK_NGX_Dimensions renderSizeMax;
-
-	NVSDK_NGX_Dimensions renderSizeMin;
-
-	NVSDK_NGX_PerfQuality_Value PerfQualityValue = NVSDK_NGX_PerfQuality_Value_Balanced;
-	bool RTXValue{}, FreeMemOnReleaseFeature{};
-	int CreationNodeMask{}, VisibilityNodeMask{}, OptLevel{}, IsDevSnippetBranch{};
-	float Sharpness = 1.0f;
-	bool ResetRender{};
-	float MVScaleX = 1.0, MVScaleY = 1.0;
-	float JitterOffsetX{}, JitterOffsetY{};
-
-	long long SizeInBytes{};
-
-	bool DepthInverted{}, AutoExposure{}, Hdr{}, EnableSharpening{}, JitterMotion{}, LowRes{};
-
-	DLSSResources<void*> Input_Resources;
-	DLSS_Settings Input_Settings;
-
-	//external Resources
-	void* InputBiasCurrentColorMask{};
-	void* Color{};
-	void* Depth{};
-	void* MotionVectors{};
-	void* Output{};
-	void* TransparencyMask{};
-	void* ExposureTexture{};
-
 	virtual void Set(const char* InName, unsigned long long InValue) override;
 	virtual void Set(const char* InName, float InValue) override;
 	virtual void Set(const char* InName, double InValue) override;
@@ -196,41 +114,9 @@ struct NvParameter : NVSDK_NGX_Parameter
 	virtual NVSDK_NGX_Result Get(const char* InName, void** OutValue) const override;
 	virtual void Reset() override;
 
-	inline void Set_Internal(const char* InName, unsigned long long InValue, NvParameterType ParameterType);
-	inline NVSDK_NGX_Result Get_Internal(const char* InName, unsigned long long* OutValue, NvParameterType ParameterType) const;
+	Hyper_NGX_DB::Hyper_NGX_ParameterDB* parameterDB;
 
-	void EvaluateRenderScale();
-
-	void SetRatio(const float x, const float y);
-	void SetResolution(const unsigned int width, const unsigned int height);
-
-	/**
-	template <typename T>
-	inline constexpr T& Cast(const auto& Parameter)
-	{
-		return *((T*)&Parameter);
-	}
-	**/
-
-	std::vector<std::shared_ptr<NvParameter>> Params;
-
-	__declspec(noinline) NvParameter* AllocateParameters()
-	{
-		const auto ptr = std::make_shared<NvParameter>();
-		Params.push_back(ptr);
-		return ptr.get();
-	}
-
-	__declspec(noinline) void DeleteParameters(NvParameter* param)
-	{
-		auto it = std::find_if(Params.begin(), Params.end(),
-			[param](const auto& p) { return p.get() == param; });
-		Params.erase(it);
-	}
-
-	static std::shared_ptr<NvParameter> instance()
-	{
-		static std::shared_ptr<NvParameter> INSTANCE { std::make_shared<NvParameter>() };
-		return INSTANCE;
-	}
+	static NGX_Strings::NGX_Enum_Strings::NGX_Strings_enum stringToEnum(const char* name);
 };
+
+

@@ -5,7 +5,7 @@
 
 
 
-#define doCFSRLogging
+//#define doCFSRLogging
 
 #ifdef doCFSRLogging
 

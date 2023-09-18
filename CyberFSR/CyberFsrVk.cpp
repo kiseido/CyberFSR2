@@ -66,7 +66,7 @@ NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_VULKAN_AllocateParameters(NV
 {
 	CyberLogArgs(OutParameters);
 
-	*OutParameters = NvParameter::instance()->AllocateParameters();
+	*OutParameters = Hyper_NGX_Parameter::instance()->AllocateParameters();
 	return NVSDK_NGX_Result_Success;
 }
 
@@ -74,7 +74,7 @@ NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_VULKAN_GetCapabilityParamete
 {
 	CyberLogArgs(OutParameters);
 
-	*OutParameters = NvParameter::instance()->AllocateParameters();
+	*OutParameters = Hyper_NGX_Parameter::instance()->AllocateParameters();
 	return NVSDK_NGX_Result_Success;
 }
 
@@ -82,7 +82,7 @@ NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_VULKAN_DestroyParameters(NVS
 {
 	CyberLogArgs(InParameters);
 
-	NvParameter::instance()->DeleteParameters((NvParameter*)InParameters);
+	Hyper_NGX_Parameter::instance()->DeleteParameters((Hyper_NGX_Parameter*)InParameters);
 	return NVSDK_NGX_Result_Success;
 }
 
@@ -106,7 +106,7 @@ NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_VULKAN_CreateFeature1(VkDevi
 {
 	CyberLogArgs(InDevice, InCmdList, InFeatureID, InParameters, OutHandle);
 
-	const auto inParams = static_cast<const NvParameter*>(InParameters);
+	const auto inParams = static_cast<const Hyper_NGX_Parameter*>(InParameters);
 
 	auto instance = CyberFsrContext::instance();
 	auto& config = instance->MyConfig;
@@ -229,7 +229,7 @@ NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_VULKAN_EvaluateFeature(VkCom
 	auto instance = CyberFsrContext::instance();
 	auto& config = instance->MyConfig;
 	auto deviceContext = CyberFsrContext::instance()->Contexts[InFeatureHandle->Id].get();
-	const auto inParams = static_cast<const NvParameter*>(InParameters);
+	const auto inParams = static_cast<const Hyper_NGX_Parameter*>(InParameters);
 
 	auto color = (NVSDK_NGX_Resource_VK*)inParams->Color;
 	auto depth = (NVSDK_NGX_Resource_VK*)inParams->Depth;

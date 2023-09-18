@@ -13,7 +13,7 @@ namespace Util
 
 	float ConvertSharpness(float sharpness, std::optional<SharpnessRangeModifier> range);
 
-	enum class NvParameter
+	enum class Hyper_NGX_Parameter
 	{
 		Invalid,
 
@@ -74,7 +74,7 @@ namespace Util
 		IsDevSnippetBranch
 	};
 
-	NvParameter NvParameterToEnum(const char* name);
+	Hyper_NGX_Parameter NvParameterToEnum(const char* name);
 
 };
 

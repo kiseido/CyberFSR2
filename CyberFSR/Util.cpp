@@ -84,65 +84,65 @@ float Util::ConvertSharpness(float sharpness, std::optional<SharpnessRangeModifi
 	}
 }
 
-Util::NvParameter Util::NvParameterToEnum(const char* name)
+Util::Hyper_NGX_Parameter Util::NvParameterToEnum(const char* name)
 {
 	//CyberLOG();
-	static ankerl::unordered_dense::map<std::string, NvParameter> NvParamTranslation = {
-		{"SuperSampling.ScaleFactor", NvParameter::SuperSampling_ScaleFactor},
-		{"SuperSampling.Available", NvParameter::SuperSampling_Available},
-		{"SuperSampling.MinDriverVersionMajor", NvParameter::SuperSampling_MinDriverVersionMajor},
-		{"SuperSampling.MinDriverVersionMinor", NvParameter::SuperSampling_MinDriverVersionMinor},
-		{"SuperSampling.FeatureInitResult", NvParameter::SuperSampling_FeatureInitResult},
-		{"SuperSampling.NeedsUpdatedDriver", NvParameter::SuperSampling_NeedsUpdatedDriver},
-		{"#\x01", NvParameter::SuperSampling_Available},
+	static ankerl::unordered_dense::map<std::string, Hyper_NGX_Parameter> NvParamTranslation = {
+		{"SuperSampling.ScaleFactor", Hyper_NGX_Parameter::SuperSampling_ScaleFactor},
+		{"SuperSampling.Available", Hyper_NGX_Parameter::SuperSampling_Available},
+		{"SuperSampling.MinDriverVersionMajor", Hyper_NGX_Parameter::SuperSampling_MinDriverVersionMajor},
+		{"SuperSampling.MinDriverVersionMinor", Hyper_NGX_Parameter::SuperSampling_MinDriverVersionMinor},
+		{"SuperSampling.FeatureInitResult", Hyper_NGX_Parameter::SuperSampling_FeatureInitResult},
+		{"SuperSampling.NeedsUpdatedDriver", Hyper_NGX_Parameter::SuperSampling_NeedsUpdatedDriver},
+		{"#\x01", Hyper_NGX_Parameter::SuperSampling_Available},
 
-		{"Width", NvParameter::Width},
-		{"Height", NvParameter::Height},
-		{"PerfQualityValue", NvParameter::PerfQualityValue},
-		{"RTXValue", NvParameter::RTXValue},
-		{"NVSDK_NGX_Parameter_FreeMemOnReleaseFeature", NvParameter::FreeMemOnReleaseFeature},
+		{"Width", Hyper_NGX_Parameter::Width},
+		{"Height", Hyper_NGX_Parameter::Height},
+		{"PerfQualityValue", Hyper_NGX_Parameter::PerfQualityValue},
+		{"RTXValue", Hyper_NGX_Parameter::RTXValue},
+		{"NVSDK_NGX_Parameter_FreeMemOnReleaseFeature", Hyper_NGX_Parameter::FreeMemOnReleaseFeature},
 
-		{"OutWidth", NvParameter::OutWidth},
-		{"OutHeight", NvParameter::OutHeight},
+		{"OutWidth", Hyper_NGX_Parameter::OutWidth},
+		{"OutHeight", Hyper_NGX_Parameter::OutHeight},
 
-		{"DLSS.Render.Subrect.Dimensions.Width", NvParameter::DLSS_Render_Subrect_Dimensions_Width},
-		{"DLSS.Render.Subrect.Dimensions.Height", NvParameter::DLSS_Render_Subrect_Dimensions_Height},
-		{"DLSS.Get.Dynamic.Max.Render.Width", NvParameter::DLSS_Get_Dynamic_Max_Render_Width},
-		{"DLSS.Get.Dynamic.Max.Render.Height", NvParameter::DLSS_Get_Dynamic_Max_Render_Height},
-		{"DLSS.Get.Dynamic.Min.Render.Width", NvParameter::DLSS_Get_Dynamic_Min_Render_Width},
-		{"DLSS.Get.Dynamic.Min.Render.Height", NvParameter::DLSS_Get_Dynamic_Min_Render_Height},
-		{"Sharpness", NvParameter::Sharpness},
+		{"DLSS.Render.Subrect.Dimensions.Width", Hyper_NGX_Parameter::DLSS_Render_Subrect_Dimensions_Width},
+		{"DLSS.Render.Subrect.Dimensions.Height", Hyper_NGX_Parameter::DLSS_Render_Subrect_Dimensions_Height},
+		{"DLSS.Get.Dynamic.Max.Render.Width", Hyper_NGX_Parameter::DLSS_Get_Dynamic_Max_Render_Width},
+		{"DLSS.Get.Dynamic.Max.Render.Height", Hyper_NGX_Parameter::DLSS_Get_Dynamic_Max_Render_Height},
+		{"DLSS.Get.Dynamic.Min.Render.Width", Hyper_NGX_Parameter::DLSS_Get_Dynamic_Min_Render_Width},
+		{"DLSS.Get.Dynamic.Min.Render.Height", Hyper_NGX_Parameter::DLSS_Get_Dynamic_Min_Render_Height},
+		{"Sharpness", Hyper_NGX_Parameter::Sharpness},
 
-		{"DLSSOptimalSettingsCallback", NvParameter::DLSSOptimalSettingsCallback},
-		{"DLSSGetStatsCallback", NvParameter::DLSSGetStatsCallback},
+		{"DLSSOptimalSettingsCallback", Hyper_NGX_Parameter::DLSSOptimalSettingsCallback},
+		{"DLSSGetStatsCallback", Hyper_NGX_Parameter::DLSSGetStatsCallback},
 
-		{"CreationNodeMask", NvParameter::CreationNodeMask},
-		{"VisibilityNodeMask", NvParameter::VisibilityNodeMask},
-		{"DLSS.Feature.Create.Flags", NvParameter::DLSS_Feature_Create_Flags},
-		{"DLSS.Enable.Output.Subrects", NvParameter::DLSS_Enable_Output_Subrects},
+		{"CreationNodeMask", Hyper_NGX_Parameter::CreationNodeMask},
+		{"VisibilityNodeMask", Hyper_NGX_Parameter::VisibilityNodeMask},
+		{"DLSS.Feature.Create.Flags", Hyper_NGX_Parameter::DLSS_Feature_Create_Flags},
+		{"DLSS.Enable.Output.Subrects", Hyper_NGX_Parameter::DLSS_Enable_Output_Subrects},
 
-		{"Color", NvParameter::Color},
-		{"MotionVectors", NvParameter::MotionVectors},
-		{"Depth", NvParameter::Depth},
-		{"Output", NvParameter::Output},
-		{"TransparencyMask", NvParameter::TransparencyMask},
-		{"ExposureTexture", NvParameter::ExposureTexture},
-		{"DLSS.Input.Bias.Current.Color.Mask", NvParameter::DLSS_Input_Bias_Current_Color_Mask},
+		{"Color", Hyper_NGX_Parameter::Color},
+		{"MotionVectors", Hyper_NGX_Parameter::MotionVectors},
+		{"Depth", Hyper_NGX_Parameter::Depth},
+		{"Output", Hyper_NGX_Parameter::Output},
+		{"TransparencyMask", Hyper_NGX_Parameter::TransparencyMask},
+		{"ExposureTexture", Hyper_NGX_Parameter::ExposureTexture},
+		{"DLSS.Input.Bias.Current.Color.Mask", Hyper_NGX_Parameter::DLSS_Input_Bias_Current_Color_Mask},
 
-		{"DLSS.Pre.Exposure", NvParameter::Pre_Exposure},
-		{"DLSS.Exposure.Scale", NvParameter::Exposure_Scale},
+		{"DLSS.Pre.Exposure", Hyper_NGX_Parameter::Pre_Exposure},
+		{"DLSS.Exposure.Scale", Hyper_NGX_Parameter::Exposure_Scale},
 
-		{"Reset", NvParameter::Reset},
-		{"MV.Scale.X", NvParameter::MV_Scale_X},
-		{"MV.Scale.Y", NvParameter::MV_Scale_Y},
-		{"Jitter.Offset.X", NvParameter::Jitter_Offset_X},
-		{"Jitter.Offset.Y", NvParameter::Jitter_Offset_Y},
+		{"Reset", Hyper_NGX_Parameter::Reset},
+		{"MV.Scale.X", Hyper_NGX_Parameter::MV_Scale_X},
+		{"MV.Scale.Y", Hyper_NGX_Parameter::MV_Scale_Y},
+		{"Jitter.Offset.X", Hyper_NGX_Parameter::Jitter_Offset_X},
+		{"Jitter.Offset.Y", Hyper_NGX_Parameter::Jitter_Offset_Y},
 
-		{"SizeInBytes", NvParameter::SizeInBytes},
-		{"Snippet.OptLevel", NvParameter::OptLevel},
-		{"#\x44", NvParameter::OptLevel},
-		{"Snippet.IsDevBranch", NvParameter::IsDevSnippetBranch},
-		{"#\x45", NvParameter::IsDevSnippetBranch}
+		{"SizeInBytes", Hyper_NGX_Parameter::SizeInBytes},
+		{"Snippet.OptLevel", Hyper_NGX_Parameter::OptLevel},
+		{"#\x44", Hyper_NGX_Parameter::OptLevel},
+		{"Snippet.IsDevBranch", Hyper_NGX_Parameter::IsDevSnippetBranch},
+		{"#\x45", Hyper_NGX_Parameter::IsDevSnippetBranch}
 	};
 
 	return NvParamTranslation[std::string(name)];

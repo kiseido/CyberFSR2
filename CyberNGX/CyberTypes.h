@@ -14,6 +14,11 @@
 
 namespace CyberTypes {
 
+    struct Resolution_Dimensions {
+        constexpr static double initialValue = -std::numeric_limits<double>::infinity();
+        double width = initialValue;
+        double height = initialValue;
+    };
 
 // #define WrapIt(BaseType) typedef Wrapper<BaseType> CT_##BaseType##_t; typedef union {BaseType base; CT_##BaseType##_t wrapped;} CT_##BaseType##_u; std::wostream& CyberTypes::CT_##BaseType##_u::operator<<(std::wostream& wos)
 

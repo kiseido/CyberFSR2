@@ -7,124 +7,13 @@
 #include <numeric>
 #include <algorithm>
 
-void NvParameter::Set(const char* InName, unsigned long long InValue)
-{
-	CyberLogArgs(this, InName, InValue);
-	auto value = (unsigned long long*) & InValue;
-	Set_Internal(InName, *value, NvULL);
-}
 
-void NvParameter::Set(const char* InName, float InValue)
-{
-	CyberLogArgs(this, InName, InValue);
-	auto value = (unsigned long long*) & InValue;
-	Set_Internal(InName, *value, NvFloat);
-}
-
-void NvParameter::Set(const char* InName, double InValue)
-{
-	CyberLogArgs(this, InName, InValue);
-	auto value = (unsigned long long*) & InValue;
-	Set_Internal(InName, *value, NvDouble);
-}
-
-void NvParameter::Set(const char* InName, unsigned int InValue)
-{
-	CyberLogArgs(this, InName, InValue);
-	auto value = (unsigned long long*) & InValue;
-	Set_Internal(InName, *value, NvUInt);
-}
-
-void NvParameter::Set(const char* InName, int InValue)
-{
-	CyberLogArgs(this, InName, InValue);
-	auto value = (unsigned long long*) & InValue;
-	Set_Internal(InName, *value, NvInt);
-}
-
-void NvParameter::Set(const char* InName, ID3D11Resource* InValue)
-{
-	CyberLogArgs(this, InName, InValue);
-	auto value = (unsigned long long*) & InValue;
-	Set_Internal(InName, *value, NvD3D11Resource);
-}
-
-void NvParameter::Set(const char* InName, ID3D12Resource* InValue)
-{
-	CyberLogArgs(this, InName, InValue);
-	auto value = (unsigned long long*) & InValue;
-	Set_Internal(InName, *value, NvD3D12Resource);
-}
-
-void NvParameter::Set(const char* InName, void* InValue)
-{
-	CyberLogArgs(this, InName, InValue);
-	auto value = (unsigned long long*) & InValue;
-	Set_Internal(InName, *value, NvVoidPtr);
-}
-
-NVSDK_NGX_Result NvParameter::Get(const char* InName, unsigned long long* OutValue) const
-{
-	const auto result = Get_Internal(InName, (unsigned long long*)OutValue, NvULL);
-	CyberLogArgs(this, result, InName, OutValue, *OutValue);
-	return result;
-}
-
-NVSDK_NGX_Result NvParameter::Get(const char* InName, float* OutValue) const
-{
-	const auto result = Get_Internal(InName, (unsigned long long*)OutValue, NvFloat);
-	CyberLogArgs(this, result, InName, OutValue, *OutValue);
-	return result;
-}
-
-NVSDK_NGX_Result NvParameter::Get(const char* InName, double* OutValue) const
-{
-	const auto result = Get_Internal(InName, (unsigned long long*)OutValue, NvDouble);
-	CyberLogArgs(this, result, InName, OutValue, *OutValue);
-	return result;
-}
-
-NVSDK_NGX_Result NvParameter::Get(const char* InName, unsigned int* OutValue) const
-{
-	const auto result = Get_Internal(InName, (unsigned long long*)OutValue, NvUInt);
-	CyberLogArgs(this, result, InName, OutValue, *OutValue);
-	return result;
-}
-
-NVSDK_NGX_Result NvParameter::Get(const char* InName, int* OutValue) const
-{
-	const auto result = Get_Internal(InName, (unsigned long long*)OutValue, NvInt);
-	CyberLogArgs(this, result, InName, OutValue, *OutValue);
-	return result;
-}
-
-NVSDK_NGX_Result NvParameter::Get(const char* InName, ID3D11Resource** OutValue) const
-{
-	const auto result = Get_Internal(InName, (unsigned long long*)OutValue, NvD3D11Resource);
-	CyberLogArgs(this, result, InName, OutValue, *OutValue);
-	return result;
-}
-
-NVSDK_NGX_Result NvParameter::Get(const char* InName, ID3D12Resource** OutValue) const
-{
-	const auto result = Get_Internal(InName, (unsigned long long*)OutValue, NvD3D12Resource);
-	CyberLogArgs(this, result, InName, OutValue, *OutValue);
-	return result;
-}
-
-NVSDK_NGX_Result NvParameter::Get(const char* InName, void** OutValue) const
-{
-	const auto result = Get_Internal(InName, (unsigned long long*)OutValue, NvVoidPtr);
-	CyberLogArgs(this, result, InName, OutValue, *OutValue);
-	return result;
-}
-
-void NvParameter::Reset()
+void Hyper_NGX_Parameter::Reset()
 {
 	CyberLogArgs(this);
 }
 
-inline void NvParameter::Set_Internal(const char* InName, unsigned long long InValue, NvParameterType ParameterType)
+inline void Hyper_NGX_Parameter::Set_Internal(const char* InName, unsigned long long InValue, NvParameterType ParameterType)
 {
 	//CyberLogArgs(InName, InValue, ParameterType);
 
@@ -137,58 +26,58 @@ inline void NvParameter::Set_Internal(const char* InName, unsigned long long InV
 
 	switch (Util::NvParameterToEnum(InName))
 	{
-	case Util::NvParameter::MV_Scale_X:
+	case Util::Hyper_NGX_Parameter::MV_Scale_X:
 		MVScaleX = *inValueFloat;
 		break;
-	case Util::NvParameter::MV_Scale_Y:
+	case Util::Hyper_NGX_Parameter::MV_Scale_Y:
 		MVScaleY = *inValueFloat;
 		break;
-	case Util::NvParameter::Jitter_Offset_X:
+	case Util::Hyper_NGX_Parameter::Jitter_Offset_X:
 		JitterOffsetX = *inValueFloat;
 		break;
-	case Util::NvParameter::Jitter_Offset_Y:
+	case Util::Hyper_NGX_Parameter::Jitter_Offset_Y:
 		JitterOffsetY = *inValueFloat;
 		break;
-	case Util::NvParameter::Sharpness:
+	case Util::Hyper_NGX_Parameter::Sharpness:
 		Sharpness = *inValueFloat;
 		break;
-	case Util::NvParameter::Width:
+	case Util::Hyper_NGX_Parameter::Width:
 		windowSize.Width = *inValueInt;
 		break;
-	case Util::NvParameter::Height:
+	case Util::Hyper_NGX_Parameter::Height:
 		windowSize.Height = *inValueInt;
 		break;
-	case Util::NvParameter::DLSS_Render_Subrect_Dimensions_Width:
+	case Util::Hyper_NGX_Parameter::DLSS_Render_Subrect_Dimensions_Width:
 		renderSize.Width = *inValueInt;
 		break;
-	case Util::NvParameter::DLSS_Render_Subrect_Dimensions_Height:
+	case Util::Hyper_NGX_Parameter::DLSS_Render_Subrect_Dimensions_Height:
 		renderSize.Height = *inValueInt;
 		break;
-	case Util::NvParameter::PerfQualityValue:
+	case Util::Hyper_NGX_Parameter::PerfQualityValue:
 		PerfQualityValue = static_cast<NVSDK_NGX_PerfQuality_Value>(*inValueInt);
 		break;
-	case Util::NvParameter::RTXValue:
+	case Util::Hyper_NGX_Parameter::RTXValue:
 		RTXValue = *inValueInt;
 		break;
-	case Util::NvParameter::FreeMemOnReleaseFeature:
+	case Util::Hyper_NGX_Parameter::FreeMemOnReleaseFeature:
 		FreeMemOnReleaseFeature = *inValueInt;
 		break;
-	case Util::NvParameter::CreationNodeMask:
+	case Util::Hyper_NGX_Parameter::CreationNodeMask:
 		CreationNodeMask = *inValueInt;
 		break;
-	case Util::NvParameter::VisibilityNodeMask:
+	case Util::Hyper_NGX_Parameter::VisibilityNodeMask:
 		VisibilityNodeMask = *inValueInt;
 		break;
-	case Util::NvParameter::Reset:
+	case Util::Hyper_NGX_Parameter::Reset:
 		ResetRender = *inValueInt;
 		break;
-	case Util::NvParameter::OutWidth:
+	case Util::Hyper_NGX_Parameter::OutWidth:
 		renderSize.Width = *inValueInt;
 		break;
-	case Util::NvParameter::OutHeight:
+	case Util::Hyper_NGX_Parameter::OutHeight:
 		renderSize.Height = *inValueInt;
 		break;
-	case Util::NvParameter::DLSS_Feature_Create_Flags:
+	case Util::Hyper_NGX_Parameter::DLSS_Feature_Create_Flags:
 		Hdr = *inValueInt & NVSDK_NGX_DLSS_Feature_Flags_IsHDR;
 		EnableSharpening = *inValueInt & NVSDK_NGX_DLSS_Feature_Flags_DoSharpening;
 		DepthInverted = *inValueInt & NVSDK_NGX_DLSS_Feature_Flags_DepthInverted;
@@ -196,37 +85,37 @@ inline void NvParameter::Set_Internal(const char* InName, unsigned long long InV
 		LowRes = *inValueInt & NVSDK_NGX_DLSS_Feature_Flags_MVLowRes;
 		AutoExposure = *inValueInt & NVSDK_NGX_DLSS_Feature_Flags_AutoExposure;
 		break;
-	case Util::NvParameter::DLSS_Input_Bias_Current_Color_Mask:
+	case Util::Hyper_NGX_Parameter::DLSS_Input_Bias_Current_Color_Mask:
 		InputBiasCurrentColorMask = inValuePtr;
 		if (InputBiasCurrentColorMask && ParameterType == NvParameterType::NvD3D12Resource)
 			((ID3D12Resource*)InputBiasCurrentColorMask)->SetName(L"Color");
 		break;
-	case Util::NvParameter::Color:
+	case Util::Hyper_NGX_Parameter::Color:
 		Color = inValuePtr;
 		if (Color && ParameterType == NvParameterType::NvD3D12Resource)
 			((ID3D12Resource*)Color)->SetName(L"Color");
 		break;
-	case Util::NvParameter::Depth:
+	case Util::Hyper_NGX_Parameter::Depth:
 		Depth = inValuePtr;
 		if (Depth && ParameterType == NvParameterType::NvD3D12Resource)
 			((ID3D12Resource*)Depth)->SetName(L"Depth");
 		break;
-	case Util::NvParameter::MotionVectors:
+	case Util::Hyper_NGX_Parameter::MotionVectors:
 		MotionVectors = inValuePtr;
 		if (MotionVectors && ParameterType == NvParameterType::NvD3D12Resource)
 			((ID3D12Resource*)MotionVectors)->SetName(L"MotionVectors");
 		break;
-	case Util::NvParameter::Output:
+	case Util::Hyper_NGX_Parameter::Output:
 		Output = inValuePtr;
 		if (Output && ParameterType == NvParameterType::NvD3D12Resource)
 			((ID3D12Resource*)Output)->SetName(L"Output");
 		break;
-	case Util::NvParameter::TransparencyMask:
+	case Util::Hyper_NGX_Parameter::TransparencyMask:
 		TransparencyMask = inValuePtr;
 		if (TransparencyMask && ParameterType == NvParameterType::NvD3D12Resource)
 			((ID3D12Resource*)TransparencyMask)->SetName(L"TransparencyMask");
 		break;
-	case Util::NvParameter::ExposureTexture:
+	case Util::Hyper_NGX_Parameter::ExposureTexture:
 		ExposureTexture = inValuePtr;
 		if (ExposureTexture && ParameterType == NvParameterType::NvD3D12Resource)
 			((ID3D12Resource*)ExposureTexture)->SetName(L"ExposureTexture");
@@ -237,7 +126,7 @@ inline void NvParameter::Set_Internal(const char* InName, unsigned long long InV
 NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_DLSS_GetOptimalSettingsCallback(NVSDK_NGX_Parameter* InParams);
 NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_DLSS_GetStatsCallback(NVSDK_NGX_Parameter* InParams);
 
-inline NVSDK_NGX_Result NvParameter::Get_Internal(const char* InName, unsigned long long* OutValue, NvParameterType ParameterType) const
+inline NVSDK_NGX_Result Hyper_NGX_Parameter::Get_Internal(const char* InName, unsigned long long* OutValue, NvParameterType ParameterType) const
 {
 	//CyberLogArgs(InName, OutValue, ParameterType);
 
@@ -251,62 +140,62 @@ inline NVSDK_NGX_Result NvParameter::Get_Internal(const char* InName, unsigned l
 
 	switch (Util::NvParameterToEnum(InName))
 	{
-	case Util::NvParameter::Sharpness:
+	case Util::Hyper_NGX_Parameter::Sharpness:
 		*outValueFloat = Sharpness;
 		break;
-	case Util::NvParameter::SuperSampling_Available:
+	case Util::Hyper_NGX_Parameter::SuperSampling_Available:
 		*outValueInt = true;
 		break;
-	case Util::NvParameter::SuperSampling_FeatureInitResult:
+	case Util::Hyper_NGX_Parameter::SuperSampling_FeatureInitResult:
 		*outValueInt = NVSDK_NGX_Result_Success;
 		break;
-	case Util::NvParameter::SuperSampling_NeedsUpdatedDriver:
+	case Util::Hyper_NGX_Parameter::SuperSampling_NeedsUpdatedDriver:
 		*outValueInt = 0;
 		break;
-	case Util::NvParameter::SuperSampling_MinDriverVersionMinor:
-	case Util::NvParameter::SuperSampling_MinDriverVersionMajor:
+	case Util::Hyper_NGX_Parameter::SuperSampling_MinDriverVersionMinor:
+	case Util::Hyper_NGX_Parameter::SuperSampling_MinDriverVersionMajor:
 		*outValueInt = 0;
 		break;
-	case Util::NvParameter::DLSS_Render_Subrect_Dimensions_Width:
+	case Util::Hyper_NGX_Parameter::DLSS_Render_Subrect_Dimensions_Width:
 		*outValueInt = renderSize.Width;
 		break;
-	case Util::NvParameter::DLSS_Render_Subrect_Dimensions_Height:
+	case Util::Hyper_NGX_Parameter::DLSS_Render_Subrect_Dimensions_Height:
 		*outValueInt = renderSize.Height;
 		break;
-	case Util::NvParameter::OutWidth:
+	case Util::Hyper_NGX_Parameter::OutWidth:
 		*outValueInt = renderSize.Width;
 		break;
-	case Util::NvParameter::OutHeight:
+	case Util::Hyper_NGX_Parameter::OutHeight:
 		*outValueInt = renderSize.Height;
 		break;
-	case Util::NvParameter::DLSS_Get_Dynamic_Max_Render_Width:
+	case Util::Hyper_NGX_Parameter::DLSS_Get_Dynamic_Max_Render_Width:
 		*outValueInt = renderSizeMax.Width;
 		break;
-	case Util::NvParameter::DLSS_Get_Dynamic_Max_Render_Height:
+	case Util::Hyper_NGX_Parameter::DLSS_Get_Dynamic_Max_Render_Height:
 		*outValueInt = renderSizeMax.Height;
 		break;
-	case Util::NvParameter::DLSS_Get_Dynamic_Min_Render_Width:
+	case Util::Hyper_NGX_Parameter::DLSS_Get_Dynamic_Min_Render_Width:
 		*outValueInt = renderSizeMin.Width;
 		break;
-	case Util::NvParameter::DLSS_Get_Dynamic_Min_Render_Height:
+	case Util::Hyper_NGX_Parameter::DLSS_Get_Dynamic_Min_Render_Height:
 		*outValueInt = renderSizeMin.Height;
 		break;
-	case Util::NvParameter::DLSSOptimalSettingsCallback:
+	case Util::Hyper_NGX_Parameter::DLSSOptimalSettingsCallback:
 		*outValuePtr = NVSDK_NGX_DLSS_GetOptimalSettingsCallback;
 		break;
-	case Util::NvParameter::DLSSGetStatsCallback:
+	case Util::Hyper_NGX_Parameter::DLSSGetStatsCallback:
 		*outValuePtr = NVSDK_NGX_DLSS_GetStatsCallback;
 		break;
-	case Util::NvParameter::SizeInBytes:
+	case Util::Hyper_NGX_Parameter::SizeInBytes:
 		*outValueULL = 0x1337; //Dummy value
 		break;
-	case Util::NvParameter::OptLevel:
+	case Util::Hyper_NGX_Parameter::OptLevel:
 		*outValueInt = 0; //Dummy value
 		break;
-	case Util::NvParameter::IsDevSnippetBranch:
+	case Util::Hyper_NGX_Parameter::IsDevSnippetBranch:
 		*outValueInt = 0; //Dummy value
 		break;
-	case Util::NvParameter::RTXValue:
+	case Util::Hyper_NGX_Parameter::RTXValue:
 		*outValueInt = RTXValue;
 		break;
 	default:
@@ -314,6 +203,143 @@ inline NVSDK_NGX_Result NvParameter::Get_Internal(const char* InName, unsigned l
 	}
 
 	return NVSDK_NGX_Result_Success;
+}
+
+#include <iostream>
+#include <unordered_map>
+#include <variant>
+#include <cmath>
+#include <vector>
+#include <utility>
+
+void FilterDB::addFilter(NGX_Strings::NGX_Enum_Strings::NGX_Strings_enum filteredEnum, std::shared_ptr<IFilter> filter) {
+	filters.insert({ filteredEnum, filter });
+}
+
+IFilter::filterAction FilterDB::Set(NGX_Strings::NGX_Enum_Strings::NGX_Strings_enum key, const Hyper_NGX_DB::ValueType& value) {
+	auto range = filters.equal_range(key);
+	for (auto it = range.first; it != range.second; ++it) {
+		auto action = it->second->BeforeSet(key, value);
+		if (action != IFilter::unconsumed) {
+			return action;
+		}
+	}
+	return IFilter::unconsumed;
+}
+
+IFilter::filterAction FilterDB::Get(NGX_Strings::NGX_Enum_Strings::NGX_Strings_enum key) {
+	auto range = filters.equal_range(key);
+	for (auto it = range.first; it != range.second; ++it) {
+		auto action = it->second->BeforeGet(key);
+		if (action != IFilter::unconsumed) {
+			return action;
+		}
+	}
+	return IFilter::unconsumed;
+}
+
+void Hyper_NGX_Parameter::Internal_Set(const char* name, const Hyper_NGX_DB::ValueType value) {
+	auto key = stringToEnum(name);
+
+	// BeforeSet filters
+	auto beforeSetAction = filters.Set(key, value);
+	if (beforeSetAction == IFilter::consumed) {
+		return;
+	}
+
+	// If unconsumed, send to DB
+	parameterDB.Set(key, value);
+}
+
+std::optional<Hyper_NGX_DB::ValueType> Hyper_NGX_Parameter::Internal_Get(const char* name) {
+	auto key = stringToEnum(name);
+
+	// BeforeGet filters
+	auto beforeGetAction = filters.Get(key);
+	if (beforeGetAction == IFilter::consumed) {
+		return std::nullopt;
+	}
+
+	// If unconsumed, retrieve from DB
+	auto value = parameterDB.Get(key);
+
+	return value;
+}
+
+namespace Hyper_NGX_DB {
+
+	Hyper_NGX_ParameterDB::Hyper_NGX_ParameterDB() : currentTimeStep{} {}
+
+	incrementTimeStepHelper Hyper_NGX_ParameterDB::incrementInternalTimeStep() {
+		std::lock_guard<std::mutex> lock(mtx);
+		incrementTimeStepHelper helper;
+
+		helper.oldStep = currentTimeStep;
+
+		currentTimeStep.internal_call_count += 1;
+
+		helper.newStep = currentTimeStep;
+
+		return helper;
+	}
+
+	TimeStep Hyper_NGX_ParameterDB::getCurrentTimeStep() const {
+		std::lock_guard<std::mutex> lock(mtx); 
+		return currentTimeStep;
+	}
+
+	incrementTimeStepHelper Hyper_NGX_ParameterDB::incrementExternalTimeStep() {
+		std::lock_guard<std::mutex> lock(mtx);
+		incrementTimeStepHelper helper;
+
+		helper.oldStep = currentTimeStep;
+
+		currentTimeStep.external_call_count += 1;
+		currentTimeStep.internal_call_count = 0;
+
+		helper.newStep = currentTimeStep;
+
+		return helper;
+	}
+
+	void Hyper_NGX_ParameterDB::Set(NGX_Strings_enum enum_val, const ValueType value) {
+		std::lock_guard<std::mutex> lock(mtx);
+
+		ScribedValue scribedValue{ value, currentTimeStep };
+
+		value_history.insert({ enum_val, scribedValue });
+		value_current[enum_val] = scribedValue;
+
+		RequestHistory::timelinestep step{
+			RequestHistory::timelinestep::set,
+			enum_val,
+			scribedValue,
+			currentTimeStep
+		};
+
+		requestHistory.timeline.push_back(step);
+		incrementInternalTimeStep();
+	}
+
+	std::optional<ValueType> Hyper_NGX_ParameterDB::Get(NGX_Strings_enum enum_val) {
+		std::lock_guard<std::mutex> lock(mtx);
+
+		auto it = value_current.find(enum_val);
+		if (it != value_current.end()) {
+			RequestHistory::timelinestep step{
+				RequestHistory::timelinestep::get,
+				enum_val,
+				it->second,
+				currentTimeStep
+			};
+
+			requestHistory.timeline.push_back(step);
+
+			return it->second.value;
+		}
+
+		return std::nullopt;
+	}
 }
 
 // EvaluateRenderScale helper
@@ -378,8 +404,61 @@ inline std::optional<float> GetQualityOverrideRatio(const NVSDK_NGX_PerfQuality_
 	return output;
 }
 
+NGX_Strings::NGX_Enum_Strings::NGX_Strings_enum Hyper_NGX_Parameter::stringToEnum(const char* name) {
+	return NGX_Strings::Strings_Converter.getEnumFromMacroName(name);
+}
 
-void NvParameter::EvaluateRenderScale()
+void Hyper_NGX_Parameter::Set(const char* InName, unsigned long long InValue) {
+	CyberLogArgs(this, InName, InValue);
+	parameterDB.Set(stringToEnum(InName), InValue);
+}
+
+void Hyper_NGX_Parameter::Set(const char* InName, int InValue) {
+	CyberLogArgs(this, InName, InValue);
+	parameterDB.Set(stringToEnum(InName), InValue);
+}
+
+void Hyper_NGX_Parameter::Set(const char* InName, unsigned int InValue) {
+	CyberLogArgs(this, InName, InValue);
+	parameterDB.Set(stringToEnum(InName), InValue);
+}
+
+void Hyper_NGX_Parameter::Set(const char* InName, float InValue) {
+	CyberLogArgs(this, InName, InValue);
+	parameterDB.Set(stringToEnum(InName), InValue);
+}
+
+void Hyper_NGX_Parameter::Set(const char* InName, double InValue) {
+	CyberLogArgs(this, InName, InValue);
+	parameterDB.Set(stringToEnum(InName), InValue);
+}
+
+void Hyper_NGX_Parameter::Set(const char* InName, ID3D11Resource* InValue) {
+	CyberLogArgs(this, InName, InValue);
+	parameterDB.Set(stringToEnum(InName), InValue);
+}
+
+void Hyper_NGX_Parameter::Set(const char* InName, ID3D12Resource* InValue) {
+	CyberLogArgs(this, InName, InValue);
+	parameterDB.Set(stringToEnum(InName), InValue);
+}
+
+void Hyper_NGX_Parameter::Set(const char* InName, void* InValue) {
+	CyberLogArgs(this, InName, InValue);
+	parameterDB.Set(stringToEnum(InName), InValue);
+}
+
+NVSDK_NGX_Result Hyper_NGX_Parameter::Get(const char* InName, unsigned long long* OutValue) const {
+	auto key = NGX_Strings::Strings_Converter.getEnumFromMacroName(InName);
+	auto opt_value = paramDB.Get(key);
+	if (opt_value.has_value()) {
+		*OutValue = std::get<unsigned long long>(opt_value.value());
+		return NVSDK_NGX_Result_Success;
+	}
+	return NVSDK_NGX_Result_Fail;
+}
+
+void Hyper_NGX_Parameter::EvaluateRenderScale()
 {
 	enum RenderScalePriorityPreference { ratio, resolution } priority = ratio;
 
@@ -483,7 +562,7 @@ std::vector<NVSDK_NGX_Dimensions> generateResolutions(unsigned int maxWidth, uns
 	const unsigned int yIncrease = ratioY1;
 
 	for (unsigned int w = ratioX1, h = ratioY1; w <= maxWidth && h <= maxHeight; w += xIncrease, h += yIncrease) {
-		if (w % NvParameter::CLAMPING_VALUE == 0 && h % NvParameter::CLAMPING_VALUE == 0) {
+		if (w % Hyper_NGX_Parameter::CLAMPING_VALUE == 0 && h % Hyper_NGX_Parameter::CLAMPING_VALUE == 0) {
 			resolutions.push_back({ w, h });
 			CyberLOGvi("Valid Resoltuion Calculated: ", w, h);
 		}
@@ -543,7 +622,7 @@ NVSDK_NGX_Dimensions findClosestResolution(const std::vector<NVSDK_NGX_Dimension
 	return closestResolution;
 }
 
-void NvParameter::SetRatio(const float ScaleRatioX, float ScaleRatioY) {
+void Hyper_NGX_Parameter::SetRatio(const float ScaleRatioX, float ScaleRatioY) {
 	CyberLogArgs(ScaleRatioX, ScaleRatioY);
 	long requestedWidth = windowSize.Width / ScaleRatioX;
 	long requestedHeight = windowSize.Height / ScaleRatioY;
@@ -559,7 +638,7 @@ void NvParameter::SetRatio(const float ScaleRatioX, float ScaleRatioY) {
 	scaleRatio.height = static_cast<float>(closestHeight) / windowSize.Height;
 }
 
-void NvParameter::SetResolution(const unsigned int width, const unsigned int height) {
+void Hyper_NGX_Parameter::SetResolution(const unsigned int width, const unsigned int height) {
 	CyberLogArgs(width, height);
 
 	long requestedWidth = width;
@@ -587,7 +666,7 @@ NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_DLSS_GetOptimalSettingsCallback(NVSDK_NGX_
 	*/
 
 	CyberLogArgs(InParams);
-	auto params = static_cast<NvParameter*>(InParams);
+	auto params = static_cast<Hyper_NGX_Parameter*>(InParams);
 	params->EvaluateRenderScale();
 	/*
 	if (num != 0) {
