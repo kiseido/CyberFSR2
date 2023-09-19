@@ -18,7 +18,7 @@ public:
 	VkInstance VulkanInstance;
 	VkPhysicalDevice VulkanPhysicalDevice;
 
-	std::shared_ptr<Hyper_NGX_Parameter> NvParameterInstance = Hyper_NGX_Parameter::instance();
+	std::shared_ptr<Parameter> NvParameterInstance = Parameter::instance();
 
 	ankerl::unordered_dense::map <unsigned int, std::unique_ptr<FeatureContext>> Contexts;
 	FeatureContext* CreateContext();

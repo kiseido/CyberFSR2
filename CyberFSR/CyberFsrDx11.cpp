@@ -46,21 +46,21 @@ NVSDK_NGX_Result NVSDK_NGX_D3D11_GetParameters(NVSDK_NGX_Parameter** OutParamete
 //currently it's kind of hack still needs a proper implementation 
 NVSDK_NGX_Result NVSDK_NGX_D3D11_GetCapabilityParameters(NVSDK_NGX_Parameter** OutParameters)
 {
-	*OutParameters = Hyper_NGX_Parameter::instance()->AllocateParameters();
+	*OutParameters = Parameter::instance()->AllocateParameters();
 	return NVSDK_NGX_Result_Success;
 }
 
 //currently it's kind of hack still needs a proper implementation
 NVSDK_NGX_Result NVSDK_NGX_D3D11_AllocateParameters(NVSDK_NGX_Parameter** OutParameters)
 {
-	*OutParameters = Hyper_NGX_Parameter::instance()->AllocateParameters();
+	*OutParameters = Parameter::instance()->AllocateParameters();
 	return NVSDK_NGX_Result_Success;
 }
 
 //currently it's kind of hack still needs a proper implementation
 NVSDK_NGX_Result NVSDK_NGX_D3D11_DestroyParameters(NVSDK_NGX_Parameter* InParameters)
 {
-	Hyper_NGX_Parameter::instance()->DeleteParameters((Hyper_NGX_Parameter*)InParameters);
+	Parameter::instance()->DeleteParameters((Parameter*)InParameters);
 	return NVSDK_NGX_Result_Success;
 }
 
@@ -86,7 +86,7 @@ void Fsr2MessageCallback_DX11(FfxFsr2MsgType type, const wchar_t* message)
 
 NVSDK_NGX_Result NVSDK_NGX_D3D11_CreateFeature(ID3D11DeviceContext* InDevCtx, NVSDK_NGX_Feature InFeatureID, NVSDK_NGX_Parameter* InParameters, NVSDK_NGX_Handle** OutHandle)
 {
-	const auto inParams = static_cast<const Hyper_NGX_Parameter*>(InParameters);
+	const auto inParams = static_cast<const Parameter*>(InParameters);
 
 	ID3D11Device* device;
 	InDevCtx->GetDevice(&device);
@@ -180,7 +180,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D11_EvaluateFeature(ID3D11DeviceContext* InDevCtx, 
 	auto& config = instance->MyConfig;
 	auto deviceContext = CyberFsrContext::instance()->Contexts[InFeatureHandle->Id].get();
 
-	const auto inParams = static_cast<const Hyper_NGX_Parameter*>(InParameters);
+	const auto inParams = static_cast<const Parameter*>(InParameters);
 
 	auto* fsrContext = &deviceContext->FsrContext;
 

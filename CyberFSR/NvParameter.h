@@ -6,117 +6,112 @@
 #include <variant>
 #include <limits>
 
-struct FSR2_Settings {
-	enum ReactiveMaskState {
-		Game_Defined,
-		Auto_Mask,
-		Disabled
-	};
-	ReactiveMaskState ReactiveMaskState;
+namespace Hyper_NGX {
 
-};
-
-namespace Hyper_NGX_DB {
-
-	struct TickerCode {
+	struct TickerCode_t {
 		size_t external_ticker = 0;
 		size_t internal_ticker = 0;
 	};
 
-	using NGX_Strings_enum = NGX_Strings::NGX_Enum_Strings::NGX_Strings_enum;
+	using MacroStrings_enum_t = NGX_Strings::MacroStrings_enum_t;
 
-	using NvParameterValue = std::variant<int, unsigned int, float, double, long, long long, unsigned long, unsigned long long, long double, void*, ID3D11Resource*, ID3D12Resource*>;
+	using InputVariable_t = std::variant<int, unsigned int, float, double, long, long long, unsigned long, unsigned long long, long double, void*, ID3D11Resource*, ID3D12Resource*>;
 
-	struct ParameterCall {
-		enum call_type {
-			error = 0, set = 8, get = 32
+	struct CallEvent_t {
+		enum call_type_t {
+			error = 0, set = 8, get = 32, reset = 64, GetOptimalSettings = 128
 		} callType;
-		NGX_Strings_enum key;
-		NvParameterValue value;
-		TickerCode request_timestep;
+
+		MacroStrings_enum_t key;
+		InputVariable_t value;
+		TickerCode_t request_timestep;
 	};
 
-	class ParamStrategy {
-	public:
-		enum StrategyAction { error, consumed, unconsumed, send_to_db };
-		virtual StrategyAction Set(Hyper_NGX_ParameterDB&, ParameterCall&) = 0;
-		virtual StrategyAction Get(Hyper_NGX_ParameterDB&, ParameterCall&) = 0;
-	};
+	struct Handler_t {
+		enum HandlerStatus_t { error, consumed, unconsumed };
 
-	class StrategyDB {
-	public:
-		std::multimap<NGX_Strings::NGX_Enum_Strings::NGX_Strings_enum, ParamStrategy> strategies;
-
-		void addStrat(NGX_Strings::NGX_Enum_Strings::NGX_Strings_enum, ParamStrategy*);
-
-		ParamStrategy::StrategyAction Set(Hyper_NGX_ParameterDB&, ParameterCall&);
-		ParamStrategy::StrategyAction Get(Hyper_NGX_ParameterDB&, ParameterCall&);
-	};
-
-	class Hyper_NGX_ParameterDB {
-	public:
-
-
-		struct ScribedValue {
-			NvParameterValue value;
-			TickerCode tick;
+		struct HandlerHelper {
+			HandlerStatus_t status;
+			int returnCode;
 		};
-		using ParameterCallHistory = std::vector<ParameterCall>;
 
-		using ValueCurrent = std::unordered_map<NGX_Strings_enum, ScribedValue>;
-		using ValueHistory = std::multimap<NGX_Strings_enum, ScribedValue>;
+		typedef HandlerHelper(*HandlerFunction_t)(ParameterDB_t&, CallEvent_t&);
 
-		struct incrementTimeStepHelper {
-			TickerCode oldStep;
-			TickerCode newStep;
+		HandlerFunction_t ApplyFunc;
+
+		Handler_t(HandlerFunction_t func = nullptr) : ApplyFunc(func) {};
+	};
+
+	struct HandlerDB_t {
+	public:
+		std::multimap<NGX_Strings::MacroStrings_enum_t, Handler_t> handlers;
+
+		void addHandlerLogic(NGX_Strings::MacroStrings_enum_t, Handler_t);
+
+		Handler_t::HandlerHelper Apply(ParameterDB_t&, CallEvent_t&);
+	};
+
+	struct ParameterDB_t {
+	public:
+		using ParameterCallHistory_t = std::vector<CallEvent_t>;
+
+		using ValueCurrent_t = std::unordered_map<MacroStrings_enum_t, InputVariable_t>;
+		using ValueHistory_t = std::multimap<MacroStrings_enum_t, CallEvent_t>;
+
+		struct IncrementTimeStepHelper_t {
+			TickerCode_t oldStep;
+			TickerCode_t newStep;
 		};
 	private:
-		ValueHistory value_history;
-		ValueCurrent value_current;
+		ValueHistory_t value_history;
+		ValueCurrent_t value_current;
 		mutable std::mutex mtx;
-		TickerCode currentTimeStep;
-		ParameterCallHistory requestHistory;
+		TickerCode_t current;
+		ParameterCallHistory_t requestHistory;
 
-		incrementTimeStepHelper incrementInternalTimeStep();
+		HandlerDB_t handlers;
+
+		IncrementTimeStepHelper_t incrementInternalTimeStep();
 
 	public:
-		Hyper_NGX_ParameterDB();
-		TickerCode getCurrentTimeStep() const;
-		incrementTimeStepHelper incrementExternalTimeStep();
+		ParameterDB_t();
+		TickerCode_t getCurrentTimeStep() const;
+		IncrementTimeStepHelper_t incrementExternalTimeStep();
 
-		void Set(const char* name, const NvParameterValue value);
-		std::optional<NvParameterValue> Get(const char* name);
+		void Set(const char* name, const InputVariable_t value);
+		InputVariable_t Get(const char* name);
+
+		void addHandlerLogic(NGX_Strings::MacroStrings_enum_t, Handler_t);
 	};
 
+	struct Parameter : NVSDK_NGX_Parameter
+	{
+		virtual void Set(const char* InName, unsigned long long InValue) override;
+		virtual void Set(const char* InName, float InValue) override;
+		virtual void Set(const char* InName, double InValue) override;
+		virtual void Set(const char* InName, unsigned int InValue) override;
+		virtual void Set(const char* InName, int InValue) override;
+		virtual void Set(const char* InName, ID3D11Resource* InValue) override;
+		virtual void Set(const char* InName, ID3D12Resource* InValue) override;
+		virtual void Set(const char* InName, void* InValue) override;
+		virtual NVSDK_NGX_Result Get(const char* InName, unsigned long long* OutValue) const override;
+		virtual NVSDK_NGX_Result Get(const char* InName, float* OutValue) const override;
+		virtual NVSDK_NGX_Result Get(const char* InName, double* OutValue) const override;
+		virtual NVSDK_NGX_Result Get(const char* InName, unsigned int* OutValue) const override;
+		virtual NVSDK_NGX_Result Get(const char* InName, int* OutValue) const override;
+		virtual NVSDK_NGX_Result Get(const char* InName, ID3D11Resource** OutValue) const override;
+		virtual NVSDK_NGX_Result Get(const char* InName, ID3D12Resource** OutValue) const override;
+		virtual NVSDK_NGX_Result Get(const char* InName, void** OutValue) const override;
+		virtual void Reset() override;
+
+		Hyper_NGX::ParameterDB_t* parameterDB;
+
+		static NGX_Strings::MacroStrings_enum_t stringToEnum(const char* name);
+
+		NVSDK_NGX_Result GetOptimalSettingsCallback();
+		NVSDK_NGX_Result GetStatsCallback();
+	};
 }
 
-
-
-
-
-struct Hyper_NGX_Parameter : NVSDK_NGX_Parameter
-{
-	virtual void Set(const char* InName, unsigned long long InValue) override;
-	virtual void Set(const char* InName, float InValue) override;
-	virtual void Set(const char* InName, double InValue) override;
-	virtual void Set(const char* InName, unsigned int InValue) override;
-	virtual void Set(const char* InName, int InValue) override;
-	virtual void Set(const char* InName, ID3D11Resource* InValue) override;
-	virtual void Set(const char* InName, ID3D12Resource* InValue) override;
-	virtual void Set(const char* InName, void* InValue) override;
-	virtual NVSDK_NGX_Result Get(const char* InName, unsigned long long* OutValue) const override;
-	virtual NVSDK_NGX_Result Get(const char* InName, float* OutValue) const override;
-	virtual NVSDK_NGX_Result Get(const char* InName, double* OutValue) const override;
-	virtual NVSDK_NGX_Result Get(const char* InName, unsigned int* OutValue) const override;
-	virtual NVSDK_NGX_Result Get(const char* InName, int* OutValue) const override;
-	virtual NVSDK_NGX_Result Get(const char* InName, ID3D11Resource** OutValue) const override;
-	virtual NVSDK_NGX_Result Get(const char* InName, ID3D12Resource** OutValue) const override;
-	virtual NVSDK_NGX_Result Get(const char* InName, void** OutValue) const override;
-	virtual void Reset() override;
-
-	Hyper_NGX_DB::Hyper_NGX_ParameterDB* parameterDB;
-
-	static NGX_Strings::NGX_Enum_Strings::NGX_Strings_enum stringToEnum(const char* name);
-};
-
-
+NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_DLSS_GetOptimalSettingsCallback(NVSDK_NGX_Parameter* InParams);
+NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_DLSS_GetStatsCallback(NVSDK_NGX_Parameter* InParams);

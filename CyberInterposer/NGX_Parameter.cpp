@@ -216,9 +216,9 @@ NVSDK_NGX_Result CI_NGX_Parameter::Get(const char* InName, void** OutValue) cons
 {
     CyberLogArgs(InName, OutValue);
 
-    constexpr const char* OptimalCallbaskStr = NGX_Strings::NGX_Strings_macrocontent[(int)NGX_Strings::NVSDK_NGX_Parameter_DLSSOptimalSettingsCallback_enum].data();
+    constexpr const char* OptimalCallbaskStr = NGX_String_Converter::NGX_Strings_macrocontent[(int)NGX_String_Converter::NVSDK_NGX_Parameter_DLSSOptimalSettingsCallback_enum].data();
 
-    constexpr const char* StatsCallbaskStr = NGX_Strings::NGX_Strings_macrocontent[(int)NGX_Strings::NVSDK_NGX_Parameter_DLSSGetStatsCallback_enum].data();
+    constexpr const char* StatsCallbaskStr = NGX_String_Converter::NGX_Strings_macrocontent[(int)NGX_String_Converter::NVSDK_NGX_Parameter_DLSSGetStatsCallback_enum].data();
 
     const auto isOptimalSettingsCallback = strcmp(InName, OptimalCallbaskStr);
 

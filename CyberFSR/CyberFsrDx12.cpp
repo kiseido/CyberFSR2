@@ -109,7 +109,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_GetParameters(NVSDK_NGX_Parameter** OutParamete
 	CyberLogArgs(OutParameters);
 
 	*OutParameters = CyberFsrContext::instance()->NvParameterInstance->AllocateParameters();
-	((Hyper_NGX_Parameter*)*OutParameters)->EvaluateRenderScale();
+	((Parameter*)*OutParameters)->EvaluateRenderScale();
 	return NVSDK_NGX_Result_Success;
 }
 
@@ -118,8 +118,8 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_GetCapabilityParameters(NVSDK_NGX_Parameter** O
 {
 	CyberLogArgs(OutParameters);
 
-	*OutParameters = Hyper_NGX_Parameter::instance()->AllocateParameters();
-	((Hyper_NGX_Parameter*)*OutParameters)->EvaluateRenderScale();
+	*OutParameters = Parameter::instance()->AllocateParameters();
+	((Parameter*)*OutParameters)->EvaluateRenderScale();
 	return NVSDK_NGX_Result_Success;
 }
 
@@ -128,7 +128,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_AllocateParameters(NVSDK_NGX_Parameter** OutPar
 {
 	CyberLogArgs(OutParameters);
 
-	*OutParameters = Hyper_NGX_Parameter::instance()->AllocateParameters();
+	*OutParameters = Parameter::instance()->AllocateParameters();
 	return NVSDK_NGX_Result_Success;
 }
 
@@ -137,7 +137,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_DestroyParameters(NVSDK_NGX_Parameter* InParame
 {
 	CyberLogArgs(InParameters);
 
-	Hyper_NGX_Parameter::instance()->DeleteParameters((Hyper_NGX_Parameter*)InParameters);
+	Parameter::instance()->DeleteParameters((Parameter*)InParameters);
 	return NVSDK_NGX_Result_Success;
 }
 
@@ -169,7 +169,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_CreateFeature(ID3D12GraphicsCommandList* InCmdL
 {
 	CyberLogArgs(InCmdList, InFeatureID, InParameters, OutHandle);
 
-	const auto inParams = static_cast<const Hyper_NGX_Parameter*>(InParameters);
+	const auto inParams = static_cast<const Parameter*>(InParameters);
 
 	ID3D12Device* device;
 	InCmdList->GetDevice(IID_PPV_ARGS(&device));
@@ -384,7 +384,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCm
 
 	if (orgRootSig)
 	{
-		const auto inParams = static_cast<const Hyper_NGX_Parameter*>(InParameters);
+		const auto inParams = static_cast<const Parameter*>(InParameters);
 
 
 #ifdef CyberFSR_DX12_DUMP
