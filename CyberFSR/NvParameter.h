@@ -81,6 +81,9 @@ namespace Hyper_NGX {
 		void Set(const char* name, const InputVariable_t value);
 		InputVariable_t Get(const char* name);
 
+		void Set(NGX_Strings::MacroStrings_enum_t, const InputVariable_t value);
+		InputVariable_t Get(NGX_Strings::MacroStrings_enum_t);
+
 		void addHandlerLogic(NGX_Strings::MacroStrings_enum_t, Handler_t);
 	};
 

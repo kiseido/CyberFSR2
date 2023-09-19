@@ -21,15 +21,15 @@ namespace Hyper_NGX {
 		handlers.emplace(key, logic);
 	}
 
-	Handler_t::HandlerStatus_t HandlerDB_t::Apply(ParameterDB_t& db, CallEvent_t& event) {
+	Handler_t::HandlerHelper HandlerDB_t::Apply(ParameterDB_t& db, CallEvent_t& event) {
 		auto range = handlers.equal_range(event.key);
 		for (auto it = range.first; it != range.second; ++it) {
-			Handler_t::HandlerStatus_t status = it->second.ApplyFunc(db, event);
-			if (status != Handler_t::HandlerStatus_t::unconsumed) {
+			auto status = it->second.ApplyFunc(db, event);
+			if (status.status != Handler_t::HandlerStatus_t::unconsumed) {
 				return status;
 			}
 		}
-		return Handler_t::HandlerStatus_t::unconsumed;
+		return { Handler_t::HandlerStatus_t::unconsumed , 0 };
 	}
 
 	ParameterDB_t::ParameterDB_t() : current{} {}
@@ -115,20 +115,9 @@ namespace Hyper_NGX {
 
 	void ParameterDB_t::Set(const char* name, const InputVariable_t value) {
 		auto key = Parameter::stringToEnum(name);
-		CallEvent_t event{ CallEvent_t::set, key, value, getCurrentTimeStep() };
-		Handler_t::HandlerHelper result;
-
-		{
-			std::lock_guard<std::mutex> lock(mtx);
-
-			result = handlers.Apply(*this, event);
-
-			if (result.status == Handler_t::HandlerStatus_t::unconsumed) {
-				value_current[key] = value;
-				value_history.emplace(key, event);
-			}
-		}
+		return Set(key, value);
 	}
+
 
 	InputVariable_t ParameterDB_t::Get(const char* name) {
 		auto key = Parameter::stringToEnum(name);
@@ -152,6 +141,25 @@ namespace Hyper_NGX {
 		return 0;
 	}
 
+	void ParameterDB_t::Set(NGX_Strings::MacroStrings_enum_t key, const InputVariable_t value) {
+		CallEvent_t event{ CallEvent_t::set, key, value, getCurrentTimeStep() };
+		Handler_t::HandlerHelper result;
+
+		{
+			std::lock_guard<std::mutex> lock(mtx);
+
+			result = handlers.Apply(*this, event);
+
+			if (result.status == Handler_t::HandlerStatus_t::unconsumed) {
+				value_current[key] = value;
+				value_history.emplace(key, event);
+			}
+		}
+	}
+
+	InputVariable_t Get(NGX_Strings::MacroStrings_enum_t) {
+
+	}
 
 	void ParameterDB_t::addHandlerLogic(NGX_Strings::MacroStrings_enum_t key, Handler_t handler) {
 		handlers.addHandlerLogic(key, handler);
@@ -189,6 +197,78 @@ namespace Hyper_NGX {
 		parameterDB->Set(InName, InValue);
 	}
 
+	NVSDK_NGX_Result Parameter::Get(const char* InName, unsigned long long* OutValue) const {
+		auto var = parameterDB->Get(InName);
+		if (std::holds_alternative<unsigned long long>(var)) {
+			*OutValue = std::get<unsigned long long>(var);
+			return NVSDK_NGX_Result::NVSDK_NGX_Result_Success;
+		}
+		return NVSDK_NGX_Result::NVSDK_NGX_Result_Fail;
+	}
+
+	NVSDK_NGX_Result Parameter::Get(const char* InName, float* OutValue) const {
+		auto var = parameterDB->Get(InName);
+		if (std::holds_alternative<float>(var)) {
+			*OutValue = std::get<float>(var);
+			return NVSDK_NGX_Result::NVSDK_NGX_Result_Success;
+		}
+		return NVSDK_NGX_Result::NVSDK_NGX_Result_Fail;
+	}
+
+	NVSDK_NGX_Result Parameter::Get(const char* InName, double* OutValue) const {
+		auto var = parameterDB->Get(InName);
+		if (std::holds_alternative<double>(var)) {
+			*OutValue = std::get<double>(var);
+			return NVSDK_NGX_Result::NVSDK_NGX_Result_Success;
+		}
+		return NVSDK_NGX_Result::NVSDK_NGX_Result_Fail;
+	}
+
+	NVSDK_NGX_Result Parameter::Get(const char* InName, unsigned int* OutValue) const {
+		auto var = parameterDB->Get(InName);
+		if (std::holds_alternative<unsigned int>(var)) {
+			*OutValue = std::get<unsigned int>(var);
+			return NVSDK_NGX_Result::NVSDK_NGX_Result_Success;
+		}
+		return NVSDK_NGX_Result::NVSDK_NGX_Result_Fail;
+	}
+
+	NVSDK_NGX_Result Parameter::Get(const char* InName, int* OutValue) const {
+		auto var = parameterDB->Get(InName);
+		if (std::holds_alternative<int>(var)) {
+			*OutValue = std::get<int>(var);
+			return NVSDK_NGX_Result::NVSDK_NGX_Result_Success;
+		}
+		return NVSDK_NGX_Result::NVSDK_NGX_Result_Fail;
+	}
+
+	NVSDK_NGX_Result Parameter::Get(const char* InName, ID3D11Resource** OutValue) const {
+		auto var = parameterDB->Get(InName);
+		if (std::holds_alternative<ID3D11Resource*>(var)) {
+			*OutValue = std::get<ID3D11Resource*>(var);
+			return NVSDK_NGX_Result::NVSDK_NGX_Result_Success;
+		}
+		return NVSDK_NGX_Result::NVSDK_NGX_Result_Fail;
+	}
+
+	NVSDK_NGX_Result Parameter::Get(const char* InName, ID3D12Resource** OutValue) const {
+		auto var = parameterDB->Get(InName);
+		if (std::holds_alternative<ID3D12Resource*>(var)) {
+			*OutValue = std::get<ID3D12Resource*>(var);
+			return NVSDK_NGX_Result::NVSDK_NGX_Result_Success;
+		}
+		return NVSDK_NGX_Result::NVSDK_NGX_Result_Fail;
+	}
+
+	NVSDK_NGX_Result Parameter::Get(const char* InName, void** OutValue) const {
+		auto var = parameterDB->Get(InName);
+		if (std::holds_alternative<void*>(var)) {
+			*OutValue = std::get<void*>(var);
+			return NVSDK_NGX_Result::NVSDK_NGX_Result_Success;
+		}
+		return NVSDK_NGX_Result::NVSDK_NGX_Result_Fail;
+	}
+
 	void Parameter::Reset()
 	{
 		CyberLogArgs(this);
@@ -198,7 +278,6 @@ namespace Hyper_NGX {
 		return NGX_Strings::Strings_Converter.getEnumFromMacroName(name);
 	}
 }
-
 
 
 // EvaluateRenderScale helper
