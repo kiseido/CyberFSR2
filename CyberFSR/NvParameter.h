@@ -8,9 +8,9 @@
 
 namespace Hyper_NGX {
 
-	struct TickerCode_t {
-		size_t external_ticker = 0;
-		size_t internal_ticker = 0;
+	struct InstructionCounter_t {
+		size_t external_counter = 0;
+		size_t internal_counter = 0;
 	};
 
 	using MacroStrings_enum_t = NGX_Strings::MacroStrings_enum_t;
@@ -19,12 +19,34 @@ namespace Hyper_NGX {
 
 	struct CallEvent_t {
 		enum call_type_t {
-			error = 0, set = 8, get = 32, reset = 64, GetOptimalSettings = 128
-		} callType;
+			error = 0b0,
+			UnsignedLongLong_ = 0b1 << 0,
+			Float_ = 0b1 << 1,
+			Double_ = 0b1 << 2,
+			UnsignedInt_ = 0b1 << 3,
+			Int_ = 0b1 << 4,
+			VoidPointer_ = 0b1 << 5,
+			D3D11Resource_ = 0b1 << 6,
+			D3D12Resource_ = 0b1 << 7,
+			VkResource_ = 0b1 << 8,
+			set = 0b1 << 12,
+			get = 0b1 << 13,
+			reset = 0b1 << 14,
+			GetOptimalSettings = 0b1 << 15,
+			GetStats = 0b1 << 16
+		};
 
+		static std::vector<call_type_t> unpackTypes(call_type_t);
+		static call_type_t packTypes(const std::vector<call_type_t>&);
+
+		bool addType(call_type_t);
+		bool hasType(call_type_t);
+		bool removeType(call_type_t);
+
+		call_type_t callType;
 		MacroStrings_enum_t key;
 		InputVariable_t value;
-		TickerCode_t request_timestep;
+		InstructionCounter_t request_timestep;
 	};
 
 	struct Handler_t {
@@ -39,11 +61,10 @@ namespace Hyper_NGX {
 
 		HandlerFunction_t ApplyFunc;
 
-		Handler_t(HandlerFunction_t func = nullptr) : ApplyFunc(func) {};
+		Handler_t(HandlerFunction_t func) : ApplyFunc(func) {};
 	};
 
 	struct HandlerDB_t {
-	public:
 		std::multimap<NGX_Strings::MacroStrings_enum_t, Handler_t> handlers;
 
 		void addHandlerLogic(NGX_Strings::MacroStrings_enum_t, Handler_t);
@@ -52,37 +73,36 @@ namespace Hyper_NGX {
 	};
 
 	struct ParameterDB_t {
-	public:
+
 		using ParameterCallHistory_t = std::vector<CallEvent_t>;
 
 		using ValueCurrent_t = std::unordered_map<MacroStrings_enum_t, InputVariable_t>;
 		using ValueHistory_t = std::multimap<MacroStrings_enum_t, CallEvent_t>;
 
 		struct IncrementTimeStepHelper_t {
-			TickerCode_t oldStep;
-			TickerCode_t newStep;
+			InstructionCounter_t oldStep;
+			InstructionCounter_t newStep;
 		};
-	private:
-		ValueHistory_t value_history;
-		ValueCurrent_t value_current;
+
 		mutable std::mutex mtx;
-		TickerCode_t current;
-		ParameterCallHistory_t requestHistory;
+
+		mutable ValueHistory_t value_history;
+		mutable ParameterCallHistory_t requestHistory;
+
+		ValueCurrent_t value_current;
+		InstructionCounter_t current;
 
 		HandlerDB_t handlers;
 
 		IncrementTimeStepHelper_t incrementInternalTimeStep();
 
-	public:
+
 		ParameterDB_t();
-		TickerCode_t getCurrentTimeStep() const;
+		InstructionCounter_t getCurrentTimeStep() const;
 		IncrementTimeStepHelper_t incrementExternalTimeStep();
 
-		void Set(const char* name, const InputVariable_t value);
-		InputVariable_t Get(const char* name);
-
 		void Set(NGX_Strings::MacroStrings_enum_t, const InputVariable_t value);
-		InputVariable_t Get(NGX_Strings::MacroStrings_enum_t);
+		std::optional<InputVariable_t> Get(NGX_Strings::MacroStrings_enum_t) const;
 
 		void addHandlerLogic(NGX_Strings::MacroStrings_enum_t, Handler_t);
 	};
@@ -107,13 +127,16 @@ namespace Hyper_NGX {
 		virtual NVSDK_NGX_Result Get(const char* InName, void** OutValue) const override;
 		virtual void Reset() override;
 
-		Hyper_NGX::ParameterDB_t* parameterDB;
+		Hyper_NGX::ParameterDB_t parameterDB;
 
 		static NGX_Strings::MacroStrings_enum_t stringToEnum(const char* name);
 
 		NVSDK_NGX_Result GetOptimalSettingsCallback();
 		NVSDK_NGX_Result GetStatsCallback();
 	};
+
+	template <typename T>
+	std::optional<T> ConvertVariant(const Hyper_NGX::InputVariable_t& var);
 }
 
 NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_DLSS_GetOptimalSettingsCallback(NVSDK_NGX_Parameter* InParams);

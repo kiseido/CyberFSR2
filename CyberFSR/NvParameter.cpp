@@ -16,6 +16,53 @@
 
 namespace Hyper_NGX {
 
+	std::vector<Hyper_NGX::CallEvent_t::call_type_t> CallEvent_t::unpackTypes(call_type_t combined) {
+		std::vector<call_type_t> types;
+		auto combined_int = static_cast<std::underlying_type_t<call_type_t>>(combined);
+		for (int i = 0; i < sizeof(call_type_t) * 8; ++i) {
+			auto mask = static_cast<std::underlying_type_t<call_type_t>>(1 << i);
+			if (combined_int & mask) {
+				types.push_back(static_cast<call_type_t>(mask));
+			}
+		}
+		return types;
+	}
+
+	Hyper_NGX::CallEvent_t::call_type_t CallEvent_t::packTypes(const std::vector<call_type_t>& types) {
+		auto combined_int = static_cast<std::underlying_type_t<call_type_t>>(0);
+		for (const auto& type : types) {
+			auto type_int = static_cast<std::underlying_type_t<call_type_t>>(type);
+			combined_int |= type_int;
+		}
+		return static_cast<call_type_t>(combined_int);
+	}
+
+	bool CallEvent_t::addType(call_type_t type) {
+		auto current = static_cast<std::underlying_type_t<call_type_t>>(callType);
+		auto adding = static_cast<std::underlying_type_t<call_type_t>>(type);
+		if (current & adding) {
+			return false; // Already exists
+		}
+		callType = static_cast<call_type_t>(current | adding);
+		return true;
+	}
+
+	bool CallEvent_t::hasType(call_type_t type) {
+		auto current = static_cast<std::underlying_type_t<call_type_t>>(callType);
+		auto checking = static_cast<std::underlying_type_t<call_type_t>>(type);
+		return (current & checking) != 0;
+	}
+
+	bool CallEvent_t::removeType(call_type_t type) {
+		auto current = static_cast<std::underlying_type_t<call_type_t>>(callType);
+		auto removing = static_cast<std::underlying_type_t<call_type_t>>(type);
+		if (current & removing) {
+			callType = static_cast<call_type_t>(current & ~removing);
+			return true;
+		}
+		return false; // Doesn't exist
+	}
+
 
 	void HandlerDB_t::addHandlerLogic(NGX_Strings::MacroStrings_enum_t key, Handler_t logic) {
 		handlers.emplace(key, logic);
@@ -39,12 +86,12 @@ namespace Hyper_NGX {
 		IncrementTimeStepHelper_t helper;
 
 		helper.oldStep = current;
-		current.internal_ticker += 1;
+		current.internal_counter += 1;
 		helper.newStep = current;
 		return helper;
 	}
 
-	TickerCode_t ParameterDB_t::getCurrentTimeStep() const {
+	InstructionCounter_t ParameterDB_t::getCurrentTimeStep() const {
 		std::lock_guard<std::mutex> lock(mtx);
 		return current;
 	}
@@ -55,8 +102,8 @@ namespace Hyper_NGX {
 
 		helper.oldStep = current;
 
-		current.external_ticker += 1;
-		current.internal_ticker = 0;
+		current.external_counter += 1;
+		current.internal_counter = 0;
 
 		helper.newStep = current;
 
@@ -87,14 +134,14 @@ namespace Hyper_NGX {
 
 		helper.oldStep = current;
 
-		current.internal_ticker += 1;
+		current.internal_counter += 1;
 
 		helper.newStep = current;
 
 		return helper;
 	}
 
-	TickerCode_t ParameterDB_t::getCurrentTimeStep() const {
+	InstructionCounter_t ParameterDB_t::getCurrentTimeStep() const {
 		std::lock_guard<std::mutex> lock(mtx);
 		return current;
 	}
@@ -105,41 +152,34 @@ namespace Hyper_NGX {
 
 		helper.oldStep = current;
 
-		current.external_ticker += 1;
-		current.internal_ticker = 0;
+		current.external_counter += 1;
+		current.internal_counter = 0;
 
 		helper.newStep = current;
 
 		return helper;
 	}
 
-	void ParameterDB_t::Set(const char* name, const InputVariable_t value) {
-		auto key = Parameter::stringToEnum(name);
-		return Set(key, value);
+	template <typename T>
+	std::optional<T> ConvertVariant(const Hyper_NGX::InputVariable_t& var) {
+		return std::visit([](auto&& arg) -> std::optional<T> {
+			using ArgType = std::decay_t<decltype(arg)>;
+
+			// Special handling for incompatible types
+			if constexpr (std::is_pointer_v<ArgType> || std::is_pointer_v<T>) {
+				if constexpr (std::is_same_v<ArgType, T>) {
+					return arg;
+				}
+				else {
+					return std::nullopt;
+				}
+			}
+			else {
+				return static_cast<T>(arg);
+			}
+			}, var);
 	}
 
-
-	InputVariable_t ParameterDB_t::Get(const char* name) {
-		auto key = Parameter::stringToEnum(name);
-		CallEvent_t event{ CallEvent_t::get, key, {}, getCurrentTimeStep() };
-		Handler_t::HandlerHelper result;
-
-		{
-			std::lock_guard<std::mutex> lock(mtx);
-
-			result = handlers.Apply(*this, event);
-
-			if (result.status != Handler_t::HandlerStatus_t::unconsumed) {
-				return event.value;
-			}
-
-			if (value_current.find(key) != value_current.end()) {
-				return value_current[key];
-			}
-		}
-
-		return 0;
-	}
 
 	void ParameterDB_t::Set(NGX_Strings::MacroStrings_enum_t key, const InputVariable_t value) {
 		CallEvent_t event{ CallEvent_t::set, key, value, getCurrentTimeStep() };
@@ -157,8 +197,16 @@ namespace Hyper_NGX {
 		}
 	}
 
-	InputVariable_t Get(NGX_Strings::MacroStrings_enum_t) {
+	std::optional<InputVariable_t> ParameterDB_t::Get(NGX_Strings::MacroStrings_enum_t key) const {
+		std::lock_guard<std::mutex> lock(mtx);  // Locking the mutable mutex
 
+		// perform non-const actions on the locked data structures here
+		auto it = value_current.find(key);
+		if (it != value_current.end()) {
+			return it->second;
+		}
+
+		return std::nullopt;  // or your default return value
 	}
 
 	void ParameterDB_t::addHandlerLogic(NGX_Strings::MacroStrings_enum_t key, Handler_t handler) {
@@ -166,106 +214,154 @@ namespace Hyper_NGX {
 	}
 
 	void Parameter::Set(const char* InName, unsigned long long InValue) {
-		parameterDB->Set(InName, InValue);
+		auto key = stringToEnum(InName);
+		parameterDB.Set(key, InValue);
 	}
 
 	void Parameter::Set(const char* InName, float InValue) {
-		parameterDB->Set(InName, InValue);
+		auto key = stringToEnum(InName);
+		parameterDB.Set(key, InValue);
 	}
 
 	void Parameter::Set(const char* InName, double InValue) {
-		parameterDB->Set(InName, InValue);
+		auto key = stringToEnum(InName);
+		parameterDB.Set(key, InValue);
 	}
 
 	void Parameter::Set(const char* InName, unsigned int InValue) {
-		parameterDB->Set(InName, InValue);
+		auto key = stringToEnum(InName);
+		parameterDB.Set(key, InValue);
 	}
 
 	void Parameter::Set(const char* InName, int InValue) {
-		parameterDB->Set(InName, InValue);
+		auto key = stringToEnum(InName);
+		parameterDB.Set(key, InValue);
 	}
 
 	void Parameter::Set(const char* InName, ID3D11Resource* InValue) {
-		parameterDB->Set(InName, InValue);
+		auto key = stringToEnum(InName);
+		parameterDB.Set(key, InValue);
 	}
 
 	void Parameter::Set(const char* InName, ID3D12Resource* InValue) {
-		parameterDB->Set(InName, InValue);
+		auto key = stringToEnum(InName);
+		parameterDB.Set(key, InValue);
 	}
 
 	void Parameter::Set(const char* InName, void* InValue) {
-		parameterDB->Set(InName, InValue);
+		auto key = stringToEnum(InName);
+		parameterDB.Set(key, InValue);
 	}
 
 	NVSDK_NGX_Result Parameter::Get(const char* InName, unsigned long long* OutValue) const {
-		auto var = parameterDB->Get(InName);
-		if (std::holds_alternative<unsigned long long>(var)) {
-			*OutValue = std::get<unsigned long long>(var);
+		auto key = stringToEnum(InName);
+		std::optional<InputVariable_t> var = parameterDB.Get(key);
+
+		auto maybeULL = ConvertVariant<unsigned long long>(var.value());
+
+		if (maybeULL.has_value()) {
+			*OutValue = maybeULL.value();
 			return NVSDK_NGX_Result::NVSDK_NGX_Result_Success;
 		}
+
 		return NVSDK_NGX_Result::NVSDK_NGX_Result_Fail;
 	}
 
 	NVSDK_NGX_Result Parameter::Get(const char* InName, float* OutValue) const {
-		auto var = parameterDB->Get(InName);
-		if (std::holds_alternative<float>(var)) {
-			*OutValue = std::get<float>(var);
+		auto key = stringToEnum(InName);
+		std::optional<InputVariable_t> var = parameterDB.Get(key);
+
+		auto maybeFloat = ConvertVariant<float>(var.value());
+
+		if (maybeFloat.has_value()) {
+			*OutValue = maybeFloat.value();
 			return NVSDK_NGX_Result::NVSDK_NGX_Result_Success;
 		}
+
 		return NVSDK_NGX_Result::NVSDK_NGX_Result_Fail;
 	}
 
 	NVSDK_NGX_Result Parameter::Get(const char* InName, double* OutValue) const {
-		auto var = parameterDB->Get(InName);
-		if (std::holds_alternative<double>(var)) {
-			*OutValue = std::get<double>(var);
+		auto key = stringToEnum(InName);
+		std::optional<InputVariable_t> var = parameterDB.Get(key);
+
+		auto maybeDouble = ConvertVariant<double>(var.value());
+
+		if (maybeDouble.has_value()) {
+			*OutValue = maybeDouble.value();
 			return NVSDK_NGX_Result::NVSDK_NGX_Result_Success;
 		}
+
 		return NVSDK_NGX_Result::NVSDK_NGX_Result_Fail;
 	}
 
 	NVSDK_NGX_Result Parameter::Get(const char* InName, unsigned int* OutValue) const {
-		auto var = parameterDB->Get(InName);
-		if (std::holds_alternative<unsigned int>(var)) {
-			*OutValue = std::get<unsigned int>(var);
+		auto key = stringToEnum(InName);
+		std::optional<InputVariable_t> var = parameterDB.Get(key);
+
+		auto maybeUI = ConvertVariant<unsigned int>(var.value());
+
+		if (maybeUI.has_value()) {
+			*OutValue = maybeUI.value();
 			return NVSDK_NGX_Result::NVSDK_NGX_Result_Success;
 		}
+
 		return NVSDK_NGX_Result::NVSDK_NGX_Result_Fail;
 	}
 
 	NVSDK_NGX_Result Parameter::Get(const char* InName, int* OutValue) const {
-		auto var = parameterDB->Get(InName);
-		if (std::holds_alternative<int>(var)) {
-			*OutValue = std::get<int>(var);
+		auto key = stringToEnum(InName);
+		std::optional<InputVariable_t> var = parameterDB.Get(key);
+
+		auto maybeI = ConvertVariant<int>(var.value());
+
+		if (maybeI.has_value()) {
+			*OutValue = maybeI.value();
 			return NVSDK_NGX_Result::NVSDK_NGX_Result_Success;
 		}
+
 		return NVSDK_NGX_Result::NVSDK_NGX_Result_Fail;
 	}
 
 	NVSDK_NGX_Result Parameter::Get(const char* InName, ID3D11Resource** OutValue) const {
-		auto var = parameterDB->Get(InName);
-		if (std::holds_alternative<ID3D11Resource*>(var)) {
-			*OutValue = std::get<ID3D11Resource*>(var);
+		auto key = stringToEnum(InName);
+		std::optional<InputVariable_t> var = parameterDB.Get(key);
+
+		auto maybeRP = ConvertVariant<ID3D11Resource*>(var.value());
+
+		if (maybeRP.has_value()) {
+			*OutValue = maybeRP.value();
 			return NVSDK_NGX_Result::NVSDK_NGX_Result_Success;
 		}
+
 		return NVSDK_NGX_Result::NVSDK_NGX_Result_Fail;
 	}
 
 	NVSDK_NGX_Result Parameter::Get(const char* InName, ID3D12Resource** OutValue) const {
-		auto var = parameterDB->Get(InName);
-		if (std::holds_alternative<ID3D12Resource*>(var)) {
-			*OutValue = std::get<ID3D12Resource*>(var);
+		auto key = stringToEnum(InName);
+		std::optional<InputVariable_t> var = parameterDB.Get(key);
+
+		auto maybeRP = ConvertVariant<ID3D12Resource*>(var.value());
+
+		if (maybeRP.has_value()) {
+			*OutValue = maybeRP.value();
 			return NVSDK_NGX_Result::NVSDK_NGX_Result_Success;
 		}
+
 		return NVSDK_NGX_Result::NVSDK_NGX_Result_Fail;
 	}
 
 	NVSDK_NGX_Result Parameter::Get(const char* InName, void** OutValue) const {
-		auto var = parameterDB->Get(InName);
-		if (std::holds_alternative<void*>(var)) {
-			*OutValue = std::get<void*>(var);
+		auto key = stringToEnum(InName);
+		std::optional<InputVariable_t> var = parameterDB.Get(key);
+
+		auto maybeVP = ConvertVariant<void*>(var.value());
+
+		if (maybeVP.has_value()) {
+			*OutValue = maybeVP.value();
 			return NVSDK_NGX_Result::NVSDK_NGX_Result_Success;
 		}
+
 		return NVSDK_NGX_Result::NVSDK_NGX_Result_Fail;
 	}
 
