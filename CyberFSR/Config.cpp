@@ -72,9 +72,9 @@ void Config::Reload()
 
 std::optional<std::string> Config::readString(std::string section, std::string key, bool lowercase)
 {
-	std::string value = ini.GetValue(section.c_str(), key.c_str(), "auto");
+	std::string chars = ini.GetValue(section.c_str(), key.c_str(), "auto");
 
-	std::string lower = value;
+	std::string lower = chars;
 	std::transform(
 		lower.begin(), lower.end(),
 		lower.begin(),
@@ -88,15 +88,15 @@ std::optional<std::string> Config::readString(std::string section, std::string k
 	{
 		return std::nullopt;
 	}
-	return lowercase ? lower : value;
+	return lowercase ? lower : chars;
 }
 
 std::optional<float> Config::readFloat(std::string section, std::string key)
 {
-	auto value = readString(section, key);
+	auto chars = readString(section, key);
 	try
 	{
-		return std::stof(value.value());
+		return std::stof(chars.chars());
 	}
 	catch (const std::bad_optional_access&) // missing or auto value
 	{
@@ -114,12 +114,12 @@ std::optional<float> Config::readFloat(std::string section, std::string key)
 
 std::optional<bool> Config::readBool(std::string section, std::string key)
 {
-	auto value = readString(section, key, true);
-	if (value == "true")
+	auto chars = readString(section, key, true);
+	if (chars == "true")
 	{
 		return true;
 	}
-	else if (value == "false")
+	else if (chars == "false")
 	{
 		return false;
 	}
@@ -129,12 +129,12 @@ std::optional<bool> Config::readBool(std::string section, std::string key)
 
 std::optional<SharpnessRangeModifier> Config::readSharpnessRange(std::string section, std::string key)
 {
-	auto value = readString(section, key, true);
-	if (value == "normal")
+	auto chars = readString(section, key, true);
+	if (chars == "normal")
 	{
 		return SharpnessRangeModifier::Normal;
 	}
-	else if (value == "extended")
+	else if (chars == "extended")
 	{
 		return SharpnessRangeModifier::Extended;
 	}
@@ -144,20 +144,20 @@ std::optional<SharpnessRangeModifier> Config::readSharpnessRange(std::string sec
 
 std::optional<ViewMethod> Config::readViewMethod(std::string section, std::string key)
 {
-	auto value = readString(section, key, true);
-	if (value == "config")
+	auto chars = readString(section, key, true);
+	if (chars == "config")
 	{
 		return ViewMethod::Config;
 	}
-	else if (value == "cyberpunk2077")
+	else if (chars == "cyberpunk2077")
 	{
 		return ViewMethod::Cyberpunk2077;
 	}
-	else if (value == "rdr2")
+	else if (chars == "rdr2")
 	{
 		return ViewMethod::RDR2;
 	}
-	else if (value == "dl2")
+	else if (chars == "dl2")
 	{
 		return ViewMethod::DL2;
 	}

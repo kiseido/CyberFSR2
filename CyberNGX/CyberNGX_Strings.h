@@ -272,7 +272,7 @@
 
 
 #define CyberNGX_Strings_Headers(name) \
-        enum CyberNGX_Strings_CONCATENATE(name, _enum_t) { CyberNGX_Strings_Macros(CyberNGX_Strings_ENUM_NAME), COUNT_enum }; \
+        enum CyberNGX_Strings_CONCATENATE(name, _enum) { CyberNGX_Strings_Macros(CyberNGX_Strings_ENUM_NAME), COUNT_enum }; \
         constexpr static std::string_view CyberNGX_Strings_CONCATENATE(name, _macroname)[] { ( CyberNGX_Strings_Macros(CyberNGX_Strings_MacroNameString) ) } ; \
         constexpr static std::string_view CyberNGX_Strings_CONCATENATE(name, _macrocontent)[] { ( CyberNGX_Strings_Macros(CyberNGX_Strings_MacroContentsString) ) };
 
@@ -289,21 +289,21 @@ namespace NGX_Strings {
 
         InitStatus initstatus{cold};
 
-        std::unordered_map<std::string_view, MacroStrings_enum_t> map_macroname_to_enum;
+        std::unordered_map<std::string_view, MacroStrings_enum> map_macroname_to_enum;
 
-        std::unordered_map<std::string_view, MacroStrings_enum_t> map_macrocontent_to_enum;
+        std::unordered_map<std::string_view, MacroStrings_enum> map_macrocontent_to_enum;
 
         void populate_maps();
 
         NGX_String_Converter();
 
-        MacroStrings_enum_t getEnumFromMacroName(const std::string_view& value);
+        MacroStrings_enum getEnumFromMacroName(const std::string_view& chars);
 
-        MacroStrings_enum_t getEnumFromMacroContents(const std::string_view& value);
+        MacroStrings_enum getEnumFromMacroContents(const std::string_view& chars);
 
-        std::string_view getMacroNameFromEnum(MacroStrings_enum_t value);
+        std::string_view getMacroNameFromEnum(MacroStrings_enum chars);
 
-        std::string_view getMacroContentFromEnum(MacroStrings_enum_t value);
+        std::string_view getMacroContentFromEnum(MacroStrings_enum chars);
     } Strings_Converter;
 
 

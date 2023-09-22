@@ -6,19 +6,48 @@
 #include <variant>
 #include <limits>
 
-namespace Hyper_NGX {
+namespace Hyper_NGX_Parameter {
 
 	struct InstructionCounter_t {
 		size_t external_counter = 0;
 		size_t internal_counter = 0;
 	};
 
-	using MacroStrings_enum_t = NGX_Strings::MacroStrings_enum_t;
+	struct IncrementCounterHelper_t {
+		InstructionCounter_t oldStep;
+		InstructionCounter_t newStep;
+	};
 
-	using InputVariable_t = std::variant<int, unsigned int, float, double, long, long long, unsigned long, unsigned long long, long double, void*, ID3D11Resource*, ID3D12Resource*>;
+	using MacroStrings_enum = NGX_Strings::MacroStrings_enum;
+
+	using InputVariableVariants_t = std::variant<int, unsigned int, float, double, long, long long, unsigned long, unsigned long long, long double, void*, ID3D11Resource*, ID3D12Resource*>;
+
+	struct InputVariable_t : public InputVariableVariants_t {
+
+		InputVariable_t(const InputVariableVariants_t& internalValue) : InputVariableVariants_t(internalValue) {}
+
+		template <typename T>
+		T GetAsType() {
+			if (std::holds_alternative<T>(*this)) {
+				return std::get<T>(*this);
+			}
+			// Arithmetic to arithmetic
+			else if constexpr (std::is_arithmetic_v<T> && std::is_arithmetic_v<std::decay_t<decltype(*this)>>) {
+				return static_cast<T>(std::get<std::decay_t<decltype(*this)>>(*this));
+			}
+			// Any type to pointer or pointer to any type
+			else if constexpr (std::is_pointer_v<T> || std::is_pointer_v<std::decay_t<decltype(*this)>>) {
+				return reinterpret_cast<T>(std::get<std::decay_t<decltype(*this)>>(*this));
+			}
+			else {
+				throw std::runtime_error("Invalid conversion.");
+			}
+		}
+	};
+
 
 	struct CallEvent_t {
-		enum call_type_t {
+		enum CallType_enum : uint16_t {
 			error = 0b0,
 			UnsignedLongLong_ = 0b1 << 0,
 			Float_ = 0b1 << 1,
@@ -29,86 +58,111 @@ namespace Hyper_NGX {
 			D3D11Resource_ = 0b1 << 6,
 			D3D12Resource_ = 0b1 << 7,
 			VkResource_ = 0b1 << 8,
-			set = 0b1 << 12,
-			get = 0b1 << 13,
-			reset = 0b1 << 14,
-			GetOptimalSettings = 0b1 << 15,
-			GetStats = 0b1 << 16
+			set = 0b1 << 11,
+			get = 0b1 << 12,
+			reset = 0b1 << 13,
+			GetOptimalSettings = 0b1 << 14,
+			GetStats = 0b1 << 15
 		};
-
-		static std::vector<call_type_t> unpackTypes(call_type_t);
-		static call_type_t packTypes(const std::vector<call_type_t>&);
-
-		bool addType(call_type_t);
-		bool hasType(call_type_t);
-		bool removeType(call_type_t);
-
-		call_type_t callType;
-		MacroStrings_enum_t key;
-		InputVariable_t value;
+	private:
+		CallType_enum callType;
+		MacroStrings_enum key;
+		InputVariable_t internalValue;
 		InstructionCounter_t request_timestep;
+	public:
+		bool addType(CallType_enum);
+		bool hasType(CallType_enum);
+		bool removeType(CallType_enum);
+
+		static std::vector<CallType_enum> unpackTypes(CallType_enum);
+		static CallType_enum packTypes(const std::vector<CallType_enum>&);
 	};
 
-	struct Handler_t {
-		enum HandlerStatus_t { error, consumed, unconsumed };
 
-		struct HandlerHelper {
-			HandlerStatus_t status;
-			int returnCode;
-		};
+	enum HandlerStatus_enum : int8_t { error_uninited = 0, consumed = 0b11110000, unconsumed = 0b00001111 };
 
-		typedef HandlerHelper(*HandlerFunction_t)(ParameterDB_t&, CallEvent_t&);
 
-		HandlerFunction_t ApplyFunc;
+	struct HandlerHelper_t {
+		HandlerStatus_enum status = error_uninited;
+		int returnCode = 0;
+	};
 
-		Handler_t(HandlerFunction_t func) : ApplyFunc(func) {};
+	typedef HandlerHelper_t(*HandlerFunction_t)(const HandlerInstance_t&, ParameterDB_t&, const CallEvent_t&);
+
+	struct HandlerInstance_t {
+		using HandlerId_t = Util::GenericId<4>;
+	public:
+		const CallEvent_t compatible_with;
+		const HandlerId_t id;
+		const HandlerFunction_t ApplyFunc;
+
+		HandlerInstance_t(HandlerFunction_t func, HandlerId_t id, CallEvent_t compat) : ApplyFunc(func), compatible_with(compat), id(id) {};
 	};
 
 	struct HandlerDB_t {
-		std::multimap<NGX_Strings::MacroStrings_enum_t, Handler_t> handlers;
+		using HandlerMap_t = std::multimap<NGX_Strings::MacroStrings_enum, HandlerInstance_t>;
+	private:
+		mutable std::mutex mtx;
+		HandlerMap_t handlers;
+	public:
+		bool addHandlerLogic(NGX_Strings::MacroStrings_enum, HandlerInstance_t);
+		int removeHandlerLogic(NGX_Strings::MacroStrings_enum key, HandlerInstance_t::HandlerId_t id);
 
-		void addHandlerLogic(NGX_Strings::MacroStrings_enum_t, Handler_t);
+		HandlerHelper_t Apply(ParameterDB_t&, CallEvent_t&);
 
-		Handler_t::HandlerHelper Apply(ParameterDB_t&, CallEvent_t&);
+		Util::SharedLockContainer<HandlerMap_t&> getMap_InternalExclusive();
+	};
+
+	struct ValueDB_t {
+		using ValueCurrent_t = std::unordered_map<MacroStrings_enum, InputVariable_t>;
+		using ValueHistory_t = std::multimap<MacroStrings_enum, CallEvent_t>;
+	private:
+		mutable std::mutex mtx;
+		ValueCurrent_t value_current;
+		ValueHistory_t value_history;
+	public:
+		void Set(NGX_Strings::MacroStrings_enum, const InputVariable_t internalValue);
+		std::optional<InputVariable_t> Get(NGX_Strings::MacroStrings_enum) const;
+
+		Util::SharedLockContainer<const ValueHistory_t&> getHistory_InternalExclusive();
 	};
 
 	struct ParameterDB_t {
-
-		using ParameterCallHistory_t = std::vector<CallEvent_t>;
-
-		using ValueCurrent_t = std::unordered_map<MacroStrings_enum_t, InputVariable_t>;
-		using ValueHistory_t = std::multimap<MacroStrings_enum_t, CallEvent_t>;
-
-		struct IncrementTimeStepHelper_t {
-			InstructionCounter_t oldStep;
-			InstructionCounter_t newStep;
-		};
-
+		using CallHistory_t = std::vector<CallEvent_t>;
+	private:
 		mutable std::mutex mtx;
-
-		mutable ValueHistory_t value_history;
-		mutable ParameterCallHistory_t requestHistory;
-
-		ValueCurrent_t value_current;
-		InstructionCounter_t current;
-
 		HandlerDB_t handlers;
+		ValueDB_t values;
+		mutable CallHistory_t requestHistory;
+		mutable InstructionCounter_t current_counter;
 
-		IncrementTimeStepHelper_t incrementInternalTimeStep();
-
-
+	public:
 		ParameterDB_t();
+
+		void Set(NGX_Strings::MacroStrings_enum, const InputVariable_t internalValue);
+		std::optional<InputVariable_t> Get(NGX_Strings::MacroStrings_enum) const;
+
 		InstructionCounter_t getCurrentTimeStep() const;
-		IncrementTimeStepHelper_t incrementExternalTimeStep();
+		IncrementCounterHelper_t incrementInternalTimeStep();
+		IncrementCounterHelper_t incrementExternalTimeStep();
 
-		void Set(NGX_Strings::MacroStrings_enum_t, const InputVariable_t value);
-		std::optional<InputVariable_t> Get(NGX_Strings::MacroStrings_enum_t) const;
+		const ValueDB_t& getValues_Internal();
+		const CallHistory_t& getCallHistory_Internal();
 
-		void addHandlerLogic(NGX_Strings::MacroStrings_enum_t, Handler_t);
+		Util::SharedLockContainer<ValueDB_t&> getValues_InternalExclusive();
+		Util::SharedLockContainer<const CallHistory_t&> getCallHistory_InternalExclusive();
+		Util::SharedLockContainer<HandlerDB_t&> getHandlers_InternalExclusive();
 	};
 
-	struct Parameter : NVSDK_NGX_Parameter
+
+	struct Parameter : public NVSDK_NGX_Parameter
 	{
+		using ParameterId_t = Util::GenericId<9>;
+	private:
+		ParameterId_t HyperId = L"CyberFSR";
+		Hyper_NGX_Parameter::ParameterDB_t parameterDB;
+
+	public:
 		virtual void Set(const char* InName, unsigned long long InValue) override;
 		virtual void Set(const char* InName, float InValue) override;
 		virtual void Set(const char* InName, double InValue) override;
@@ -127,16 +181,27 @@ namespace Hyper_NGX {
 		virtual NVSDK_NGX_Result Get(const char* InName, void** OutValue) const override;
 		virtual void Reset() override;
 
-		Hyper_NGX::ParameterDB_t parameterDB;
-
-		static NGX_Strings::MacroStrings_enum_t stringToEnum(const char* name);
-
 		NVSDK_NGX_Result GetOptimalSettingsCallback();
 		NVSDK_NGX_Result GetStatsCallback();
+
+		static Parameter* convertPointerIfValid(NVSDK_NGX_Parameter*);
+		static NGX_Strings::MacroStrings_enum stringToEnum(const char* name);
 	};
 
-	template <typename T>
-	std::optional<T> ConvertVariant(const Hyper_NGX::InputVariable_t& var);
+	class ParameterFactory {
+	private:
+		std::unordered_map<Parameter*, std::unique_ptr<Parameter>> parameterMap;
+		std::mutex mtx;
+
+	public:
+		ParameterFactory();
+		~ParameterFactory();
+
+		Parameter* CreateParameter();
+		void DestroyParameter(Parameter* parameter);
+		void DestroyAllParameters();
+
+	};
 }
 
 NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_DLSS_GetOptimalSettingsCallback(NVSDK_NGX_Parameter* InParams);

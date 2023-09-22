@@ -27,7 +27,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D11_Init_with_ProjectID(const char* InProjectId, NV
 
 NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_Shutdown(void)
 {
-	CyberFsrContext::instance()->NvParameterInstance->Params.clear();
+	//CyberFsrContext::instance()->NvParameterInstance->Params.clear();
 	CyberFsrContext::instance()->Contexts.clear();
 	return NVSDK_NGX_Result_Success;
 }
@@ -39,28 +39,28 @@ NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D11_Shutdown1(ID3D11Device* InDevice)
 
 NVSDK_NGX_Result NVSDK_NGX_D3D11_GetParameters(NVSDK_NGX_Parameter** OutParameters)
 {
-	*OutParameters = CyberFsrContext::instance()->NvParameterInstance->AllocateParameters();
+	*OutParameters = CyberFsrContext::instance()->paramFactory.CreateParameter();
 	return NVSDK_NGX_Result_Success;
 }
 
 //currently it's kind of hack still needs a proper implementation 
 NVSDK_NGX_Result NVSDK_NGX_D3D11_GetCapabilityParameters(NVSDK_NGX_Parameter** OutParameters)
 {
-	*OutParameters = Parameter::instance()->AllocateParameters();
+	*OutParameters = CyberFsrContext::instance()->paramFactory.CreateParameter();
 	return NVSDK_NGX_Result_Success;
 }
 
 //currently it's kind of hack still needs a proper implementation
 NVSDK_NGX_Result NVSDK_NGX_D3D11_AllocateParameters(NVSDK_NGX_Parameter** OutParameters)
 {
-	*OutParameters = Parameter::instance()->AllocateParameters();
+	*OutParameters = CyberFsrContext::instance()->paramFactory.CreateParameter();
 	return NVSDK_NGX_Result_Success;
 }
 
 //currently it's kind of hack still needs a proper implementation
 NVSDK_NGX_Result NVSDK_NGX_D3D11_DestroyParameters(NVSDK_NGX_Parameter* InParameters)
 {
-	Parameter::instance()->DeleteParameters((Parameter*)InParameters);
+	CyberFsrContext::instance()->paramFactory.DestroyParameter((Hyper_NGX::Parameter*)InParameters);
 	return NVSDK_NGX_Result_Success;
 }
 
@@ -86,7 +86,7 @@ void Fsr2MessageCallback_DX11(FfxFsr2MsgType type, const wchar_t* message)
 
 NVSDK_NGX_Result NVSDK_NGX_D3D11_CreateFeature(ID3D11DeviceContext* InDevCtx, NVSDK_NGX_Feature InFeatureID, NVSDK_NGX_Parameter* InParameters, NVSDK_NGX_Handle** OutHandle)
 {
-	const auto inParams = static_cast<const Parameter*>(InParameters);
+	const auto inParams = Hyper_NGX::Parameter::convertPointerIfValid(InParameters);
 
 	ID3D11Device* device;
 	InDevCtx->GetDevice(&device);
@@ -111,13 +111,13 @@ NVSDK_NGX_Result NVSDK_NGX_D3D11_CreateFeature(ID3D11DeviceContext* InDevCtx, NV
 	FFX_ASSERT(errorCode == FFX_OK);
 
 	initParams.device = ffxGetDeviceDX11(device);
-	initParams.maxRenderSize.width = inParams->renderSize.Width;
-	initParams.maxRenderSize.height = inParams->renderSize.Height;
-	initParams.displaySize.width = inParams->windowSize.Height;
-	initParams.displaySize.height = inParams->windowSize.Width;
+	initParams.maxRenderSize.width = inParams->parameterDB.Get(NGX_Strings::NVSDK_NGX_Parameter_Width_enum)).value_or(0).GetAsType<unint32_t>();
+	initParams.maxRenderSize.height = Hyper_NGX::ConvertVariant<uint32_t>(inParams->parameterDB.Get(NGX_Strings::NVSDK_NGX_Parameter_Width_enum)).chars();
+	initParams.displaySize.width = Hyper_NGX::ConvertVariant<uint32_t>(inParams->parameterDB.Get(NGX_Strings::NVSDK_NGX_Parameter_OutWidth_enum)).chars();
+	initParams.displaySize.height = Hyper_NGX::ConvertVariant<uint32_t>(inParams->parameterDB.Get(NGX_Strings::NVSDK_NGX_Parameter_OutHeight_enum)).chars();
 
 	initParams.flags = 0;
-	if (config->DepthInverted.value_or(inParams->DepthInverted))
+	if (config->DepthInverted.value_or(Hyper_NGX::ConvertVariant<uint32_t>(inParams->parameterDB.Get(NGX_Strings::NVSDK_NGX_Parameter_Width_enum)).chars()))
 	{
 		initParams.flags |= FFX_FSR2_ENABLE_DEPTH_INVERTED;
 	}
@@ -180,7 +180,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D11_EvaluateFeature(ID3D11DeviceContext* InDevCtx, 
 	auto& config = instance->MyConfig;
 	auto deviceContext = CyberFsrContext::instance()->Contexts[InFeatureHandle->Id].get();
 
-	const auto inParams = static_cast<const Parameter*>(InParameters);
+	const auto inParams = static_cast<const Hyper_NGX::Parameter*>(InParameters);
 
 	auto* fsrContext = &deviceContext->FsrContext;
 

@@ -16,188 +16,144 @@
 
 namespace Hyper_NGX {
 
-	std::vector<Hyper_NGX::CallEvent_t::call_type_t> CallEvent_t::unpackTypes(call_type_t combined) {
-		std::vector<call_type_t> types;
-		auto combined_int = static_cast<std::underlying_type_t<call_type_t>>(combined);
-		for (int i = 0; i < sizeof(call_type_t) * 8; ++i) {
-			auto mask = static_cast<std::underlying_type_t<call_type_t>>(1 << i);
+	std::vector<Hyper_NGX::CallEvent_t::CallType_enum> CallEvent_t::unpackTypes(CallType_enum combined) {
+		std::vector<CallType_enum> types;
+		auto combined_int = static_cast<std::underlying_type_t<CallType_enum>>(combined);
+		for (int i = 0; i < sizeof(CallType_enum) * 8; ++i) {
+			auto mask = static_cast<std::underlying_type_t<CallType_enum>>(1 << i);
 			if (combined_int & mask) {
-				types.push_back(static_cast<call_type_t>(mask));
+				types.push_back(static_cast<CallType_enum>(mask));
 			}
 		}
 		return types;
 	}
 
-	Hyper_NGX::CallEvent_t::call_type_t CallEvent_t::packTypes(const std::vector<call_type_t>& types) {
-		auto combined_int = static_cast<std::underlying_type_t<call_type_t>>(0);
+	Hyper_NGX::CallEvent_t::CallType_enum CallEvent_t::packTypes(const std::vector<CallType_enum>& types) {
+		auto combined_int = static_cast<std::underlying_type_t<CallType_enum>>(0);
 		for (const auto& type : types) {
-			auto type_int = static_cast<std::underlying_type_t<call_type_t>>(type);
+			auto type_int = static_cast<std::underlying_type_t<CallType_enum>>(type);
 			combined_int |= type_int;
 		}
-		return static_cast<call_type_t>(combined_int);
+		return static_cast<CallType_enum>(combined_int);
 	}
 
-	bool CallEvent_t::addType(call_type_t type) {
-		auto current = static_cast<std::underlying_type_t<call_type_t>>(callType);
-		auto adding = static_cast<std::underlying_type_t<call_type_t>>(type);
-		if (current & adding) {
+	bool CallEvent_t::addType(CallType_enum type) {
+		auto current_counter = static_cast<std::underlying_type_t<CallType_enum>>(callType);
+		auto adding = static_cast<std::underlying_type_t<CallType_enum>>(type);
+		if (current_counter & adding) {
 			return false; // Already exists
 		}
-		callType = static_cast<call_type_t>(current | adding);
+		callType = static_cast<CallType_enum>(current_counter | adding);
 		return true;
 	}
 
-	bool CallEvent_t::hasType(call_type_t type) {
-		auto current = static_cast<std::underlying_type_t<call_type_t>>(callType);
-		auto checking = static_cast<std::underlying_type_t<call_type_t>>(type);
-		return (current & checking) != 0;
+	bool CallEvent_t::hasType(CallType_enum type) {
+		auto current_counter = static_cast<std::underlying_type_t<CallType_enum>>(callType);
+		auto checking = static_cast<std::underlying_type_t<CallType_enum>>(type);
+		return (current_counter & checking) != 0;
 	}
 
-	bool CallEvent_t::removeType(call_type_t type) {
-		auto current = static_cast<std::underlying_type_t<call_type_t>>(callType);
-		auto removing = static_cast<std::underlying_type_t<call_type_t>>(type);
-		if (current & removing) {
-			callType = static_cast<call_type_t>(current & ~removing);
+	bool CallEvent_t::removeType(CallType_enum type) {
+		auto current_counter = static_cast<std::underlying_type_t<CallType_enum>>(callType);
+		auto removing = static_cast<std::underlying_type_t<CallType_enum>>(type);
+		if (current_counter & removing) {
+			callType = static_cast<CallType_enum>(current_counter & ~removing);
 			return true;
 		}
 		return false; // Doesn't exist
 	}
 
 
-	void HandlerDB_t::addHandlerLogic(NGX_Strings::MacroStrings_enum_t key, Handler_t logic) {
+	bool HandlerDB_t::addHandlerLogic(NGX_Strings::MacroStrings_enum key, Handler_t logic) {
 		handlers.emplace(key, logic);
+		return true;
 	}
 
-	Handler_t::HandlerHelper HandlerDB_t::Apply(ParameterDB_t& db, CallEvent_t& event) {
+	Handler_t::HandlerHelper_t HandlerDB_t::Apply(ParameterDB_t& db, CallEvent_t& event) {
 		auto range = handlers.equal_range(event.key);
 		for (auto it = range.first; it != range.second; ++it) {
 			auto status = it->second.ApplyFunc(db, event);
-			if (status.status != Handler_t::HandlerStatus_t::unconsumed) {
+			if (status.status != Handler_t::HandlerStatus_enum::unconsumed) {
 				return status;
 			}
 		}
-		return { Handler_t::HandlerStatus_t::unconsumed , 0 };
+		return { Handler_t::HandlerStatus_enum::unconsumed , 0 };
 	}
 
-	ParameterDB_t::ParameterDB_t() : current{} {}
+	ParameterDB_t::ParameterDB_t() : current_counter{} {}
 
-	ParameterDB_t::IncrementTimeStepHelper_t ParameterDB_t::incrementInternalTimeStep() {
+	IncrementCounterHelper_t ParameterDB_t::incrementInternalTimeStep() {
 		std::lock_guard<std::mutex> lock(mtx);
-		IncrementTimeStepHelper_t helper;
+		IncrementCounterHelper_t helper;
 
-		helper.oldStep = current;
-		current.internal_counter += 1;
-		helper.newStep = current;
+		helper.oldStep = current_counter;
+		current_counter.internal_counter += 1;
+		helper.newStep = current_counter;
 		return helper;
 	}
 
 	InstructionCounter_t ParameterDB_t::getCurrentTimeStep() const {
 		std::lock_guard<std::mutex> lock(mtx);
-		return current;
+		return current_counter;
 	}
 
-	ParameterDB_t::IncrementTimeStepHelper_t ParameterDB_t::incrementExternalTimeStep() {
+	IncrementCounterHelper_t ParameterDB_t::incrementExternalTimeStep() {
 		std::lock_guard<std::mutex> lock(mtx);
-		IncrementTimeStepHelper_t helper;
+		IncrementCounterHelper_t helper;
 
-		helper.oldStep = current;
+		helper.oldStep = current_counter;
 
-		current.external_counter += 1;
-		current.internal_counter = 0;
+		current_counter.external_counter += 1;
+		current_counter.internal_counter = 0;
 
-		helper.newStep = current;
+		helper.newStep = current_counter;
 
 		return helper;
 	}
 
-	void HandlerDB_t::addHandlerLogic(NGX_Strings::MacroStrings_enum_t key, Handler_t handler) {
+	bool  HandlerDB_t::addHandlerLogic(NGX_Strings::MacroStrings_enum key, Handler_t handler) {
 		handlers.emplace(key, handler);
+		return true;
 	}
 
-	Handler_t::HandlerHelper HandlerDB_t::Apply(ParameterDB_t& db, CallEvent_t& event) {
+	Handler_t::HandlerHelper_t HandlerDB_t::Apply(ParameterDB_t& db, CallEvent_t& event) {
 		auto range = handlers.equal_range(event.key);
 		for (auto it = range.first; it != range.second; ++it) {
-			Handler_t::HandlerHelper status = it->second.ApplyFunc(db, event);
-			if (status.status != Handler_t::HandlerStatus_t::unconsumed) {
+			Handler_t::HandlerHelper_t status = it->second.ApplyFunc(db, event);
+			if (status.status != Handler_t::HandlerStatus_enum::unconsumed) {
 				return status;
 			}
 		}
-		return Handler_t::HandlerHelper{ Handler_t::HandlerStatus_t::unconsumed, 0 };
+		return Handler_t::HandlerHelper_t{ Handler_t::HandlerStatus_enum::unconsumed, 0 };
 	}
 
-	ParameterDB_t::ParameterDB_t() : current{} {
+	ParameterDB_t::ParameterDB_t() : current_counter{} {
 	}
 
-	ParameterDB_t::IncrementTimeStepHelper_t ParameterDB_t::incrementInternalTimeStep() {
-		std::lock_guard<std::mutex> lock(mtx);
-		IncrementTimeStepHelper_t helper;
-
-		helper.oldStep = current;
-
-		current.internal_counter += 1;
-
-		helper.newStep = current;
-
-		return helper;
-	}
 
 	InstructionCounter_t ParameterDB_t::getCurrentTimeStep() const {
 		std::lock_guard<std::mutex> lock(mtx);
-		return current;
-	}
-
-	ParameterDB_t::IncrementTimeStepHelper_t ParameterDB_t::incrementExternalTimeStep() {
-		std::lock_guard<std::mutex> lock(mtx);
-		IncrementTimeStepHelper_t helper;
-
-		helper.oldStep = current;
-
-		current.external_counter += 1;
-		current.internal_counter = 0;
-
-		helper.newStep = current;
-
-		return helper;
-	}
-
-	template <typename T>
-	std::optional<T> ConvertVariant(const Hyper_NGX::InputVariable_t& var) {
-		return std::visit([](auto&& arg) -> std::optional<T> {
-			using ArgType = std::decay_t<decltype(arg)>;
-
-			// Special handling for incompatible types
-			if constexpr (std::is_pointer_v<ArgType> || std::is_pointer_v<T>) {
-				if constexpr (std::is_same_v<ArgType, T>) {
-					return arg;
-				}
-				else {
-					return std::nullopt;
-				}
-			}
-			else {
-				return static_cast<T>(arg);
-			}
-			}, var);
+		return current_counter;
 	}
 
 
-	void ParameterDB_t::Set(NGX_Strings::MacroStrings_enum_t key, const InputVariable_t value) {
-		CallEvent_t event{ CallEvent_t::set, key, value, getCurrentTimeStep() };
-		Handler_t::HandlerHelper result;
+	void ParameterDB_t::Set(NGX_Strings::MacroStrings_enum key, const InputVariable_t chars) {
+		CallEvent_t event{ CallEvent_t::set, key, chars, getCurrentTimeStep() };
+		Handler_t::HandlerHelper_t result;
 
 		{
 			std::lock_guard<std::mutex> lock(mtx);
 
 			result = handlers.Apply(*this, event);
 
-			if (result.status == Handler_t::HandlerStatus_t::unconsumed) {
-				value_current[key] = value;
+			if (result.status == Handler_t::HandlerStatus_enum::unconsumed) {
+				value_current[key] = chars;
 				value_history.emplace(key, event);
 			}
 		}
 	}
 
-	std::optional<InputVariable_t> ParameterDB_t::Get(NGX_Strings::MacroStrings_enum_t key) const {
+	std::optional<InputVariable_t> ParameterDB_t::Get(NGX_Strings::MacroStrings_enum key) const {
 		std::lock_guard<std::mutex> lock(mtx);  // Locking the mutable mutex
 
 		// perform non-const actions on the locked data structures here
@@ -207,10 +163,6 @@ namespace Hyper_NGX {
 		}
 
 		return std::nullopt;  // or your default return value
-	}
-
-	void ParameterDB_t::addHandlerLogic(NGX_Strings::MacroStrings_enum_t key, Handler_t handler) {
-		handlers.addHandlerLogic(key, handler);
 	}
 
 	void Parameter::Set(const char* InName, unsigned long long InValue) {
@@ -257,10 +209,10 @@ namespace Hyper_NGX {
 		auto key = stringToEnum(InName);
 		std::optional<InputVariable_t> var = parameterDB.Get(key);
 
-		auto maybeULL = ConvertVariant<unsigned long long>(var.value());
+		auto maybeULL = ConvertVariant<unsigned long long>(var.chars());
 
 		if (maybeULL.has_value()) {
-			*OutValue = maybeULL.value();
+			*OutValue = maybeULL.chars();
 			return NVSDK_NGX_Result::NVSDK_NGX_Result_Success;
 		}
 
@@ -271,10 +223,10 @@ namespace Hyper_NGX {
 		auto key = stringToEnum(InName);
 		std::optional<InputVariable_t> var = parameterDB.Get(key);
 
-		auto maybeFloat = ConvertVariant<float>(var.value());
+		auto maybeFloat = ConvertVariant<float>(var.chars());
 
 		if (maybeFloat.has_value()) {
-			*OutValue = maybeFloat.value();
+			*OutValue = maybeFloat.chars();
 			return NVSDK_NGX_Result::NVSDK_NGX_Result_Success;
 		}
 
@@ -285,10 +237,10 @@ namespace Hyper_NGX {
 		auto key = stringToEnum(InName);
 		std::optional<InputVariable_t> var = parameterDB.Get(key);
 
-		auto maybeDouble = ConvertVariant<double>(var.value());
+		auto maybeDouble = ConvertVariant<double>(var.chars());
 
 		if (maybeDouble.has_value()) {
-			*OutValue = maybeDouble.value();
+			*OutValue = maybeDouble.chars();
 			return NVSDK_NGX_Result::NVSDK_NGX_Result_Success;
 		}
 
@@ -299,10 +251,10 @@ namespace Hyper_NGX {
 		auto key = stringToEnum(InName);
 		std::optional<InputVariable_t> var = parameterDB.Get(key);
 
-		auto maybeUI = ConvertVariant<unsigned int>(var.value());
+		auto maybeUI = ConvertVariant<unsigned int>(var.chars());
 
 		if (maybeUI.has_value()) {
-			*OutValue = maybeUI.value();
+			*OutValue = maybeUI.chars();
 			return NVSDK_NGX_Result::NVSDK_NGX_Result_Success;
 		}
 
@@ -313,10 +265,10 @@ namespace Hyper_NGX {
 		auto key = stringToEnum(InName);
 		std::optional<InputVariable_t> var = parameterDB.Get(key);
 
-		auto maybeI = ConvertVariant<int>(var.value());
+		auto maybeI = ConvertVariant<int>(var.chars());
 
 		if (maybeI.has_value()) {
-			*OutValue = maybeI.value();
+			*OutValue = maybeI.chars();
 			return NVSDK_NGX_Result::NVSDK_NGX_Result_Success;
 		}
 
@@ -327,10 +279,10 @@ namespace Hyper_NGX {
 		auto key = stringToEnum(InName);
 		std::optional<InputVariable_t> var = parameterDB.Get(key);
 
-		auto maybeRP = ConvertVariant<ID3D11Resource*>(var.value());
+		auto maybeRP = ConvertVariant<ID3D11Resource*>(var.chars());
 
 		if (maybeRP.has_value()) {
-			*OutValue = maybeRP.value();
+			*OutValue = maybeRP.chars();
 			return NVSDK_NGX_Result::NVSDK_NGX_Result_Success;
 		}
 
@@ -341,10 +293,10 @@ namespace Hyper_NGX {
 		auto key = stringToEnum(InName);
 		std::optional<InputVariable_t> var = parameterDB.Get(key);
 
-		auto maybeRP = ConvertVariant<ID3D12Resource*>(var.value());
+		auto maybeRP = ConvertVariant<ID3D12Resource*>(var.chars());
 
 		if (maybeRP.has_value()) {
-			*OutValue = maybeRP.value();
+			*OutValue = maybeRP.chars();
 			return NVSDK_NGX_Result::NVSDK_NGX_Result_Success;
 		}
 
@@ -355,10 +307,10 @@ namespace Hyper_NGX {
 		auto key = stringToEnum(InName);
 		std::optional<InputVariable_t> var = parameterDB.Get(key);
 
-		auto maybeVP = ConvertVariant<void*>(var.value());
+		auto maybeVP = ConvertVariant<void*>(var.chars());
 
 		if (maybeVP.has_value()) {
-			*OutValue = maybeVP.value();
+			*OutValue = maybeVP.chars();
 			return NVSDK_NGX_Result::NVSDK_NGX_Result_Success;
 		}
 
@@ -370,8 +322,34 @@ namespace Hyper_NGX {
 		CyberLogArgs(this);
 	}
 	
-	NGX_Strings::MacroStrings_enum_t Parameter::stringToEnum(const char* name) {
+	NGX_Strings::MacroStrings_enum Parameter::stringToEnum(const char* name) {
 		return NGX_Strings::Strings_Converter.getEnumFromMacroName(name);
+	}
+
+	ParameterFactory::ParameterFactory() {}
+
+	ParameterFactory::~ParameterFactory() {
+		// Optional: Delete all remaining Parameter instances
+	}
+
+	Parameter* ParameterFactory::CreateParameter() {
+		std::lock_guard<std::mutex> lock(mtx);
+		auto ptr = new Parameter();
+		parameterMap[ptr] = std::unique_ptr<Parameter>(ptr);
+		return ptr;
+	}
+
+	void ParameterFactory::DestroyParameter(Parameter* parameter) {
+		std::lock_guard<std::mutex> lock(mtx);
+		auto it = parameterMap.find(parameter);
+		if (it != parameterMap.end()) {
+			parameterMap.erase(it);
+		}
+	}
+
+	void ParameterFactory::DestroyAllParameters() {
+		std::lock_guard<std::mutex> lock(mtx);
+		parameterMap.clear();
 	}
 }
 
@@ -411,7 +389,7 @@ inline std::optional<float> GetQualityOverrideRatio(const NVSDK_NGX_PerfQuality_
 	//CyberLogArgs(input);
 	std::optional<float> output;
 
-	if (!(config->QualityRatioOverrideEnabled.has_value() && config->QualityRatioOverrideEnabled.value()))
+	if (!(config->QualityRatioOverrideEnabled.has_value() && config->QualityRatioOverrideEnabled.chars()))
 		return output; // override not enabled
 
 	switch (input)
