@@ -3,72 +3,39 @@
 
 #ifdef CyberInterposer_DO_DX12
 
-using namespace CyberInterposer;
-
-bool CyberInterposer::PFN_Table_NVNGX_DX12::LoadDLL(HMODULE hModule, bool populateChildren)
-{
-    CyberLogArgs(hModule, populateChildren);
-
-    if (hModule == nullptr)
+namespace CyberInterposer {
+    bool PFN_Table_NVNGX_DX12::LoadDLL(HMODULE hModule, bool populateChildren)
     {
-        return false;
+        CyberLogArgs(hModule, populateChildren);
+
+        if (hModule == nullptr)
+        {
+            return false;
+        }
+
+        bool foundFunctions = true;
+
+        foundFunctions &= LoadFunction(pfn_D3D12_Init, hModule, "NVSDK_NGX_D3D12_Init");
+        foundFunctions &= LoadFunction(pfn_D3D12_Init_Ext, hModule, "NVSDK_NGX_D3D12_Init_Ext");
+        foundFunctions &= LoadFunction(pfn_D3D12_Init_ProjectID, hModule, "NVSDK_NGX_D3D12_Init_ProjectID");
+        foundFunctions &= LoadFunction(pfn_D3D12_Shutdown, hModule, "NVSDK_NGX_D3D12_Shutdown");
+        foundFunctions &= LoadFunction(pfn_D3D12_Shutdown1, hModule, "NVSDK_NGX_D3D12_Shutdown1");
+        foundFunctions &= LoadFunction(pfn_D3D12_GetCapabilityParameters, hModule, "NVSDK_NGX_D3D12_GetCapabilityParameters");
+        foundFunctions &= LoadFunction(pfn_D3D12_GetParameters, hModule, "NVSDK_NGX_D3D12_GetParameters");
+        foundFunctions &= LoadFunction(pfn_D3D12_GetScratchBufferSize, hModule, "NVSDK_NGX_D3D12_GetScratchBufferSize");
+        foundFunctions &= LoadFunction(pfn_D3D12_CreateFeature, hModule, "NVSDK_NGX_D3D12_CreateFeature");
+        foundFunctions &= LoadFunction(pfn_D3D12_ReleaseFeature, hModule, "NVSDK_NGX_D3D12_ReleaseFeature");
+        foundFunctions &= LoadFunction(pfn_D3D12_GetFeatureRequirements, hModule, "NVSDK_NGX_D3D12_GetFeatureRequirements");
+        foundFunctions &= LoadFunction(pfn_D3D12_EvaluateFeature, hModule, "NVSDK_NGX_D3D12_EvaluateFeature");
+        foundFunctions &= LoadFunction(pfn_D3D12_EvaluateFeature_C, hModule, "NVSDK_NGX_D3D12_EvaluateFeature_C");
+        foundFunctions &= LoadFunction(pfn_D3D12_AllocateParameters, hModule, "NVSDK_NGX_D3D12_AllocateParameters");
+        foundFunctions &= LoadFunction(pfn_D3D12_DestroyParameters, hModule, "NVSDK_NGX_D3D12_DestroyParameters");
+
+        return foundFunctions;
     }
-
-    pfn_D3D12_Init = reinterpret_cast<PFN_NVSDK_NGX_D3D12_Init>(GetProcAddress(hModule, "NVSDK_NGX_D3D12_Init"));
-    pfn_D3D12_Init_Ext = reinterpret_cast<PFN_NVSDK_NGX_D3D12_Init_Ext>(GetProcAddress(hModule, "NVSDK_NGX_D3D12_Init_Ext"));
-    pfn_D3D12_Init_ProjectID = reinterpret_cast<PFN_NVSDK_NGX_D3D12_Init_ProjectID>(GetProcAddress(hModule, "NVSDK_NGX_D3D12_Init_ProjectID"));
-
-    pfn_D3D12_Shutdown = reinterpret_cast<PFN_NVSDK_NGX_D3D12_Shutdown>(GetProcAddress(hModule, "NVSDK_NGX_D3D12_Shutdown"));
-    pfn_D3D12_Shutdown1 = reinterpret_cast<PFN_NVSDK_NGX_D3D12_Shutdown1>(GetProcAddress(hModule, "NVSDK_NGX_D3D12_Shutdown1"));
-
-    pfn_D3D12_GetCapabilityParameters = reinterpret_cast<PFN_NVSDK_NGX_D3D12_GetCapabilityParameters>(GetProcAddress(hModule, "NVSDK_NGX_D3D12_GetCapabilityParameters"));
-    pfn_D3D12_GetParameters = reinterpret_cast<PFN_NVSDK_NGX_D3D12_GetParameters>(GetProcAddress(hModule, "NVSDK_NGX_D3D12_GetParameters"));
-
-    pfn_D3D12_AllocateParameters = reinterpret_cast<PFN_NVSDK_NGX_D3D12_AllocateParameters>(GetProcAddress(hModule, "NVSDK_NGX_D3D12_AllocateParameters"));
-    pfn_D3D12_DestroyParameters = reinterpret_cast<PFN_NVSDK_NGX_D3D12_DestroyParameters>(GetProcAddress(hModule, "NVSDK_NGX_D3D12_DestroyParameters"));
-    pfn_D3D12_GetScratchBufferSize = reinterpret_cast<PFN_NVSDK_NGX_D3D12_GetScratchBufferSize>(GetProcAddress(hModule, "NVSDK_NGX_D3D12_GetScratchBufferSize"));
-
-    pfn_D3D12_CreateFeature = reinterpret_cast<PFN_NVSDK_NGX_D3D12_CreateFeature>(GetProcAddress(hModule, "NVSDK_NGX_D3D12_CreateFeature"));
-    pfn_D3D12_ReleaseFeature = reinterpret_cast<PFN_NVSDK_NGX_D3D12_ReleaseFeature>(GetProcAddress(hModule, "NVSDK_NGX_D3D12_ReleaseFeature"));
-
-    pfn_D3D12_GetFeatureRequirements = reinterpret_cast<PFN_NVSDK_NGX_D3D12_GetFeatureRequirements>(GetProcAddress(hModule, "NVSDK_NGX_D3D12_GetFeatureRequirements"));
-
-    pfn_D3D12_EvaluateFeature = reinterpret_cast<PFN_NVSDK_NGX_D3D12_EvaluateFeature>(GetProcAddress(hModule, "NVSDK_NGX_D3D12_EvaluateFeature"));
-    pfn_D3D12_EvaluateFeature_C = reinterpret_cast<PFN_NVSDK_NGX_D3D12_EvaluateFeature_C>(GetProcAddress(hModule, "NVSDK_NGX_D3D12_EvaluateFeature_C"));
-
-    bool foundFunctions = true;
-
-#define CyDLLLoadLog(name) \
-	do { \
-		const bool found = (name != nullptr); \
-		if(found){ \
-			CyberLOGi(L#name, L" found", name); \
-		} \
-		else { \
-			CyberLOGi(L#name, L" not found"); \
-		} \
-		foundFunctions = false; \
-	} while(false)
-
-    CyDLLLoadLog(pfn_D3D12_Init);
-    CyDLLLoadLog(pfn_D3D12_Init_Ext);
-    CyDLLLoadLog(pfn_D3D12_Init_ProjectID);
-    CyDLLLoadLog(pfn_D3D12_Shutdown);
-    CyDLLLoadLog(pfn_D3D12_Shutdown1);
-    CyDLLLoadLog(pfn_D3D12_GetCapabilityParameters);
-    CyDLLLoadLog(pfn_D3D12_GetParameters);
-    CyDLLLoadLog(pfn_D3D12_GetScratchBufferSize);
-    CyDLLLoadLog(pfn_D3D12_CreateFeature);
-    CyDLLLoadLog(pfn_D3D12_ReleaseFeature);
-    CyDLLLoadLog(pfn_D3D12_EvaluateFeature);
-    CyDLLLoadLog(pfn_D3D12_EvaluateFeature_C);
-    CyDLLLoadLog(pfn_D3D12_AllocateParameters);
-    CyDLLLoadLog(pfn_D3D12_DestroyParameters);
-
-#undef CyDLLLoadLog
-
-    return foundFunctions;
 }
+
+
 
 NVSDK_NGX_Result NVSDK_NGX_D3D12_Init_Ext(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath,
     ID3D12Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion,
@@ -78,7 +45,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_Init_Ext(unsigned long long InApplicationId, co
     WaitForLoading();
     CyberLogArgs(InApplicationId, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion, unknown0, start);
 
-    auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX12.pfn_D3D12_Init_Ext;
+    auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_DX12.pfn_D3D12_Init_Ext;
 
     if (ptr != nullptr)
     {
@@ -96,7 +63,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_Init(unsigned long long InApplicationId, const 
     WaitForLoading();
     CyberLogArgs(InApplicationId, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion, start);
 
-    auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX12.pfn_D3D12_Init;
+    auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_DX12.pfn_D3D12_Init;
 
     if (ptr != nullptr)
     {
@@ -114,7 +81,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_Init_ProjectID(const char* InProjectId, NVSDK_N
     WaitForLoading();
     CyberLogArgs(InProjectId, InEngineType, InEngineVersion, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion, start);
 
-    auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX12.pfn_D3D12_Init_ProjectID;
+    auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_DX12.pfn_D3D12_Init_ProjectID;
 
     if (ptr != nullptr)
     {
@@ -132,7 +99,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_Shutdown(void)
     WaitForLoading();
     CyberLogArgs(start);
 
-    auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX12.pfn_D3D12_Shutdown;
+    auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_DX12.pfn_D3D12_Shutdown;
 
     if (ptr != nullptr)
     {
@@ -150,7 +117,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_Shutdown1(ID3D12Device* InDevice)
     WaitForLoading();
     CyberLogArgs(InDevice, start);
 
-    auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX12.pfn_D3D12_Shutdown1;
+    auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_DX12.pfn_D3D12_Shutdown1;
 
     if (ptr != nullptr)
     {
@@ -168,7 +135,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_GetParameters(NVSDK_NGX_Parameter** OutParamete
     WaitForLoading();
     CyberLogArgs(OutParameters, start);
 
-    auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX12.pfn_D3D12_GetParameters;
+    auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_DX12.pfn_D3D12_GetParameters;
 
     if (ptr != nullptr)
     {
@@ -186,7 +153,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_GetCapabilityParameters(NVSDK_NGX_Parameter** O
     WaitForLoading();
     CyberLogArgs(OutParameters, start);
 
-    auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX12.pfn_D3D12_GetCapabilityParameters;
+    auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_DX12.pfn_D3D12_GetCapabilityParameters;
 
     if (ptr != nullptr)
     {
@@ -204,7 +171,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_AllocateParameters(NVSDK_NGX_Parameter** OutPar
     WaitForLoading();
     CyberLogArgs(OutParameters, start);
 
-    auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX12.pfn_D3D12_AllocateParameters;
+    auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_DX12.pfn_D3D12_AllocateParameters;
 
     if (ptr != nullptr)
     {
@@ -222,7 +189,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_DestroyParameters(NVSDK_NGX_Parameter* InParame
     WaitForLoading();
     CyberLogArgs(InParameters, start);
 
-    auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX12.pfn_D3D12_DestroyParameters;
+    auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_DX12.pfn_D3D12_DestroyParameters;
 
     if (ptr != nullptr)
     {
@@ -241,7 +208,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_GetScratchBufferSize(NVSDK_NGX_Feature InFeatur
     WaitForLoading();
     CyberLogArgs(InFeatureId, InParameters, OutSizeInBytes, start);
 
-    auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX12.pfn_D3D12_GetScratchBufferSize;
+    auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_DX12.pfn_D3D12_GetScratchBufferSize;
 
     if (ptr != nullptr)
     {
@@ -260,7 +227,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_CreateFeature(ID3D12GraphicsCommandList* InCmdL
     WaitForLoading();
     CyberLogArgs(InCmdList, InFeatureID, InParameters, OutHandle, start);
 
-    auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX12.pfn_D3D12_CreateFeature;
+    auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_DX12.pfn_D3D12_CreateFeature;
 
     if (ptr != nullptr)
     {
@@ -278,7 +245,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_ReleaseFeature(NVSDK_NGX_Handle* InHandle)
     WaitForLoading();
     CyberLogArgs(InHandle, start);
 
-    auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX12.pfn_D3D12_ReleaseFeature;
+    auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_DX12.pfn_D3D12_ReleaseFeature;
 
     if (ptr != nullptr)
     {
@@ -296,7 +263,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_GetFeatureRequirements(IDXGIAdapter* Adapter, c
     WaitForLoading();
     CyberLogArgs(Adapter, FeatureDiscoveryInfo, OutSupported, start);
 
-    auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX12.pfn_D3D12_GetFeatureRequirements;
+    auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_DX12.pfn_D3D12_GetFeatureRequirements;
 
     if (ptr != nullptr)
     {
@@ -314,7 +281,7 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCm
     WaitForLoading();
     CyberLogArgs(InCmdList, InFeatureHandle, InParameters, InCallback, start);
 
-    auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX12.pfn_D3D12_EvaluateFeature;
+    auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_DX12.pfn_D3D12_EvaluateFeature;
 
     if (ptr != nullptr)
     {
@@ -332,7 +299,7 @@ NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_D3D12_EvaluateFeature_C(ID3D12GraphicsComm
     WaitForLoading();
     CyberLogArgs(InCmdList, InFeatureHandle, InParameters, InCallback, start);
 
-    auto ptr = DLLs.GetLoadedDLL().pointer_tables.PFN_DX12.pfn_D3D12_EvaluateFeature_C;
+    auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_DX12.pfn_D3D12_EvaluateFeature_C;
 
     if (ptr != nullptr)
     {

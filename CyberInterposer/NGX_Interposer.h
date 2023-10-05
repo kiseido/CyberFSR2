@@ -14,10 +14,26 @@
 #include "NGX_Vk.h"
 #include "NGX_Parameter.h"
 
-NVSDK_NGX_API NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_GetVersion(NVSDK_NGX_Version* version);
+Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_GetVersion(NVSDK_NGX_Version* version);
 
 namespace CyberInterposer
 {
+
+    template <typename T>
+    bool LoadFunction(T& functionPointer, HMODULE hModule, const char* functionName)
+    {
+        functionPointer = reinterpret_cast<T>(GetProcAddress(hModule, functionName));
+        if (functionPointer != nullptr)
+        {
+            CyberLOGi(functionName, " found", functionPointer);
+            return true;
+        }
+        else
+        {
+            CyberLOGi(functionName, " not found");
+            return false;
+        }
+    }
 
     static bool CyberFSRLoaded = false;
     static bool LoggerLoaded = false;

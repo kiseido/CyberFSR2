@@ -8,17 +8,17 @@
 
 namespace CyberInterposer
 {
-	typedef char Raw_NVNGX_Parameter[sizeof(NVSDK_NGX_Parameter)];
+	typedef void* Raw_NVNGX_Parameter[sizeof(NVSDK_NGX_Parameter)];
 
 	union PFN_Table_NVNGX_Parameter_Union_P
 	{
-		Raw_NVNGX_Parameter* bytes;
+		Raw_NVNGX_Parameter* pointers;
 		NVSDK_NGX_Parameter* param;
 		PFN_Table_NVNGX_Parameter_Union_P(NVSDK_NGX_Parameter*);
 		PFN_Table_NVNGX_Parameter_Union_P();
 	};
 
-	struct CI_NGX_Parameter : public NVSDK_NGX_Parameter
+	struct CI_Parameter : public NVSDK_NGX_Parameter
 	{
 		virtual void Set(const char* InName, unsigned long long InValue) override;
 		virtual void Set(const char* InName, float InValue) override;
@@ -43,9 +43,9 @@ namespace CyberInterposer
 		NVSDK_NGX_Result GetOptimalSettingsCallback();
 		NVSDK_NGX_Result GetStatsCallback();
 
-		CI_NGX_Parameter(NVSDK_NGX_Parameter*);
+		CI_Parameter(NVSDK_NGX_Parameter*);
 
-		CI_NGX_Parameter();
+		CI_Parameter();
 
 	private:
 
@@ -64,10 +64,10 @@ namespace CyberInterposer
 	struct CI_MGX_Parameter_StaticAlloc {
 		static constexpr std::size_t PoolSize = 10000;
 
-		CI_NGX_Parameter* claim() noexcept(false);
-		CI_NGX_Parameter* claim(std::size_t number) noexcept(false);
-		bool release(CI_NGX_Parameter* p) noexcept(false);
-		bool release(CI_NGX_Parameter* p, std::size_t number) noexcept(false);
+		CI_Parameter* claim() noexcept(false);
+		CI_Parameter* claim(std::size_t number) noexcept(false);
+		bool release(CI_Parameter* p) noexcept(false);
+		bool release(CI_Parameter* p, std::size_t number) noexcept(false);
 
 		CI_MGX_Parameter_StaticAlloc();
 
@@ -76,7 +76,7 @@ namespace CyberInterposer
 
 	private:
 
-		std::array<CI_NGX_Parameter, PoolSize> memoryPool;
+		std::array<CI_Parameter, PoolSize> memoryPool;
 		std::bitset<PoolSize> freeSlots;
 		std::mutex allocatorMutex;
 	};

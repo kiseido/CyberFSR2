@@ -65,6 +65,7 @@ typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_VULKAN_RequiredExtensions)(un
 
 typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_VULKAN_Init)(unsigned long long, const wchar_t*, VkInstance, VkPhysicalDevice, VkDevice, PFN_vkGetInstanceProcAddr, PFN_vkGetDeviceProcAddr, const NVSDK_NGX_FeatureCommonInfo*, NVSDK_NGX_Version);
 typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_VULKAN_Init_Ext)(unsigned long long, const wchar_t*, VkInstance, VkPhysicalDevice, VkDevice, PFN_vkGetInstanceProcAddr, PFN_vkGetDeviceProcAddr, const NVSDK_NGX_FeatureCommonInfo*, NVSDK_NGX_Version, unsigned long long);
+typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_VULKAN_Init_Ext2)(unsigned long long, const wchar_t*, VkInstance, VkPhysicalDevice, VkDevice, PFN_vkGetInstanceProcAddr, PFN_vkGetDeviceProcAddr, const NVSDK_NGX_FeatureCommonInfo*, NVSDK_NGX_Version, unsigned long long, unsigned long long);
 typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_VULKAN_Init_ProjectID)(const char*, NVSDK_NGX_EngineType, const char*, const wchar_t*, VkInstance, VkPhysicalDevice, VkDevice, PFN_vkGetInstanceProcAddr, PFN_vkGetDeviceProcAddr, const NVSDK_NGX_FeatureCommonInfo*, NVSDK_NGX_Version);
 
 typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_VULKAN_Shutdown)(void);

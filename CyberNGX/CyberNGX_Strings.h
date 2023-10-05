@@ -271,20 +271,15 @@
 #define CyberNGX_Strings_ENUM_NAME(name) CyberNGX_Strings_CONCATENATE(##name, _enum)
 
 
-#define CyberNGX_Strings_Headers(name) \
-        enum CyberNGX_Strings_CONCATENATE(name, _enum) { CyberNGX_Strings_Macros(CyberNGX_Strings_ENUM_NAME), COUNT_enum }; \
-        constexpr static std::string_view CyberNGX_Strings_CONCATENATE(name, _macroname)[] { ( CyberNGX_Strings_Macros(CyberNGX_Strings_MacroNameString) ) } ; \
-        constexpr static std::string_view CyberNGX_Strings_CONCATENATE(name, _macrocontent)[] { ( CyberNGX_Strings_Macros(CyberNGX_Strings_MacroContentsString) ) };
-
-
-
 #include <unordered_map>
 
 namespace NGX_Strings {
-    CyberNGX_Strings_Headers(MacroStrings);
+    enum MacroStrings_enum { CyberNGX_Strings_Macros(CyberNGX_Strings_ENUM_NAME), COUNT_enum }; \
+    constexpr static std::string_view MacroStrings_macroname[] { (CyberNGX_Strings_Macros(CyberNGX_Strings_MacroNameString)) }; \
+    constexpr static std::string_view MacroStrings_macrocontent[] { (CyberNGX_Strings_Macros(CyberNGX_Strings_MacroContentsString)) };
 
     static struct NGX_String_Converter {
-
+    private:
         enum InitStatus { cold, warming, hot};
 
         InitStatus initstatus{cold};
@@ -295,15 +290,16 @@ namespace NGX_Strings {
 
         void populate_maps();
 
+    public:
         NGX_String_Converter();
 
-        MacroStrings_enum getEnumFromMacroName(const std::string_view& chars);
+        MacroStrings_enum getEnumFromMacroName(const std::string_view& chars) const;
 
-        MacroStrings_enum getEnumFromMacroContents(const std::string_view& chars);
+        MacroStrings_enum getEnumFromMacroContents(const std::string_view& chars) const;
 
-        std::string_view getMacroNameFromEnum(MacroStrings_enum chars);
+        std::string_view getMacroNameFromEnum(MacroStrings_enum chars) const;
 
-        std::string_view getMacroContentFromEnum(MacroStrings_enum chars);
+        std::string_view getMacroContentFromEnum(MacroStrings_enum chars) const;
     } Strings_Converter;
 
 
