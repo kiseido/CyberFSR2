@@ -7,41 +7,41 @@
 #include <algorithm>
 #include <cctype>
 
-using ACT = Configurationator::AcceptedValueTypes;
+using AVT = Configurationator::AcceptedValueTypes;
 
-namespace ACTUtils {
+namespace AVTUtils {
 
 
-    ACT pack(ACT a, ACT b) {
-        return static_cast<ACT>(
+    AVT pack(AVT a, AVT b) {
+        return static_cast<AVT>(
             static_cast<int>(a) | static_cast<int>(b)
             );
     }
 
-    ACT pack(ACT a, ACT b, ACT c) {
-        return static_cast<ACT>(
+    AVT pack(AVT a, AVT b, AVT c) {
+        return static_cast<AVT>(
             static_cast<int>(a) | static_cast<int>(b) | static_cast<int>(c)
             );
     }
 
-    bool contains(ACT value, ACT flag) {
+    bool contains(AVT value, AVT flag) {
         return (static_cast<int>(value) & static_cast<int>(flag)) != 0;
     }
 
 }
-inline ACT operator| (ACT a, ACT b) {
-    return static_cast<ACT>(static_cast<int>(a) | static_cast<int>(b));
+inline AVT operator| (AVT a, AVT b) {
+    return static_cast<AVT>(static_cast<int>(a) | static_cast<int>(b));
 }
 
-inline ACT& operator|= (ACT& a, ACT b) {
+inline AVT& operator|= (AVT& a, AVT b) {
     return a = a | b;
 }
 
-inline ACT operator& (ACT a, ACT b) {
-    return static_cast<ACT>(static_cast<int>(a) & static_cast<int>(b));
+inline AVT operator& (AVT a, AVT b) {
+    return static_cast<AVT>(static_cast<int>(a) & static_cast<int>(b));
 }
 
-inline ACT& operator&= (ACT& a, ACT b) {
+inline AVT& operator&= (AVT& a, AVT b) {
     return a = a & b;
 }
 
@@ -78,9 +78,14 @@ Configurationator::ini_value::ini_value(
     Comments(Comments)
 { }
 
+Configurationator::ini_section::ini_section() : std::map<std::string, ini_value>(), Comments() {}
+
+Configurationator::ini_section::ini_section(const std::vector<std::string>& comments) : std::map<std::string, ini_value>(), Comments(comments) {}
+
+Configurationator::ini_section::ini_section(const ini_section& other) : std::map<std::string, ini_value>(other), Comments(other.Comments) {}
+
 // Constructor implementation
 Configurationator::Configurationator() {
-    loadDefaultValues();
 }
 
 
@@ -108,23 +113,25 @@ Configurationator::ini_section& Configurationator::operator[](const std::string&
     return configData[key];
 }
 
-void Configurationator::loadFromFile(const std::string& filename) {
+Configurationator::FileLoadStatus Configurationator::loadFromFile(const std::string& filename) {
     std::ifstream file(filename);
 
     if (!file.is_open()) {
-        // Handle file opening error (e.g., throw exception, log error, etc.)
-        throw std::runtime_error("Unable to open file for reading: " + filename);
+        // Handle file opening error by returning an appropriate status
+        return FileLoadStatus::FileNotFound;
     }
 
     std::stringstream buffer;
     buffer << file.rdbuf();
 
     if (!deserialize(buffer.str())) {
-        // Handle INI deserialization error (e.g., throw exception, log error, etc.)
-        throw std::runtime_error("Error deserializing INI data from file: " + filename);
+        // Handle INI deserialization error by returning an appropriate status
+        file.close();
+        return FileLoadStatus::DeserializeError;
     }
 
     file.close();
+    return FileLoadStatus::Success;
 }
 
 std::string Configurationator::serialize() {
@@ -133,6 +140,12 @@ std::string Configurationator::serialize() {
     for (const auto& [sectionName, sectionData] : configData) {
         out << "[" << sectionName << "]\n";
         for (const auto& [key, iniVal] : sectionData) {
+
+            // Write comments first (on their own lines)
+            for (const auto& comment : iniVal.Comments) {
+                out << "; " << comment << "\n";
+            }
+
             out << key << "=";
 
             if (std::holds_alternative<std::string>(iniVal.value)) {
@@ -154,19 +167,14 @@ std::string Configurationator::serialize() {
                 }
             }
 
-            if (!iniVal.Comments.empty()) {
-                for (const auto& comment : iniVal.Comments) {
-                    out << "; " << comment << "\n";
-                }
-            }
-            else {
-                out << "\n";
-            }
+            out << "\n";  // end the line for the current key-value pair
         }
+        out << "\n";  // end the line for the current key-value pair
     }
 
     return out.str();
 }
+
 
 bool Configurationator::deserialize(const std::string& ini_data) {
     std::stringstream ss(ini_data);
@@ -194,23 +202,21 @@ bool Configurationator::deserialize(const std::string& ini_data) {
 
     return true;
 }
-
 bool Configurationator::parseIniValue(ini_value& receiver, const std::string& valueStr) {
     // SpecialValue type handling
-    if (auto it = std::find_if(receiver.Acceptable_Values.begin(),
+    if (std::find_if(receiver.Acceptable_Values.begin(),
         receiver.Acceptable_Values.end(),
         [&valueStr](const auto& val) {
             return std::holds_alternative<std::string>(val) &&
                 std::get<std::string>(val) == valueStr;
-        });
-        it != receiver.Acceptable_Values.end()) {
-        receiver.value = SpecialValue::Auto;
+        }) != receiver.Acceptable_Values.end()) {
+        receiver.value = SpecialValue::Auto;  // This seems off, might want to set the actual SpecialValue.
         receiver.loaded_status = LoadStatus::Present_ReadOkay;
         return true;
     }
 
     // Boolean type handling
-    if (ACTUtils::contains(receiver.Acceptable_Types, ACT::Boolean) &&
+    if (AVTUtils::contains(receiver.Acceptable_Types, AVT::Boolean) &&
         (valueStr == "true" || valueStr == "false")) {
         receiver.value = (valueStr == "true");
         receiver.loaded_status = LoadStatus::Present_ReadOkay;
@@ -218,12 +224,15 @@ bool Configurationator::parseIniValue(ini_value& receiver, const std::string& va
     }
 
     // Unsigned integer type handling
-    if (ACTUtils::contains(receiver.Acceptable_Types, ACT::Unsigned_Integer)) {
+    if (AVTUtils::contains(receiver.Acceptable_Types, AVT::Unsigned_Integer)) {
         try {
-            unsigned int value = std::stoul(valueStr);
+            unsigned int uValue = std::stoul(valueStr);
             if (receiver.Acceptable_Values.empty() ||
-                std::find(receiver.Acceptable_Values.begin(), receiver.Acceptable_Values.end(), value) != receiver.Acceptable_Values.end()) {
-                receiver.value = value;
+                std::find_if(receiver.Acceptable_Values.begin(), receiver.Acceptable_Values.end(),
+                    [&uValue](const value_type& val) {
+                        return std::holds_alternative<unsigned int>(val) && std::get<unsigned int>(val) == uValue;
+                    }) != receiver.Acceptable_Values.end()) {
+                receiver.value = uValue;
                 receiver.loaded_status = LoadStatus::Present_ReadOkay;
                 return true;
             }
@@ -234,12 +243,15 @@ bool Configurationator::parseIniValue(ini_value& receiver, const std::string& va
     }
 
     // Float type handling
-    if (ACTUtils::contains(receiver.Acceptable_Types, ACT::Float)) {
+    if (AVTUtils::contains(receiver.Acceptable_Types, AVT::Float)) {
         try {
-            float value = std::stof(valueStr);
+            float fValue = std::stof(valueStr);
             if (receiver.Acceptable_Values.empty() ||
-                std::find(receiver.Acceptable_Values.begin(), receiver.Acceptable_Values.end(), value) != receiver.Acceptable_Values.end()) {
-                receiver.value = value;
+                std::find_if(receiver.Acceptable_Values.begin(), receiver.Acceptable_Values.end(),
+                    [&fValue](const value_type& val) {
+                        return std::holds_alternative<float>(val) && std::get<float>(val) == fValue;
+                    }) != receiver.Acceptable_Values.end()) {
+                receiver.value = fValue;
                 receiver.loaded_status = LoadStatus::Present_ReadOkay;
                 return true;
             }
@@ -250,7 +262,7 @@ bool Configurationator::parseIniValue(ini_value& receiver, const std::string& va
     }
 
     // String type handling
-    if (ACTUtils::contains(receiver.Acceptable_Types, ACT::String)) {
+    if (AVTUtils::contains(receiver.Acceptable_Types, AVT::String)) {
         if (receiver.Acceptable_Values.empty() ||
             std::find_if(receiver.Acceptable_Values.begin(),
                 receiver.Acceptable_Values.end(),
@@ -277,17 +289,69 @@ Configurationator::ini_value::ini_value(const ini_value& other)
     Comments(other.Comments)
 { }
 
+Configurationator::ini_value::ini_value()
+    : value(),
+    loaded_status(),
+    DefaultValue(),
+    Acceptable_Types(AcceptedValueTypes::NotSet),
+    Acceptable_Values(),
+    Comments() {}
+
+
 Configurationator::ini_value& Configurationator::ini_value::operator=(const ini_value& other) {
     if (this != &other) { // check for self-assignment
         value = other.value;
         loaded_status = other.loaded_status;
 
-        // Manually handle the assignment for const members using const_cast and placement new.
-        const_cast<AcceptedValueTypes&>(Acceptable_Types) = other.Acceptable_Types;
-        new (&const_cast<value_type&>(DefaultValue)) value_type(other.DefaultValue);
-        new (&const_cast<std::vector<value_type>&>(Acceptable_Values)) std::vector<value_type>(other.Acceptable_Values);
-        new (&const_cast<std::vector<std::string>&>(Comments)) std::vector<std::string>(other.Comments);
+        // Copy comments if the current instance doesn't have any
+        if (Comments.empty() && !other.Comments.empty()) {
+            Comments = other.Comments;
+        }
+
+        // Copy acceptable values if the current instance doesn't have any
+        if (Acceptable_Values.empty() && !other.Acceptable_Values.empty()) {
+            Acceptable_Values = other.Acceptable_Values;
+        }
     }
     return *this;
 }
 
+
+bool Configurationator::ini_value::operator==(const ini_value& rhs) {
+    return (this == &rhs) || 
+        ( 
+            (value == rhs.value) &&
+            (loaded_status == rhs.loaded_status)
+            );
+}
+
+bool Configurationator::ini_value::operator!=(const ini_value& rhs) {
+    return !(*this == rhs);
+}
+
+// Comparison operators for SpecialValue
+bool operator==(Configurationator::SpecialValue lhs, Configurationator::SpecialValue rhs) {
+    return static_cast<int>(lhs) == static_cast<int>(rhs);
+}
+
+bool operator!=(Configurationator::SpecialValue lhs, Configurationator::SpecialValue rhs) {
+    return !(lhs == rhs);
+}
+
+// Comparison operators for LoadStatus
+bool operator==(Configurationator::LoadStatus lhs, Configurationator::LoadStatus rhs) {
+    return static_cast<int>(lhs) == static_cast<int>(rhs);
+}
+
+bool operator!=(Configurationator::LoadStatus lhs, Configurationator::LoadStatus rhs) {
+    return !(lhs == rhs);
+}
+
+// Comparison operators for AcceptedValueTypes
+bool operator==(Configurationator::AcceptedValueTypes lhs, Configurationator::AcceptedValueTypes rhs) {
+    return static_cast<int>(lhs) == static_cast<int>(rhs);
+}
+
+bool operator!=(Configurationator::AcceptedValueTypes lhs, Configurationator::AcceptedValueTypes rhs) {
+    return !(lhs == rhs);
+}

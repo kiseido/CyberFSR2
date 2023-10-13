@@ -7,7 +7,8 @@
 #include "Configurationator.h"
 
 struct DemoConfigurationator : public Configurationator {
-    void loadDefaultValues() override;
+public:
+    DemoConfigurationator();
 };
 
 #endif

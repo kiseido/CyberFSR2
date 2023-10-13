@@ -12,15 +12,23 @@
 
 
 struct Configurationator {
+    enum class FileLoadStatus {
+        Success,
+        FileNotFound,
+        DeserializeError
+    };
+
     enum class SpecialValue {
+        NotSet = 0,
         Default,
-        Auto
+        Auto,
     };
 
     enum class LoadStatus {
-        Missing = 0,
-        Present_Malformed,
-        Present_ReadOkay,
+        NotSet = 0,
+        Missing = 1,
+        Present_Malformed=1<<1,
+        Present_ReadOkay=1<<2,
     };
 
     enum class AcceptedValueTypes {
@@ -28,18 +36,21 @@ struct Configurationator {
         String = 0b1,
         Unsigned_Integer = 0b1 << 1,
         Float = 0b1 << 2,
-        Boolean = 0b1 << 3
+        Boolean = 0b1 << 3,
+        SpecialValue = 0b1 << 4,
     };
 
     using value_type = std::variant<std::string, bool, unsigned int, float, SpecialValue>;
 
     struct ini_value {
+    public:
         value_type value;
         LoadStatus loaded_status;
-        const value_type DefaultValue;
-        const AcceptedValueTypes Acceptable_Types;
-        const std::vector<value_type> Acceptable_Values;
-        const std::vector<std::string> Comments;
+        value_type DefaultValue;
+        AcceptedValueTypes Acceptable_Types;
+        std::vector<value_type> Acceptable_Values;
+        std::vector<std::string> Comments;
+        ini_value();
         ini_value(
             value_type value,
             LoadStatus loadStatus
@@ -52,16 +63,21 @@ struct Configurationator {
         );
         ini_value(const ini_value&);
         ini_value& operator=(const ini_value& other);
-
+        bool operator==(const ini_value& rhs);
+        bool operator!=(const ini_value& rhs);
     };
 
-    using ini_section = std::map<std::string, ini_value>;
+    struct ini_section : public std::map<std::string, ini_value> {
+        std::vector<std::string> Comments;
+        ini_section();
+        ini_section(const std::vector<std::string>&);
+        ini_section(const ini_section&);
+    };
+
     using ini_data = std::map<std::string, ini_section>;
 
-    void loadFromFile(const std::string& filename);
+    FileLoadStatus loadFromFile(const std::string& filename);
     void saveToFile(const std::string& filename);
-
-    virtual void loadDefaultValues() = 0;
 
     std::string serialize();
     bool deserialize(const std::string& ini_data);
@@ -75,5 +91,34 @@ protected:
 
     ini_data configData;
 };
+
+// Comparison operators for SpecialValue
+bool operator==(Configurationator::SpecialValue lhs, Configurationator::SpecialValue rhs);
+
+bool operator!=(Configurationator::SpecialValue lhs, Configurationator::SpecialValue rhs);
+
+// Comparison operators for LoadStatus
+bool operator==(Configurationator::LoadStatus lhs, Configurationator::LoadStatus rhs);
+
+bool operator!=(Configurationator::LoadStatus lhs, Configurationator::LoadStatus rhs);
+
+// Comparison operators for AcceptedValueTypes
+bool operator==(Configurationator::AcceptedValueTypes lhs, Configurationator::AcceptedValueTypes rhs);
+
+bool operator!=(Configurationator::AcceptedValueTypes lhs, Configurationator::AcceptedValueTypes rhs);
+
+namespace AVTUtils {
+    inline Configurationator::AcceptedValueTypes pack() {
+        return Configurationator::AcceptedValueTypes::NotSet;
+    }
+
+    template<typename... Args>
+    inline Configurationator::AcceptedValueTypes pack(Configurationator::AcceptedValueTypes first, Args... args) {
+        return static_cast<Configurationator::AcceptedValueTypes>(
+            static_cast<int>(first) | static_cast<int>(pack(args...))
+            );
+    }
+}
+
 
 #endif
