@@ -14,9 +14,9 @@
 #include <vector>
 #include <utility>
 
-namespace Hyper_NGX {
+namespace Hyper_NGX_Parameter {
 
-	std::vector<Hyper_NGX::CallEvent_t::CallType_enum> CallEvent_t::unpackTypes(CallType_enum combined) {
+	std::vector<Hyper_NGX_Parameter::CallEvent_t::CallType_enum> CallEvent_t::unpackTypes(CallType_enum combined) {
 		std::vector<CallType_enum> types;
 		auto combined_int = static_cast<std::underlying_type_t<CallType_enum>>(combined);
 		for (int i = 0; i < sizeof(CallType_enum) * 8; ++i) {
@@ -28,7 +28,7 @@ namespace Hyper_NGX {
 		return types;
 	}
 
-	Hyper_NGX::CallEvent_t::CallType_enum CallEvent_t::packTypes(const std::vector<CallType_enum>& types) {
+	Hyper_NGX_Parameter::CallEvent_t::CallType_enum CallEvent_t::packTypes(const std::vector<CallType_enum>& types) {
 		auto combined_int = static_cast<std::underlying_type_t<CallType_enum>>(0);
 		for (const auto& type : types) {
 			auto type_int = static_cast<std::underlying_type_t<CallType_enum>>(type);
@@ -64,20 +64,20 @@ namespace Hyper_NGX {
 	}
 
 
-	bool HandlerDB_t::addHandlerLogic(NGX_Strings::MacroStrings_enum key, Handler_t logic) {
+	bool HandlerDB_t::addHandlerLogic(NGX_Strings::MacroStrings_enum key, HandlerInstance_t logic) {
 		handlers.emplace(key, logic);
 		return true;
 	}
 
-	Handler_t::HandlerHelper_t HandlerDB_t::Apply(ParameterDB_t& db, CallEvent_t& event) {
+	HandlerInstance_t::HandlerHelper_t HandlerDB_t::Apply(ParameterDB_t& db, CallEvent_t& event) {
 		auto range = handlers.equal_range(event.key);
 		for (auto it = range.first; it != range.second; ++it) {
 			auto status = it->second.ApplyFunc(db, event);
-			if (status.status != Handler_t::HandlerStatus_enum::unconsumed) {
+			if (status.status != HandlerInstance_t::HandlerStatus_enum::unconsumed) {
 				return status;
 			}
 		}
-		return { Handler_t::HandlerStatus_enum::unconsumed , 0 };
+		return { HandlerInstance_t::HandlerStatus_enum::unconsumed , 0 };
 	}
 
 	ParameterDB_t::ParameterDB_t() : current_counter{} {}
@@ -111,20 +111,20 @@ namespace Hyper_NGX {
 		return helper;
 	}
 
-	bool  HandlerDB_t::addHandlerLogic(NGX_Strings::MacroStrings_enum key, Handler_t handler) {
+	bool  HandlerDB_t::addHandlerLogic(NGX_Strings::MacroStrings_enum key, HandlerInstance_t handler) {
 		handlers.emplace(key, handler);
 		return true;
 	}
 
-	Handler_t::HandlerHelper_t HandlerDB_t::Apply(ParameterDB_t& db, CallEvent_t& event) {
+	HandlerInstance_t::HandlerHelper_t HandlerDB_t::Apply(ParameterDB_t& db, CallEvent_t& event) {
 		auto range = handlers.equal_range(event.key);
 		for (auto it = range.first; it != range.second; ++it) {
-			Handler_t::HandlerHelper_t status = it->second.ApplyFunc(db, event);
-			if (status.status != Handler_t::HandlerStatus_enum::unconsumed) {
+			HandlerInstance_t::HandlerHelper_t status = it->second.ApplyFunc(db, event);
+			if (status.status != HandlerInstance_t::HandlerStatus_enum::unconsumed) {
 				return status;
 			}
 		}
-		return Handler_t::HandlerHelper_t{ Handler_t::HandlerStatus_enum::unconsumed, 0 };
+		return HandlerInstance_t::HandlerHelper_t{ HandlerInstance_t::HandlerStatus_enum::unconsumed, 0 };
 	}
 
 	ParameterDB_t::ParameterDB_t() : current_counter{} {
@@ -139,14 +139,14 @@ namespace Hyper_NGX {
 
 	void ParameterDB_t::Set(NGX_Strings::MacroStrings_enum key, const InputVariable_t chars) {
 		CallEvent_t event{ CallEvent_t::set, key, chars, getCurrentTimeStep() };
-		Handler_t::HandlerHelper_t result;
+		HandlerInstance_t::HandlerHelper_t result;
 
 		{
 			std::lock_guard<std::mutex> lock(mtx);
 
 			result = handlers.Apply(*this, event);
 
-			if (result.status == Handler_t::HandlerStatus_enum::unconsumed) {
+			if (result.status == HandlerInstance_t::HandlerStatus_enum::unconsumed) {
 				value_current[key] = chars;
 				value_history.emplace(key, event);
 			}
@@ -629,7 +629,7 @@ NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_DLSS_GetOptimalSettingsCallback(NVSDK_NGX_
 
 	CyberLogArgs(InParams);
 	if (InParams != nullptr) {
-		auto params = static_cast<Hyper_NGX::Parameter*>(InParams);
+		auto params = static_cast<Hyper_NGX_Parameter::Parameter*>(InParams);
 		return params->GetOptimalSettingsCallback();
 	}
 
@@ -653,7 +653,7 @@ NVSDK_NGX_Result NVSDK_CONV NVSDK_NGX_DLSS_GetStatsCallback(NVSDK_NGX_Parameter*
 	//Then set values: SizeInBytes, OptLevel, IsDevSnippetBranch
 
 	if (InParams != nullptr) {
-		auto params = static_cast<Hyper_NGX::Parameter*>(InParams);
+		auto params = static_cast<Hyper_NGX_Parameter::Parameter*>(InParams);
 		return params->GetStatsCallback();
 	}
 

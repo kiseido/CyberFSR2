@@ -4,12 +4,13 @@
 
 HMODULE dllModule;
 
-const LPCWSTR cyberFSRdllFileName = L"CyberFSR.dll";
+const wchar_t* cyberinterposerdllFileName = L"CyberInterposer.ini";
 
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
-       
+    InterposerConfig.loadFromFile(cyberinterposerdllFileName);
+    InterposerConfig.saveToFile(cyberinterposerdllFileName);
 
     switch (ul_reason_for_call)
     {
@@ -33,7 +34,9 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
                         //CyberLogArgs("CyberLogArgs test", "");
                     }
 
-                    const auto hmodule = LoadLibraryW(cyberFSRdllFileName);
+                    const auto dllFileName = std::get<std::wstring>(InterposerConfig[L"DLSSBackEnd"][L"DLL"].value);
+
+                    const auto hmodule = LoadLibraryW(dllFileName.c_str());
 
                     if (!hmodule)
                     {

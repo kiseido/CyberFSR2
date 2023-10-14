@@ -1,7 +1,5 @@
-#include "pch.h"
-#include "framework.h"
+#include "CyberConfigurationator.h"
 
-#include "Configurationator.h"
 #include <fstream>
 #include <sstream>
 #include <algorithm>
@@ -46,10 +44,10 @@ inline AVT& operator&= (AVT& a, AVT b) {
 }
 
 // Helper function to trim whitespace from a string.
-static std::string trim(const std::string& str) {
-    size_t start = str.find_first_not_of(" \t");
-    size_t end = str.find_last_not_of(" \t");
-    return (start == std::string::npos) ? "" : str.substr(start, end - start + 1);
+static std::wstring trim(const std::wstring& str) {
+    size_t start = str.find_first_not_of(L" \t");
+    size_t end = str.find_last_not_of(L" \t");
+    return (start == std::wstring::npos) ? L"" : str.substr(start, end - start + 1);
 }
 
 Configurationator::ini_value::ini_value(
@@ -68,7 +66,7 @@ Configurationator::ini_value::ini_value(
     value_type DefaultValue,
     AcceptedValueTypes AcceptableTypes,
     const std::vector<value_type>& AcceptableValues,
-    const std::vector<std::string>& Comments
+    const std::vector<std::wstring>& Comments
 )
     : value(DefaultValue),
     DefaultValue(DefaultValue),
@@ -78,42 +76,42 @@ Configurationator::ini_value::ini_value(
     Comments(Comments)
 { }
 
-Configurationator::ini_section::ini_section() : std::map<std::string, ini_value>(), Comments() {}
+Configurationator::ini_section::ini_section() : std::map<std::wstring, ini_value>(), Comments() {}
 
-Configurationator::ini_section::ini_section(const std::vector<std::string>& comments) : std::map<std::string, ini_value>(), Comments(comments) {}
+Configurationator::ini_section::ini_section(const std::vector<std::wstring>& comments) : std::map<std::wstring, ini_value>(), Comments(comments) {}
 
-Configurationator::ini_section::ini_section(const ini_section& other) : std::map<std::string, ini_value>(other), Comments(other.Comments) {}
+Configurationator::ini_section::ini_section(const ini_section& other) : std::map<std::wstring, ini_value>(other), Comments(other.Comments) {}
 
 // Constructor implementation
 Configurationator::Configurationator() {
 }
 
 
-void Configurationator::saveToFile(const std::string& filename) {
-    std::ofstream file(filename);
+void Configurationator::saveToFile(const std::wstring& filename) {
+    std::wofstream file(filename);
 
     if (!file.is_open()) {
         // Handle file opening error (e.g., throw exception, log error, etc.)
-        throw std::runtime_error("Unable to open file for writing: " + filename);
+        throw std::runtime_error("Unable to open file for writing");
     }
 
-    std::string serializedData = serialize();
+    std::wstring serializedData = serialize();
     file << serializedData;
 
     if (file.fail()) {
         // Handle file writing error (e.g., throw exception, log error, etc.)
-        throw std::runtime_error("Error writing to file: " + filename);
+        throw std::runtime_error("Error writing to file");
     }
 
     file.close();
 }
 
 
-Configurationator::ini_section& Configurationator::operator[](const std::string& key) {
+Configurationator::ini_section& Configurationator::operator[](const std::wstring& key) {
     return configData[key];
 }
 
-Configurationator::FileLoadStatus Configurationator::loadFromFile(const std::string& filename) {
+Configurationator::FileLoadStatus Configurationator::loadFromFile(const std::wstring& filename) {
     std::ifstream file(filename);
 
     if (!file.is_open()) {
@@ -121,7 +119,7 @@ Configurationator::FileLoadStatus Configurationator::loadFromFile(const std::str
         return FileLoadStatus::FileNotFound;
     }
 
-    std::stringstream buffer;
+    std::wstringstream buffer;
     buffer << file.rdbuf();
 
     if (!deserialize(buffer.str())) {
@@ -134,25 +132,30 @@ Configurationator::FileLoadStatus Configurationator::loadFromFile(const std::str
     return FileLoadStatus::Success;
 }
 
-std::string Configurationator::serialize() {
-    std::stringstream out;
+std::wstring Configurationator::serialize() {
+    std::wstringstream out;
 
     for (const auto& [sectionName, sectionData] : configData) {
-        out << "[" << sectionName << "]\n";
+        out << L"[" << sectionName << L"]\n";
+
+        for (const auto& comment : sectionData.Comments) {
+            out << L"; " << comment << L"\n";
+        }
+
         for (const auto& [key, iniVal] : sectionData) {
 
             // Write comments first (on their own lines)
             for (const auto& comment : iniVal.Comments) {
-                out << "; " << comment << "\n";
+                out << L"; " << comment << L"\n";
             }
 
-            out << key << "=";
+            out << key << L"=";
 
-            if (std::holds_alternative<std::string>(iniVal.value)) {
-                out << std::get<std::string>(iniVal.value);
+            if (std::holds_alternative<std::wstring>(iniVal.value)) {
+                out << std::get<std::wstring>(iniVal.value);
             }
             else if (std::holds_alternative<bool>(iniVal.value)) {
-                out << (std::get<bool>(iniVal.value) ? "true" : "false");
+                out << (std::get<bool>(iniVal.value) ? L"true" : L"false");
             }
             else if (std::holds_alternative<unsigned int>(iniVal.value)) {
                 out << std::get<unsigned int>(iniVal.value);
@@ -162,23 +165,24 @@ std::string Configurationator::serialize() {
             }
             else if (std::holds_alternative<SpecialValue>(iniVal.value)) {
                 switch (std::get<SpecialValue>(iniVal.value)) {
-                case SpecialValue::Default: out << "Default"; break;
-                case SpecialValue::Auto: out << "Auto"; break;
+                case SpecialValue::Default: out << L"Default"; break;
+                case SpecialValue::Auto: out << L"Auto"; break;
                 }
             }
 
-            out << "\n";  // end the line for the current key-value pair
+            out << L"\n";  // end the line for the current key-value pair
         }
-        out << "\n";  // end the line for the current key-value pair
+
+        out << L"\n";  // end the line for the current key-value pair
     }
 
     return out.str();
 }
 
 
-bool Configurationator::deserialize(const std::string& ini_data) {
-    std::stringstream ss(ini_data);
-    std::string line, currentSection;
+bool Configurationator::deserialize(const std::wstring& ini_data) {
+    std::wstringstream ss(ini_data);
+    std::wstring line, currentSection;
 
     while (std::getline(ss, line)) {
         line = trim(line);
@@ -191,8 +195,8 @@ bool Configurationator::deserialize(const std::string& ini_data) {
 
         size_t pos = line.find('=');
         if (pos != std::string::npos) {
-            std::string key = trim(line.substr(0, pos));
-            std::string valueStr = trim(line.substr(pos + 1));
+            std::wstring key = trim(line.substr(0, pos));
+            std::wstring valueStr = trim(line.substr(pos + 1));
 
             ini_value& parsedValue = configData[currentSection][key];
 
@@ -202,13 +206,13 @@ bool Configurationator::deserialize(const std::string& ini_data) {
 
     return true;
 }
-bool Configurationator::parseIniValue(ini_value& receiver, const std::string& valueStr) {
+bool Configurationator::parseIniValue(ini_value& receiver, const std::wstring& valueStr) {
     // SpecialValue type handling
     if (std::find_if(receiver.Acceptable_Values.begin(),
         receiver.Acceptable_Values.end(),
         [&valueStr](const auto& val) {
-            return std::holds_alternative<std::string>(val) &&
-                std::get<std::string>(val) == valueStr;
+            return std::holds_alternative<std::wstring>(val) &&
+                std::get<std::wstring>(val) == valueStr;
         }) != receiver.Acceptable_Values.end()) {
         receiver.value = SpecialValue::Auto;  // This seems off, might want to set the actual SpecialValue.
         receiver.loaded_status = LoadStatus::Present_ReadOkay;
@@ -217,8 +221,8 @@ bool Configurationator::parseIniValue(ini_value& receiver, const std::string& va
 
     // Boolean type handling
     if (AVTUtils::contains(receiver.Acceptable_Types, AVT::Boolean) &&
-        (valueStr == "true" || valueStr == "false")) {
-        receiver.value = (valueStr == "true");
+        (valueStr == L"true" || valueStr == L"false")) {
+        receiver.value = (valueStr == L"true");
         receiver.loaded_status = LoadStatus::Present_ReadOkay;
         return true;
     }
@@ -267,8 +271,8 @@ bool Configurationator::parseIniValue(ini_value& receiver, const std::string& va
             std::find_if(receiver.Acceptable_Values.begin(),
                 receiver.Acceptable_Values.end(),
                 [&valueStr](const auto& val) {
-                    return std::holds_alternative<std::string>(val) &&
-                        std::get<std::string>(val) == valueStr;
+                    return std::holds_alternative<std::wstring>(val) &&
+                        std::get<std::wstring>(val) == valueStr;
                 }) != receiver.Acceptable_Values.end()) {
             receiver.value = valueStr;
             receiver.loaded_status = LoadStatus::Present_ReadOkay;
@@ -318,8 +322,8 @@ Configurationator::ini_value& Configurationator::ini_value::operator=(const ini_
 
 
 bool Configurationator::ini_value::operator==(const ini_value& rhs) {
-    return (this == &rhs) || 
-        ( 
+    return (this == &rhs) ||
+        (
             (value == rhs.value) &&
             (loaded_status == rhs.loaded_status)
             );

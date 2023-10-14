@@ -1,12 +1,8 @@
-#include "pch.h"
-
-#ifndef CyberLOGGER_H
-#define CyberLOGGER_H
+#pragma once
 
 #include "CyberNGX.h"
 
 #include <queue>
-
 #include <fstream>
 
 namespace CyberLogger {
@@ -41,7 +37,7 @@ namespace CyberLogger {
         CyberTypes::CyString message;
         CyberTypes::CyString_view function;
 
-        LogEntry(const CyberLogger::LogType&, const CyberTypes::SystemInfo&, const CyberTypes::CyString_view& , const CyberTypes::CyString&);
+        LogEntry(const CyberLogger::LogType&, const CyberTypes::SystemInfo&, const CyberTypes::CyString_view&, const CyberTypes::CyString&);
         LogEntry(const LogEntry& other);
     };
 
@@ -58,9 +54,9 @@ namespace CyberLogger {
         void start();
         void stop();
 
-        void logVerboseInfo( const CyberTypes::CyString_view& functionName, const CyberTypes::CyString& message);
+        void logVerboseInfo(const CyberTypes::CyString_view& functionName, const CyberTypes::CyString& message);
 
-        void logInfo( const CyberTypes::CyString_view& functionName, const CyberTypes::CyString& message);
+        void logInfo(const CyberTypes::CyString_view& functionName, const CyberTypes::CyString& message);
         void logWarning(const CyberTypes::CyString_view& functionName, const CyberTypes::CyString& message);
         void logError(const CyberTypes::CyString_view& functionName, const CyberTypes::CyString& message);
 
@@ -99,7 +95,3 @@ CyberTypes::CyString to_CyString(const CyberLogger::LogEntry&);
 
 std::wostream& operator<<(std::wostream& os, const CyberLogger::LogType& logType);
 std::wostream& operator<<(std::wostream& os, const CyberLogger::LogEntry& entry);
-
-
-
-#endif

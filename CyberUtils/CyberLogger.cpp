@@ -1,4 +1,3 @@
-#include "pch.h"
 #include "CyberLogger.h"
 
 using namespace CyberTypes;
@@ -169,7 +168,7 @@ void CyberLogger::Logger::logError(const CyString_view& functionName, const CySt
 
 CyberLogger::StatusContainer::StatusContainer() : status(Fresh) {}
 
-CyberLogger::LogEntry::LogEntry(const LogType& a, const SystemInfo& b, const CyString_view& c, const CyberTypes::CyString& d): type(a), hardware_info(b), function(c), message(d)
+CyberLogger::LogEntry::LogEntry(const LogType& a, const SystemInfo& b, const CyString_view& c, const CyberTypes::CyString& d) : type(a), hardware_info(b), function(c), message(d)
 {
 }
 

@@ -6,6 +6,16 @@
 //#define CyberFSR_DO_CUDA
 #define CyberFSR_DO_VULKAN
 
+#include "CyberConfigurationator.h"
+
+struct CFSRConfig : public Configurationator {
+public:
+	CFSRConfig();
+};
+
+extern CFSRConfig CyberFSRConfig;
+
+
 enum class SharpnessRangeModifier
 {
 	Normal,

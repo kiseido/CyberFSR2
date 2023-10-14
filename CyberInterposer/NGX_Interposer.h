@@ -7,6 +7,7 @@
 #include "CyberNGX.h"
 
 #include "Common.h"
+#include "Config.h"
 
 #include "NGX_Cuda.h"
 #include "NGX_DX11.h"

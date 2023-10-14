@@ -2,6 +2,66 @@
 #include "Config.h"
 #include "Util.h"
 
+#include "pch.h"
+#include "Config.h"
+
+CFSRConfig InterposerConfig = CFSRConfig();
+
+using AVT = Configurationator::AcceptedValueTypes;
+
+CFSRConfig::CFSRConfig() {
+	// Depth
+	configData[L"Depth"][L"DepthInverted"] = ini_value(SpecialValue::Auto, AVT::Boolean, {}, { L"true or false" });
+
+	// Color
+	configData[L"Color"][L"AutoExposure"] = ini_value(SpecialValue::Auto, AVT::Boolean, {}, { L"true or false" });
+	configData[L"Color"][L"HDR"] = ini_value(SpecialValue::Auto, AVT::Boolean, {}, { L"true or false" });
+
+	// MotionVectors
+	configData[L"MotionVectors"][L"JitterCancellation"] = ini_value(SpecialValue::Auto, AVT::Boolean, {}, { L"true or false" });
+	configData[L"MotionVectors"][L"DisplayResolution"] = ini_value(SpecialValue::Auto, AVT::Boolean, {}, { L"true or false" });
+
+	// Sharpening
+	configData[L"Sharpening"][L"EnableSharpening"] = ini_value(SpecialValue::Auto, AVT::Boolean, {}, { L"true or false" });
+	configData[L"Sharpening"][L"Sharpness"] = ini_value(SpecialValue::Auto, AVT::Float, {}, { L"number between 0 and 1.0" });
+	configData[L"Sharpening"][L"SharpnessRange"] = ini_value(SpecialValue::Auto, AVT::String, { L"normal", L"extended" }, {});
+
+	// QualityOverrides
+	configData[L"QualityOverrides"].Comments = {
+		L"",
+		L"Default values:",
+		L"Ultra Quality         : 1.3",
+		L"Quality               : 1.5",
+		L"Balanced              : 1.7",
+		L"Performance           : 2.0",
+		L"Ultra Performance     : 3.0",
+		L"",
+	};
+	configData[L"QualityOverrides"][L"RatioUltraQuality"] = ini_value(1.3f, AVT::Float, {}, {});
+	configData[L"QualityOverrides"][L"RatioQuality"] = ini_value(1.5f, AVT::Float, {}, {});
+	configData[L"QualityOverrides"][L"RatioBalanced"] = ini_value(1.7f, AVT::Float, {}, {});
+	configData[L"QualityOverrides"][L"RatioPerformance"] = ini_value(2.0f, AVT::Float, {}, {});
+	configData[L"QualityOverrides"][L"RatioUltraPerformance"] = ini_value(3.0f, AVT::Float, {}, {});
+
+	configData[L"QualityOverrides"][L"QualityRatioFixedResolutionOverrideEnabled"] = ini_value(false, AVT::Boolean, {}, { L"When Fixed Resolution is enabled any non-zero resolutions will be used in place of the ratio computed resolution" });
+	configData[L"QualityOverrides"][L"QualityRatioFixedResolutionAxis"] = ini_value(L"height", AVT::String, { L"height", L"width" }, {});
+	configData[L"QualityOverrides"][L"FixedResUltraQuality"] = ini_value(unsigned int(0), AVT::Unsigned_Integer, {}, {});
+	configData[L"QualityOverrides"][L"FixedResQuality"] = ini_value(unsigned int(0), AVT::Unsigned_Integer, {}, {});
+	configData[L"QualityOverrides"][L"FixedResBalanced"] = ini_value(unsigned int(0), AVT::Unsigned_Integer, {}, {});
+	configData[L"QualityOverrides"][L"FixedResPerformance"] = ini_value(unsigned int(0), AVT::Unsigned_Integer, {}, {});
+	configData[L"QualityOverrides"][L"FixedResUltraPerformance"] = ini_value(unsigned int(0), AVT::Unsigned_Integer, {}, {});
+
+	// View
+	configData[L"View"][L"Method"] = ini_value(L"auto", AVT::String, { L"auto", L"config", L"cyberpunk2077", L"rdr2", L"dl2" }, { L"config, cyberpunk2077 or rdr2 or dl2" });
+	configData[L"View"][L"VerticalFOV"] = ini_value(SpecialValue::Auto, AVTUtils::pack(AVT::SpecialValue, AVT::Float), {}, { L"number for the vertical field of view value", L"use a convertor if you only know the horizontal field of view" });
+	configData[L"View"][L"NearPlane"] = ini_value(SpecialValue::Auto, AVTUtils::pack(AVT::SpecialValue, AVT::Float), {}, { L"number that is at least 0" });
+	configData[L"View"][L"FarPlane"] = ini_value(SpecialValue::Auto, AVTUtils::pack(AVT::SpecialValue, AVT::Float), {}, { L"number that is higher than the NearPlane value" });
+	configData[L"View"][L"InfiniteFarPlane"] = ini_value(SpecialValue::Auto, AVTUtils::pack(AVT::SpecialValue, AVT::Float), {}, { L"set this if the far clip plane is infinite" });
+
+	// Hotfix
+	configData[L"Hotfix"][L"DisableReactiveMask"] = ini_value(false, AVTUtils::pack(AVT::SpecialValue, AVT::Boolean), {}, { L"true or false" });
+};
+
 Config::Config(std::wstring fileName)
 {
 	absoluteFileName = Util::DllPath().parent_path() / fileName;

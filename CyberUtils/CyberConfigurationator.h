@@ -1,15 +1,9 @@
-#include "pch.h"
-
-
-#ifndef Configurationator_h
-#define Configurationator_h
+#pragma once
 
 #include <string>
 #include <map>
 #include <variant>
 #include <vector>
-
-
 
 struct Configurationator {
     enum class FileLoadStatus {
@@ -27,8 +21,8 @@ struct Configurationator {
     enum class LoadStatus {
         NotSet = 0,
         Missing = 1,
-        Present_Malformed=1<<1,
-        Present_ReadOkay=1<<2,
+        Present_Malformed = 1 << 1,
+        Present_ReadOkay = 1 << 2,
     };
 
     enum class AcceptedValueTypes {
@@ -40,7 +34,7 @@ struct Configurationator {
         SpecialValue = 0b1 << 4,
     };
 
-    using value_type = std::variant<std::string, bool, unsigned int, float, SpecialValue>;
+    using value_type = std::variant<std::wstring, bool, unsigned int, float, SpecialValue>;
 
     struct ini_value {
     public:
@@ -49,7 +43,7 @@ struct Configurationator {
         value_type DefaultValue;
         AcceptedValueTypes Acceptable_Types;
         std::vector<value_type> Acceptable_Values;
-        std::vector<std::string> Comments;
+        std::vector<std::wstring> Comments;
         ini_value();
         ini_value(
             value_type value,
@@ -59,7 +53,7 @@ struct Configurationator {
             value_type DefaultValue,
             AcceptedValueTypes AcceptableTypes,
             const std::vector<value_type>& AcceptableValues,
-            const std::vector<std::string>& Comments
+            const std::vector<std::wstring>& Comments
         );
         ini_value(const ini_value&);
         ini_value& operator=(const ini_value& other);
@@ -67,27 +61,27 @@ struct Configurationator {
         bool operator!=(const ini_value& rhs);
     };
 
-    struct ini_section : public std::map<std::string, ini_value> {
-        std::vector<std::string> Comments;
+    struct ini_section : public std::map<std::wstring, ini_value> {
+        std::vector<std::wstring> Comments;
         ini_section();
-        ini_section(const std::vector<std::string>&);
+        ini_section(const std::vector<std::wstring>&);
         ini_section(const ini_section&);
     };
 
-    using ini_data = std::map<std::string, ini_section>;
+    using ini_data = std::map<std::wstring, ini_section>;
 
-    FileLoadStatus loadFromFile(const std::string& filename);
-    void saveToFile(const std::string& filename);
+    FileLoadStatus loadFromFile(const std::wstring& filename);
+    void saveToFile(const std::wstring& filename);
 
-    std::string serialize();
-    bool deserialize(const std::string& ini_data);
+    std::wstring serialize();
+    bool deserialize(const std::wstring& ini_data);
 
-    ini_section& operator[](const std::string& key);
+    ini_section& operator[](const std::wstring& key);
 
 protected:
     Configurationator();
 
-    static bool parseIniValue(ini_value& receiver, const std::string& valueStr);
+    static bool parseIniValue(ini_value& receiver, const std::wstring& valueStr);
 
     ini_data configData;
 };
@@ -119,6 +113,3 @@ namespace AVTUtils {
             );
     }
 }
-
-
-#endif
