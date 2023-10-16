@@ -40,150 +40,271 @@ namespace CyberInterposer {
 Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_Init(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath, VkInstance InInstance, VkPhysicalDevice InPD, VkDevice InDevice, PFN_vkGetInstanceProcAddr InGIPA, PFN_vkGetDeviceProcAddr InGDPA, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion)
 {
 	const CyberTypes::RTC start = CyberTypes::RTC(true);
-	WaitForLoading();
+	CyberInterposer::interposer.wait_for_ready();
 	CyberLogArgs(InApplicationId, InApplicationDataPath, InInstance, InPD, InDevice, InGIPA, InGDPA, InFeatureInfo, InSDKVersion, start);
 
-	// is pointer good? cast pointer and call it and return any results!
-	return NVSDK_NGX_Result_Success;
+	auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_Vulkan.pfn_VULKAN_Init;
+
+	if (ptr != nullptr)
+	{
+		auto result = ptr(InApplicationId, InApplicationDataPath, InInstance, InPD, InDevice, InGIPA, InGDPA, InFeatureInfo, InSDKVersion);
+		CyberLOGvi(result);
+		return result;
+	}
+
+	return NVSDK_NGX_Result_Fail;
 }
 
 Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_Init_ProjectID(const char* InProjectId, NVSDK_NGX_EngineType InEngineType, const char* InEngineVersion, const wchar_t* InApplicationDataPath, VkInstance InInstance, VkPhysicalDevice InPD, VkDevice InDevice, PFN_vkGetInstanceProcAddr InGIPA, PFN_vkGetDeviceProcAddr InGDPA, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion)
 {
 	const CyberTypes::RTC start = CyberTypes::RTC(true);
-	WaitForLoading();
+	CyberInterposer::interposer.wait_for_ready();
 	CyberLogArgs(InProjectId, InEngineType, InEngineVersion, InApplicationDataPath, InInstance, InPD, InDevice, InGIPA, InGDPA, InFeatureInfo, InSDKVersion, start);
 
-	// is pointer good? cast pointer and call it and return any results!
-	return NVSDK_NGX_Result_Success;
+	auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_Vulkan.pfn_VULKAN_Init_ProjectID;
+
+	if (ptr != nullptr)
+	{
+		auto result = ptr(InProjectId, InEngineType, InEngineVersion, InApplicationDataPath, InInstance, InPD, InDevice, InGIPA, InGDPA, InFeatureInfo, InSDKVersion);
+		CyberLOGvi(result);
+		return result;
+	}
+
+	return NVSDK_NGX_Result_Fail;
 }
 
 Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_Init_with_ProjectID(const char* InProjectId, NVSDK_NGX_EngineType InEngineType, const char* InEngineVersion, const wchar_t* InApplicationDataPath, VkInstance InInstance, VkPhysicalDevice InPD, VkDevice InDevice, PFN_vkGetInstanceProcAddr InGIPA, PFN_vkGetDeviceProcAddr InGDPA, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion)
 {
 	const CyberTypes::RTC start = CyberTypes::RTC(true);
-	WaitForLoading();
+	CyberInterposer::interposer.wait_for_ready();
 	CyberLogArgs(InProjectId, InEngineType, InEngineVersion, InApplicationDataPath, InInstance, InPD, InDevice, InGIPA, InGDPA, InFeatureInfo, InSDKVersion, start);
 
-	// is pointer good? cast pointer and call it and return any results!
-	return NVSDK_NGX_Result_Success;
+	auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_Vulkan.pfn_VULKAN_Init_ProjectID;
+
+	if (ptr != nullptr)
+	{
+		auto result = ptr(InProjectId, InEngineType, InEngineVersion, InApplicationDataPath, InInstance, InPD, InDevice, InGIPA, InGDPA, InFeatureInfo, InSDKVersion);
+		CyberLOGvi(result);
+		return result;
+	}
+
+	return NVSDK_NGX_Result_Fail;
 }
 
 Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_Shutdown(void)
 {
 	const CyberTypes::RTC start = CyberTypes::RTC(true);
-	WaitForLoading();
+	CyberInterposer::interposer.wait_for_ready();
 	CyberLogArgs(start);
 
-	// is pointer good? cast pointer and call it and return any results!
-	return NVSDK_NGX_Result_Success;
+	auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_Vulkan.pfn_VULKAN_Shutdown;
+
+	if (ptr != nullptr)
+	{
+		auto result = ptr();
+		CyberLOGvi(result);
+		return result;
+	}
+
+	return NVSDK_NGX_Result_Fail;
 }
 
 Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_Shutdown1(VkDevice InDevice)
 {
 	const CyberTypes::RTC start = CyberTypes::RTC(true);
-	WaitForLoading();
+	CyberInterposer::interposer.wait_for_ready();
 	CyberLogArgs(InDevice, start);
 
-	// is pointer good? cast pointer and call it and return any results!
-	return NVSDK_NGX_Result_Success;
+	auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_Vulkan.pfn_VULKAN_Shutdown1;
+
+	if (ptr != nullptr)
+	{
+		auto result = ptr(InDevice);
+		CyberLOGvi(result);
+		return result;
+	}
+
+	return NVSDK_NGX_Result_Fail;
 }
 
 Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_GetParameters(NVSDK_NGX_Parameter** OutParameters)
 {
 	const CyberTypes::RTC start = CyberTypes::RTC(true);
-	WaitForLoading();
+	CyberInterposer::interposer.wait_for_ready();
 	CyberLogArgs(OutParameters, start);
 
-	// is pointer good? cast pointer and call it and return any results!
-	return NVSDK_NGX_Result_Success;
+	auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_Vulkan.pfn_VULKAN_GetParameters;
+
+	if (ptr != nullptr)
+	{
+		auto result = ptr(OutParameters);
+		CyberLOGvi(result);
+		return result;
+	}
+
+	return NVSDK_NGX_Result_Fail;
 }
 
 Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_AllocateParameters(NVSDK_NGX_Parameter** OutParameters)
 {
 	const CyberTypes::RTC start = CyberTypes::RTC(true);
-	WaitForLoading();
+	CyberInterposer::interposer.wait_for_ready();
 	CyberLogArgs(OutParameters, start);
 
-	// is pointer good? cast pointer and call it and return any results!
-	return NVSDK_NGX_Result_Success;
+	auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_Vulkan.pfn_VULKAN_AllocateParameters;
+
+	if (ptr != nullptr)
+	{
+		auto result = ptr(OutParameters);
+		CyberLOGvi(result);
+		return result;
+	}
+
+	return NVSDK_NGX_Result_Fail;
 }
 
 Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_GetCapabilityParameters(NVSDK_NGX_Parameter** OutParameters)
 {
 	const CyberTypes::RTC start = CyberTypes::RTC(true);
-	WaitForLoading();
+	CyberInterposer::interposer.wait_for_ready();
 	CyberLogArgs(OutParameters, start);
 
-	// is pointer good? cast pointer and call it and return any results!
-	return NVSDK_NGX_Result_Success;
+	auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_Vulkan.pfn_VULKAN_GetCapabilityParameters;
+
+	if (ptr != nullptr)
+	{
+		auto result = ptr(OutParameters);
+		CyberLOGvi(result);
+		return result;
+	}
+
+	return NVSDK_NGX_Result_Fail;
 }
 
 Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_DestroyParameters(NVSDK_NGX_Parameter* InParameters)
 {
 	const CyberTypes::RTC start = CyberTypes::RTC(true);
-	WaitForLoading();
+	CyberInterposer::interposer.wait_for_ready();
 	CyberLogArgs(InParameters, start);
 
-	// is pointer good? cast pointer and call it and return any results!
-	return NVSDK_NGX_Result_Success;
+	auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_Vulkan.pfn_VULKAN_DestroyParameters;
+
+	if (ptr != nullptr)
+	{
+		auto result = ptr(InParameters);
+		CyberLOGvi(result);
+		return result;
+	}
+
+	return NVSDK_NGX_Result_Fail;
 }
 
 Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_GetScratchBufferSize(NVSDK_NGX_Feature InFeatureId, const NVSDK_NGX_Parameter* InParameters, size_t* OutSizeInBytes)
 {
 	const CyberTypes::RTC start = CyberTypes::RTC(true);
-	WaitForLoading();
+	CyberInterposer::interposer.wait_for_ready();
 	CyberLogArgs(InFeatureId, InParameters, OutSizeInBytes, start);
 
-	// is pointer good? cast pointer and call it and return any results!
-	return NVSDK_NGX_Result_Success;
+	auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_Vulkan.pfn_VULKAN_GetScratchBufferSize;
+
+	if (ptr != nullptr)
+	{
+		auto result = ptr(InFeatureId, InParameters, OutSizeInBytes);
+		CyberLOGvi(result);
+		return result;
+	}
+
+	return NVSDK_NGX_Result_Fail;
 }
 
 Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_CreateFeature(VkCommandBuffer InCmdBuffer, NVSDK_NGX_Feature InFeatureID, NVSDK_NGX_Parameter* InParameters, NVSDK_NGX_Handle** OutHandle)
 {
 	const CyberTypes::RTC start = CyberTypes::RTC(true);
-	WaitForLoading();
+	CyberInterposer::interposer.wait_for_ready();
 	CyberLogArgs(InCmdBuffer, InFeatureID, InParameters, OutHandle, start);
 
-	// is pointer good? cast pointer and call it and return any results!
-	return NVSDK_NGX_Result_Success;
+	auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_Vulkan.pfn_VULKAN_CreateFeature;
+
+	if (ptr != nullptr)
+	{
+		auto result = ptr(InCmdBuffer, InFeatureID, InParameters, OutHandle);
+		CyberLOGvi(result);
+		return result;
+	}
+
+	return NVSDK_NGX_Result_Fail;
 }
 
 Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_CreateFeature1(VkDevice InDevice, VkCommandBuffer InCmdList, NVSDK_NGX_Feature InFeatureID, NVSDK_NGX_Parameter* InParameters, NVSDK_NGX_Handle** OutHandle)
 {
 	const CyberTypes::RTC start = CyberTypes::RTC(true);
-	WaitForLoading();
+	CyberInterposer::interposer.wait_for_ready();
 	CyberLogArgs(InDevice, InCmdList, InFeatureID, InParameters, OutHandle, start);
 
-	// is pointer good? cast pointer and call it and return any results!
-	return NVSDK_NGX_Result_Success;
+	auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_Vulkan.pfn_VULKAN_CreateFeature1;
+
+	if (ptr != nullptr)
+	{
+		auto result = ptr(InDevice, InCmdList, InFeatureID, InParameters, OutHandle);
+		CyberLOGvi(result);
+		return result;
+	}
+
+	return NVSDK_NGX_Result_Fail;
 }
 
 Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_ReleaseFeature(NVSDK_NGX_Handle* InHandle)
 {
 	const CyberTypes::RTC start = CyberTypes::RTC(true);
-	WaitForLoading();
+	CyberInterposer::interposer.wait_for_ready();
 	CyberLogArgs(InHandle, start);
 
-	// is pointer good? cast pointer and call it and return any results!
-	return NVSDK_NGX_Result_Success;
+	auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_Vulkan.pfn_VULKAN_ReleaseFeature;
+
+	if (ptr != nullptr)
+	{
+		auto result = ptr(InHandle);
+		CyberLOGvi(result);
+		return result;
+	}
+
+	return NVSDK_NGX_Result_Fail;
 }
 
 Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_EvaluateFeature(VkCommandBuffer InCmdList, const NVSDK_NGX_Handle* InFeatureHandle, const NVSDK_NGX_Parameter* InParameters, PFN_NVSDK_NGX_ProgressCallback InCallback)
 {
 	const CyberTypes::RTC start = CyberTypes::RTC(true);
-	WaitForLoading();
+	CyberInterposer::interposer.wait_for_ready();
 	CyberLogArgs(InCmdList, InFeatureHandle, InParameters, InCallback, start);
 
-	// is pointer good? cast pointer and call it and return any results!
-	return NVSDK_NGX_Result_Success;
+	auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_Vulkan.pfn_VULKAN_EvaluateFeature;
+
+	if (ptr != nullptr)
+	{
+		auto result = ptr(InCmdList, InFeatureHandle, InParameters, InCallback);
+		CyberLOGvi(result);
+		return result;
+	}
+
+	return NVSDK_NGX_Result_Fail;
 }
 
 Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_EvaluateFeature_C(VkCommandBuffer InCmdList, const NVSDK_NGX_Handle* InFeatureHandle, const NVSDK_NGX_Parameter* InParameters, PFN_NVSDK_NGX_ProgressCallback_C InCallback)
 {
 	const CyberTypes::RTC start = CyberTypes::RTC(true);
-	WaitForLoading();
+	CyberInterposer::interposer.wait_for_ready();
 	CyberLogArgs(InCmdList, InFeatureHandle, InParameters, InCallback, start);
 
-	return NVSDK_NGX_Result_Success;
+	auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_Vulkan.pfn_VULKAN_EvaluateFeature_C;
+
+	if (ptr != nullptr)
+	{
+		auto result = ptr(InCmdList, InFeatureHandle, InParameters, InCallback);
+		CyberLOGvi(result);
+		return result;
+	}
+
+	return NVSDK_NGX_Result_Fail;
 }
 
 #endif

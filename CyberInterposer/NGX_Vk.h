@@ -28,6 +28,8 @@ namespace CyberInterposer
         PFN_NVSDK_NGX_VULKAN_GetScratchBufferSize pfn_VULKAN_GetScratchBufferSize = nullptr;
 
         PFN_NVSDK_NGX_VULKAN_CreateFeature pfn_VULKAN_CreateFeature = nullptr;
+        PFN_NVSDK_NGX_VULKAN_CreateFeature1 pfn_VULKAN_CreateFeature1 = nullptr;
+
         PFN_NVSDK_NGX_VULKAN_ReleaseFeature pfn_VULKAN_ReleaseFeature = nullptr;
         PFN_NVSDK_NGX_VULKAN_EvaluateFeature pfn_VULKAN_EvaluateFeature = nullptr;
         PFN_NVSDK_NGX_VULKAN_EvaluateFeature_C pfn_VULKAN_EvaluateFeature_C = nullptr;

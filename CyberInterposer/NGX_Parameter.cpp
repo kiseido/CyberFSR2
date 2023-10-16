@@ -215,9 +215,9 @@ bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool
     {
         CyberLogArgs(InName, OutValue);
 
-        const char* OptimalCallbaskStr = NGX_Strings::Strings_Converter.getMacroContentFromEnum(NGX_Strings::MacroStrings_enum::NVSDK_NGX_Parameter_DLSSOptimalSettingsCallback_enum).data();
+        const char* OptimalCallbaskStr = NGX_Strings::StringsConverter.getContentFromEnum(NGX_Strings::MacroStrings_enum::NVSDK_NGX_Parameter_DLSSOptimalSettingsCallback_enum).data();
 
-        const char* StatsCallbaskStr = NGX_Strings::Strings_Converter.getMacroContentFromEnum(NGX_Strings::MacroStrings_enum::NVSDK_NGX_Parameter_DLSSGetStatsCallback_enum).data();
+        const char* StatsCallbaskStr = NGX_Strings::StringsConverter.getContentFromEnum(NGX_Strings::MacroStrings_enum::NVSDK_NGX_Parameter_DLSSGetStatsCallback_enum).data();
 
         const auto isOptimalSettingsCallback = strcmp(InName, OptimalCallbaskStr);
 
@@ -356,12 +356,12 @@ bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool
 }
 
 
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_DLSS_GetOptimalSettingsCallback(NVSDK_NGX_Parameter* InParams)
+NVSDK_NGX_Result C_Declare NVSDK_NGX_DLSS_GetOptimalSettingsCallback(NVSDK_NGX_Parameter* InParams)
 {
     return ((CyberInterposer::CI_Parameter*)InParams)->GetOptimalSettingsCallback();
 }
 
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_DLSS_GetStatsCallback(NVSDK_NGX_Parameter* InParams)
+NVSDK_NGX_Result C_Declare NVSDK_NGX_DLSS_GetStatsCallback(NVSDK_NGX_Parameter* InParams)
 {
     return ((CyberInterposer::CI_Parameter*)InParams)->GetStatsCallback();
 }

@@ -42,6 +42,7 @@ typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_D3D11_EvaluateFeature_C)(ID3D
 typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_D3D12_Init)(unsigned long long, const wchar_t*, ID3D12Device*, const NVSDK_NGX_FeatureCommonInfo*, NVSDK_NGX_Version);
 typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_D3D12_Init_Ext)(unsigned long long, const wchar_t*, ID3D12Device*, const NVSDK_NGX_FeatureCommonInfo*, NVSDK_NGX_Version, unsigned long long);
 typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_D3D12_Init_ProjectID)(const char*, NVSDK_NGX_EngineType, const char*, const wchar_t*, ID3D12Device*, const NVSDK_NGX_FeatureCommonInfo*, NVSDK_NGX_Version);
+typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_D3D12_Init_with_ProjectID)(const char* InProjectId,NVSDK_NGX_EngineType InEngineType, const char* InEngineVersion, const wchar_t* InApplicationDataPath, ID3D12Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion);
 
 typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_D3D12_Shutdown)(void);
 typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_D3D12_Shutdown1)(ID3D12Device*);
@@ -69,7 +70,7 @@ typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_VULKAN_Init_Ext2)(unsigned lo
 typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_VULKAN_Init_ProjectID)(const char*, NVSDK_NGX_EngineType, const char*, const wchar_t*, VkInstance, VkPhysicalDevice, VkDevice, PFN_vkGetInstanceProcAddr, PFN_vkGetDeviceProcAddr, const NVSDK_NGX_FeatureCommonInfo*, NVSDK_NGX_Version);
 
 typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_VULKAN_Shutdown)(void);
-typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_VULKAN_Shutdown1)(VkInstance);
+typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_VULKAN_Shutdown1)(VkDevice);
 
 typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_VULKAN_GetCapabilityParameters)(NVSDK_NGX_Parameter**);
 typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_VULKAN_GetParameters)(NVSDK_NGX_Parameter**);
@@ -87,7 +88,7 @@ typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_VULKAN_GetFeatureInstanceExte
 typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_VULKAN_GetFeatureDeviceExtensionRequirements)(VkInstance, VkPhysicalDevice, const NVSDK_NGX_FeatureDiscoveryInfo*, uint32_t*, VkExtensionProperties**);
 
 typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_VULKAN_EvaluateFeature)(VkCommandBuffer, const NVSDK_NGX_Handle*, const NVSDK_NGX_Parameter*, PFN_NVSDK_NGX_ProgressCallback);
-typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_VULKAN_EvaluateFeature_C)(VkCommandBuffer, NVSDK_NGX_Handle*, NVSDK_NGX_Parameter*, PFN_NVSDK_NGX_ProgressCallback_C);
+typedef NVSDK_NGX_Result(NVSDK_CONV* PFN_NVSDK_NGX_VULKAN_EvaluateFeature_C)(VkCommandBuffer, const NVSDK_NGX_Handle* , const NVSDK_NGX_Parameter* , PFN_NVSDK_NGX_ProgressCallback_C);
 
 
 // CUDA

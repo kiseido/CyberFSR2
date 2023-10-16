@@ -1,5 +1,13 @@
 #include "pch.h"
 
+#include <array>
+#include <string_view>
+#include <iostream>
+#include <string>
+#include <unordered_set>
+#include <vector>
+#include <unordered_map>
+
 #ifndef CyberNGX_Strings_H
 #define CyberNGX_Strings_H
 
@@ -264,45 +272,93 @@
 
 #define CyberNGX_Strings_CONCATENATE(a, b) a##b
 
-#define CyberNGX_Strings_MacroToEnum(name) CyberNGX_Strings_CONCATENATE(name, _enum)
-#define CyberNGX_Strings_MacroNameString(name) std::string_view(#name)
-#define CyberNGX_Strings_MacroContentsString(name) std::string_view(name)
-
 #define CyberNGX_Strings_ENUM_NAME(name) CyberNGX_Strings_CONCATENATE(##name, _enum)
 
+#define CyberNGX_Strings_MacroToEnum(name) CyberNGX_Strings_CONCATENATE(name, _enum)
+#define CyberNGX_Strings_MacroNameString(name) (#name)
+#define CyberNGX_Strings_MacroContentsString(name) (name)
 
-#include <unordered_map>
+#define CyberNGX_Strings_NameEnumPair(name) ValuePair({MacroStrings_macroname[CyberNGX_Strings_ENUM_NAME(##name)], CyberNGX_Strings_ENUM_NAME(##name)})
+#define CyberNGX_Strings_ContentEnumPair(name) ValuePair({MacroStrings_macrocontent[CyberNGX_Strings_ENUM_NAME(##name)], CyberNGX_Strings_ENUM_NAME(##name)})
+
+
+namespace NGX_StringsHelper {
+
+    enum MacroStrings_enum { CyberNGX_Strings_Macros(CyberNGX_Strings_ENUM_NAME), COUNT_enum };
+
+    template <typename T>
+    using EnumLengthArray = std::array<T, COUNT_enum>;
+
+    using ValuePair = std::pair<std::string_view, MacroStrings_enum>;
+
+    using StringsArray = EnumLengthArray<std::string_view>;
+    using ValuePairArray = EnumLengthArray<ValuePair>;
+
+    constexpr StringsArray MacroStrings_macroname = { CyberNGX_Strings_Macros(CyberNGX_Strings_MacroNameString) };
+    constexpr StringsArray MacroStrings_macrocontent = { CyberNGX_Strings_Macros(CyberNGX_Strings_MacroContentsString) };
+
+    constexpr ValuePairArray MacroStrings_macronamepairs = { CyberNGX_Strings_Macros(CyberNGX_Strings_NameEnumPair) };
+    constexpr ValuePairArray MacroStrings_macrocontentpairs = { CyberNGX_Strings_Macros(CyberNGX_Strings_ContentEnumPair) };
+
+    constexpr bool compareValuePairs(const ValuePair& a, const ValuePair& b) {
+        return a.first < b.first;
+    }
+
+    constexpr ValuePairArray sortValuePairArray(const ValuePairArray& arr) {
+        ValuePairArray sortedArray = arr;
+        std::sort(sortedArray.begin(), sortedArray.end(), compareValuePairs);
+        return sortedArray;
+    }
+
+    constexpr ValuePairArray sortedNamePairs = sortValuePairArray(MacroStrings_macronamepairs);
+    constexpr ValuePairArray sortedContentPairs = sortValuePairArray(MacroStrings_macrocontentpairs);
+
+    
+}
 
 namespace NGX_Strings {
-    enum MacroStrings_enum { CyberNGX_Strings_Macros(CyberNGX_Strings_ENUM_NAME), COUNT_enum }; \
-    constexpr static std::string_view MacroStrings_macroname[] { (CyberNGX_Strings_Macros(CyberNGX_Strings_MacroNameString)) }; \
-    constexpr static std::string_view MacroStrings_macrocontent[] { (CyberNGX_Strings_Macros(CyberNGX_Strings_MacroContentsString)) };
 
-    static struct NGX_String_Converter {
-    private:
-        enum InitStatus { cold, warming, hot};
+    using MacroStrings_enum = NGX_StringsHelper::MacroStrings_enum;
 
-        InitStatus initstatus{cold};
-
-        std::unordered_map<std::string_view, MacroStrings_enum> map_macroname_to_enum;
-
-        std::unordered_map<std::string_view, MacroStrings_enum> map_macrocontent_to_enum;
-
-        void populate_maps();
+    class StringConverter {
+        std::unordered_map<std::string_view, MacroStrings_enum> nameToEnumMap;
+        std::unordered_map<std::string_view, MacroStrings_enum> contentToEnumMap;
 
     public:
-        NGX_String_Converter();
+        StringConverter();
 
-        MacroStrings_enum getEnumFromMacroName(const std::string_view& chars) const;
+        MacroStrings_enum getEnumFromName(const std::string_view& chars) const;
+        MacroStrings_enum getEnumFromContent(const std::string_view& chars) const;
+        std::string_view getNameFromEnum(MacroStrings_enum value) const;
+        std::string_view getContentFromEnum(MacroStrings_enum value) const;
+    };
 
-        MacroStrings_enum getEnumFromMacroContents(const std::string_view& chars) const;
+    inline static StringConverter StringsConverter;
+}
 
-        std::string_view getMacroNameFromEnum(MacroStrings_enum chars) const;
+namespace NGX_StringsHelper {
 
-        std::string_view getMacroContentFromEnum(MacroStrings_enum chars) const;
-    } Strings_Converter;
+    // Node for Huffman tree
+    struct Node {
+        std::string_view token;
+        int frequency;
+        Node* left;
+        Node* right;
+    };
 
+    // Build Huffman tree
+    template<size_t N, size_t M>
+    constexpr Node* buildHuffmanTree(const std::array<std::string_view, N>& dictionary, const std::array<std::string_view, M>& tokens);
 
+    // Compress a string using Huffman codes
+    template <size_t N, size_t M>
+    constexpr std::string compress(const std::array<std::string_view, N>& dictionary,
+        const std::array<std::string_view, M>& tokens,
+        Node* huffmanTree,
+        std::string_view input);
+
+    // Decompress a string using Huffman codes
+    constexpr std::string decompress(Node* huffmanTree, std::string_view compressed);
 }
 
 #endif

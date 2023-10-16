@@ -15,7 +15,9 @@
 #include "NGX_Vk.h"
 #include "NGX_Parameter.h"
 
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_GetVersion(NVSDK_NGX_Version* version);
+constexpr wchar_t const*  cyberinterposerdllFileName = L"CyberInterposer.ini";
+
+NVSDK_NGX_Result C_Declare NVSDK_NGX_GetVersion(NVSDK_NGX_Version* version);
 
 namespace CyberInterposer
 {
@@ -35,11 +37,6 @@ namespace CyberInterposer
             return false;
         }
     }
-
-    static bool CyberFSRLoaded = false;
-    static bool LoggerLoaded = false;
-    static std::mutex startupMutex;
-    static std::condition_variable InterposerReady_cv;
 
     struct PFN_Table_NVNGX_Top_Interposer : public  PFN_Table_T {
 
@@ -115,7 +112,22 @@ namespace CyberInterposer
         void ProcessDisconnect(HMODULE hModule);
     };
 
+    struct Interposer {
+        std::atomic<bool> InterposerInitialized = false;
+        std::atomic<bool> LoggerLoaded = false;
+        std::mutex startupMutex;
+        std::condition_variable InterposerReady_cv;
+
+        Interposer();
+        void wait_for_ready();
+        bool is_ready();
+
+        int init();
+    };
+
     extern DLLRepo DLLs;
+
+    extern Interposer interposer;
 };
 
 #endif

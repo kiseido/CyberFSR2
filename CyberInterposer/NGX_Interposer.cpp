@@ -4,6 +4,76 @@
 namespace CyberInterposer {
     DLLRepo DLLs = DLLRepo();
 
+    Interposer interposer = Interposer();
+
+    Interposer::Interposer() {
+
+    }
+
+    int Interposer::init() {
+        if (InterposerInitialized == true) return 0;
+
+        std::lock_guard<std::mutex> lock(startupMutex);
+        
+        if (InterposerInitialized == true) return 0;
+
+        InterposerConfig.loadFromFile(cyberinterposerdllFileName);
+        InterposerConfig.saveToFile(cyberinterposerdllFileName);
+
+        if (LoggerLoaded == false)
+        {
+            logger.start();
+            LoggerLoaded = true;
+            //CyberInterposer::logger.config(LogFilename, true, true, true);
+            //CyberLOGi("CyberLOGi test");
+            //CyberLOGw("CyberLOGw test");
+            //CyberLOGe("CyberLOGe test");
+            //CyberLogLots("CyberLogLots test", "");
+            //CyberLogArgs("CyberLogArgs test", "");
+        }
+
+
+        const auto dllFileName = std::get<std::wstring>(InterposerConfig[L"DLSSBackEnd"][L"DLL"].value);
+
+        CyberLOGi("Loading ", dllFileName);
+
+        const auto hmodule = LoadLibraryW(dllFileName.c_str());
+
+        if (!hmodule)
+        {
+            CyberLOGe("Loading NVNGX.dll failed");
+            // Handle the error if the dependent DLL cannot be loaded
+            // return FALSE;
+        }
+        else {
+            const bool dllLoadStatus = CyberInterposer::DLLs.LoadDLL(hmodule, true);
+
+            if (!dllLoadStatus)
+            {
+                CyberLOGe("LoadDLL failed");
+                // Handle the error if the dependent DLL cannot be loaded
+                // return FALSE;
+            }
+        }
+        InterposerInitialized = true;
+    
+        InterposerReady_cv.notify_all();
+        
+        return 1;
+    }
+
+    void Interposer::wait_for_ready() {
+        if (InterposerInitialized) return;
+
+        std::unique_lock<std::mutex> lock(startupMutex);
+        InterposerReady_cv.wait(lock, [this] { return InterposerInitialized == true; });
+    }
+
+    bool Interposer::is_ready() {
+        return InterposerInitialized;
+    }
+
+
     bool PFN_Table_NVNGX_Top_Interposer::LoadDLL(HMODULE hModule, bool populateChildren)
     {
         CyberLogArgs(hModule, populateChildren);
@@ -143,14 +213,14 @@ namespace CyberInterposer {
     }
 }
 
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_GetVersion(NVSDK_NGX_Version* version)
+NVSDK_NGX_Result C_Declare NVSDK_NGX_GetVersion(NVSDK_NGX_Version* version)
 {
     CyberLogArgs(version);
 
     return NVSDK_NGX_Result_Fail;
 }
 
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_UpdateFeature(const NVSDK_NGX_Application_Identifier* ApplicationId, const NVSDK_NGX_Feature FeatureID)
+NVSDK_NGX_Result C_Declare NVSDK_NGX_UpdateFeature(const NVSDK_NGX_Application_Identifier* ApplicationId, const NVSDK_NGX_Feature FeatureID)
 {
     CyberLogArgs(ApplicationId, FeatureID);
 

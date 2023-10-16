@@ -5,49 +5,44 @@
 
 #include <unordered_map>
 
-void NGX_Strings::NGX_String_Converter::populate_maps() {
-    initstatus = warming;
 
-    for (std::size_t i = 0; i < COUNT_enum; ++i) {
-        map_macroname_to_enum[MacroStrings_macrocontent[i]] = static_cast<MacroStrings_enum>(i);
-    }
-    for (std::size_t i = 0; i < COUNT_enum; ++i) {
-        map_macrocontent_to_enum[MacroStrings_macrocontent[i]] = static_cast<MacroStrings_enum>(i);
+
+NGX_Strings::StringConverter::StringConverter() {
+    for (const auto& pair : NGX_StringsHelper::sortedNamePairs) {
+        nameToEnumMap.emplace(pair.first, pair.second);
     }
 
-    initstatus = hot;
+    for (const auto& pair : NGX_StringsHelper::sortedContentPairs) {
+        contentToEnumMap.emplace(pair.first, pair.second);
+    }
 }
 
-NGX_Strings::NGX_String_Converter::NGX_String_Converter() {
-    populate_maps();
-}
-
-NGX_Strings::MacroStrings_enum NGX_Strings::NGX_String_Converter::getEnumFromMacroName(const std::string_view& chars) const {
-    auto found = map_macroname_to_enum.find(chars);
-    if (found != map_macroname_to_enum.end()) {
+NGX_Strings::MacroStrings_enum NGX_Strings::StringConverter::getEnumFromName(const std::string_view& chars) const {
+    auto found = nameToEnumMap.find(chars);
+    if (found != nameToEnumMap.end()) {
         return found->second;
     }
-    return COUNT_enum;  // Not found
+    return MacroStrings_enum::COUNT_enum;  // Not found
 }
 
-NGX_Strings::MacroStrings_enum NGX_Strings::NGX_String_Converter::getEnumFromMacroContents(const std::string_view& chars) const {
-    auto found = map_macrocontent_to_enum.find(chars);
-    if (found != map_macrocontent_to_enum.end()) {
+NGX_Strings::MacroStrings_enum NGX_Strings::StringConverter::getEnumFromContent(const std::string_view& chars) const {
+    auto found = contentToEnumMap.find(chars);
+    if (found != contentToEnumMap.end()) {
         return found->second;
     }
-    return COUNT_enum;  // Not found
+    return MacroStrings_enum::COUNT_enum;  // Not found
 }
 
-std::string_view NGX_Strings::NGX_String_Converter::getMacroNameFromEnum(MacroStrings_enum chars) const {
-    if (chars >= 0 && chars < COUNT_enum) {
-        return MacroStrings_macroname[chars];
+std::string_view NGX_Strings::StringConverter::getNameFromEnum(MacroStrings_enum chars) const {
+    if (chars >= 0 && chars < MacroStrings_enum::COUNT_enum) {
+        return NGX_StringsHelper::MacroStrings_macroname[chars];
     }
     return ""; // Invalid enum value
 }
 
-std::string_view NGX_Strings::NGX_String_Converter::getMacroContentFromEnum(MacroStrings_enum chars) const {
-    if (chars >= 0 && chars < COUNT_enum) {
-        return MacroStrings_macrocontent[chars];
+std::string_view NGX_Strings::StringConverter::getContentFromEnum(MacroStrings_enum chars) const {
+    if (chars >= 0 && chars < MacroStrings_enum::COUNT_enum) {
+        return NGX_StringsHelper::MacroStrings_macrocontent[chars];
     }
     return ""; // Invalid enum value
 }

@@ -26,6 +26,7 @@ namespace CyberInterposer
         PFN_NVSDK_NGX_D3D12_Init pfn_D3D12_Init = nullptr;
         PFN_NVSDK_NGX_D3D12_Init_Ext pfn_D3D12_Init_Ext = nullptr;
         PFN_NVSDK_NGX_D3D12_Init_ProjectID pfn_D3D12_Init_ProjectID = nullptr;
+        PFN_NVSDK_NGX_D3D12_Init_with_ProjectID pfn_D3D12_Init_with_ProjectID = nullptr;
 
         PFN_NVSDK_NGX_D3D12_Shutdown pfn_D3D12_Shutdown = nullptr;
         PFN_NVSDK_NGX_D3D12_Shutdown1 pfn_D3D12_Shutdown1 = nullptr;
@@ -52,43 +53,43 @@ namespace CyberInterposer
 // Expose_API void C_Declare NVSDK_NGX_Parameter_SetD3d12Resource(NVSDK_NGX_Parameter* InParameter, const char* InName, ID3D12Resource* InValue);
 //Expose_API  NVSDK_NGX_Result C_Declare NVSDK_NGX_Parameter_GetD3d12Resource(NVSDK_NGX_Parameter* InParameter, const char* InName, ID3D12Resource** OutValue);
 
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D12_Init(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath, ID3D12Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion);
+NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D12_Init(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath, ID3D12Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion);
 
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D12_Init(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath, ID3D12Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion);
+NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D12_Init(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath, ID3D12Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion);
 
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D12_Init_Ext(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath, ID3D12Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion, unsigned long long Inflags);
+NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D12_Init_Ext(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath, ID3D12Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion, unsigned long long Inflags);
 
 // Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D12_Init_Ext(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath, ID3D12Device* InDevice, NVSDK_NGX_Version InSDKVersion, const char* Apointer1, const char* Apointer2);
 
 
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D12_Init_ProjectID(const char* InProjectId, NVSDK_NGX_EngineType InEngineType, const char* InEngineVersion, const wchar_t* InApplicationDataPath, ID3D12Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion);
+NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D12_Init_ProjectID(const char* InProjectId, NVSDK_NGX_EngineType InEngineType, const char* InEngineVersion, const wchar_t* InApplicationDataPath, ID3D12Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion);
 
 
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D12_Shutdown(void);
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D12_Shutdown1(ID3D12Device* InDevice);
+NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D12_Shutdown(void);
+NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D12_Shutdown1(ID3D12Device* InDevice);
 
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D12_GetCapabilityParameters(NVSDK_NGX_Parameter** OutParameters);
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D12_GetParameters(NVSDK_NGX_Parameter** OutParameters);
+NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D12_GetCapabilityParameters(NVSDK_NGX_Parameter** OutParameters);
+NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D12_GetParameters(NVSDK_NGX_Parameter** OutParameters);
 
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D12_GetScratchBufferSize(NVSDK_NGX_Feature InFeatureId, const NVSDK_NGX_Parameter* InParameters, size_t* OutSizeInBytes);
+NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D12_GetScratchBufferSize(NVSDK_NGX_Feature InFeatureId, const NVSDK_NGX_Parameter* InParameters, size_t* OutSizeInBytes);
 
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D12_AllocateParameters(NVSDK_NGX_Parameter** OutParameters);
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D12_DestroyParameters(NVSDK_NGX_Parameter* InParameters);
+NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D12_AllocateParameters(NVSDK_NGX_Parameter** OutParameters);
+NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D12_DestroyParameters(NVSDK_NGX_Parameter* InParameters);
 
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D12_CreateFeature(ID3D12Device* InDevice, NVSDK_NGX_Feature InFeatureID, NVSDK_NGX_Parameter* InParameters, NVSDK_NGX_Handle** OutHandle);
+NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D12_CreateFeature(ID3D12Device* InDevice, NVSDK_NGX_Feature InFeatureID, NVSDK_NGX_Parameter* InParameters, NVSDK_NGX_Handle** OutHandle);
 
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D12_CreateFeature(ID3D12GraphicsCommandList* InCmdList, NVSDK_NGX_Feature InFeatureID, NVSDK_NGX_Parameter* InParameters, NVSDK_NGX_Handle** OutHandle);
+NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D12_CreateFeature(ID3D12GraphicsCommandList* InCmdList, NVSDK_NGX_Feature InFeatureID, NVSDK_NGX_Parameter* InParameters, NVSDK_NGX_Handle** OutHandle);
 
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D12_ReleaseFeature(NVSDK_NGX_Handle* InHandle);
+NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D12_ReleaseFeature(NVSDK_NGX_Handle* InHandle);
 
 
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D12_ReleaseFeature(NVSDK_NGX_Handle* InHandle);
+NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D12_ReleaseFeature(NVSDK_NGX_Handle* InHandle);
 
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCmdList, const NVSDK_NGX_Handle* InFeatureHandle, const NVSDK_NGX_Parameter* InParameters, PFN_NVSDK_NGX_ProgressCallback InCallback);
+NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D12_EvaluateFeature(ID3D12GraphicsCommandList* InCmdList, const NVSDK_NGX_Handle* InFeatureHandle, const NVSDK_NGX_Parameter* InParameters, PFN_NVSDK_NGX_ProgressCallback InCallback);
 
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D12_EvaluateFeature_C(ID3D12GraphicsCommandList* InCmdList, const NVSDK_NGX_Handle* InFeatureHandle, const NVSDK_NGX_Parameter* InParameters, PFN_NVSDK_NGX_ProgressCallback_C InCallback);
+NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D12_EvaluateFeature_C(ID3D12GraphicsCommandList* InCmdList, const NVSDK_NGX_Handle* InFeatureHandle, const NVSDK_NGX_Parameter* InParameters, PFN_NVSDK_NGX_ProgressCallback_C InCallback);
 
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D12_GetFeatureRequirements(IDXGIAdapter* Adapter, const NVSDK_NGX_FeatureDiscoveryInfo* FeatureDiscoveryInfo, NVSDK_NGX_FeatureRequirement* OutSupported);
+NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D12_GetFeatureRequirements(IDXGIAdapter* Adapter, const NVSDK_NGX_FeatureDiscoveryInfo* FeatureDiscoveryInfo, NVSDK_NGX_FeatureRequirement* OutSupported);
 
 // external\FidelityFX-FSR2\src\ffx-fsr2-api\ffx_fsr2_interface.h
 // external\nvngx_dlss_sdk\include\nvsdk_ngx_defs.h
