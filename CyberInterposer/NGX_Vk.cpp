@@ -127,7 +127,7 @@ Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_Shutdown1(VkDevice InDevi
 	return NVSDK_NGX_Result_Fail;
 }
 
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_GetParameters(NVSDK_NGX_Parameter** OutParameters)
+NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_GetParameters(NVSDK_NGX_Parameter** OutParameters)
 {
 	const CyberTypes::RTC start = CyberTypes::RTC(true);
 	CyberInterposer::interposer.wait_for_ready();
@@ -137,15 +137,34 @@ Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_GetParameters(NVSDK_NGX_P
 
 	if (ptr != nullptr)
 	{
-		auto result = ptr(OutParameters);
+		NVSDK_NGX_Parameter* originalParam = nullptr;
+		auto result = ptr(&originalParam);
 		CyberLOGvi(result);
+
+		if (result == NVSDK_NGX_Result_Success && originalParam)
+		{
+			// Claim a wrapper from the memory pool
+			auto wrappedParameter = CyberInterposer::CI_MGX_Parameter_StaticAlloc::GetParameters_depreciated.claim();
+
+			// Set the wrapped member to the original parameter
+			wrappedParameter->wrapped.param = originalParam;
+
+			// Return the wrapped parameter
+			*OutParameters = wrappedParameter;
+		}
+		else
+		{
+			*OutParameters = originalParam;
+		}
+
 		return result;
 	}
 
 	return NVSDK_NGX_Result_Fail;
 }
 
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_AllocateParameters(NVSDK_NGX_Parameter** OutParameters)
+
+NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_AllocateParameters(NVSDK_NGX_Parameter** OutParameters)
 {
 	const CyberTypes::RTC start = CyberTypes::RTC(true);
 	CyberInterposer::interposer.wait_for_ready();
@@ -155,15 +174,34 @@ Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_AllocateParameters(NVSDK_
 
 	if (ptr != nullptr)
 	{
-		auto result = ptr(OutParameters);
+		NVSDK_NGX_Parameter* originalParam = nullptr;
+		auto result = ptr(&originalParam);
 		CyberLOGvi(result);
+
+		if (result == NVSDK_NGX_Result_Success && originalParam)
+		{
+			// Claim a wrapper from the memory pool
+			auto wrappedParameter = CyberInterposer::CI_MGX_Parameter_StaticAlloc::AllocateParameters.claim();
+
+			// Set the wrapped member to the original parameter
+			wrappedParameter->wrapped.param = originalParam;
+
+			// Return the wrapped parameter
+			*OutParameters = wrappedParameter;
+		}
+		else
+		{
+			*OutParameters = originalParam;
+		}
+
 		return result;
 	}
 
 	return NVSDK_NGX_Result_Fail;
 }
 
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_GetCapabilityParameters(NVSDK_NGX_Parameter** OutParameters)
+
+NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_GetCapabilityParameters(NVSDK_NGX_Parameter** OutParameters)
 {
 	const CyberTypes::RTC start = CyberTypes::RTC(true);
 	CyberInterposer::interposer.wait_for_ready();
@@ -173,16 +211,37 @@ Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_GetCapabilityParameters(N
 
 	if (ptr != nullptr)
 	{
-		auto result = ptr(OutParameters);
+		NVSDK_NGX_Parameter* originalParam = nullptr;
+		auto result = ptr(&originalParam);
 		CyberLOGvi(result);
+
+		if (result == NVSDK_NGX_Result_Success && originalParam)
+		{
+			// Here, let's assume that capability parameters are also claimed from the AllocateParameters pool.
+			auto wrappedParameter = CyberInterposer::CI_MGX_Parameter_StaticAlloc::GetParameters_depreciated.claim();
+
+			// Set the wrapped member to the original parameter
+			wrappedParameter->wrapped.param = originalParam;
+
+			// Return the wrapped parameter
+			*OutParameters = wrappedParameter;
+		}
+		else
+		{
+			*OutParameters = originalParam;
+		}
+
 		return result;
 	}
 
 	return NVSDK_NGX_Result_Fail;
 }
 
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_DestroyParameters(NVSDK_NGX_Parameter* InParameters)
+
+NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_DestroyParameters(NVSDK_NGX_Parameter* InParameters)
 {
+	const auto castedInParameters = (CyberInterposer::CI_Parameter*)InParameters;
+
 	const CyberTypes::RTC start = CyberTypes::RTC(true);
 	CyberInterposer::interposer.wait_for_ready();
 	CyberLogArgs(InParameters, start);
@@ -191,25 +250,36 @@ Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_DestroyParameters(NVSDK_N
 
 	if (ptr != nullptr)
 	{
-		auto result = ptr(InParameters);
+		// Release the wrapper back to the pool
+
+		// Call the original function with the unwrapped parameter
+		auto result = ptr(castedInParameters->wrapped.param);
 		CyberLOGvi(result);
+
+
+		CyberInterposer::CI_MGX_Parameter_StaticAlloc::AllocateParameters.release(castedInParameters);
+		CyberInterposer::CI_MGX_Parameter_StaticAlloc::GetParameters_depreciated.release(castedInParameters);
+
 		return result;
 	}
 
 	return NVSDK_NGX_Result_Fail;
 }
 
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_GetScratchBufferSize(NVSDK_NGX_Feature InFeatureId, const NVSDK_NGX_Parameter* InParameters, size_t* OutSizeInBytes)
+
+NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_GetScratchBufferSize(NVSDK_NGX_Feature InFeatureId, const NVSDK_NGX_Parameter* InParameters, size_t* OutSizeInBytes)
 {
+	const auto castedInParameters = (CyberInterposer::CI_Parameter*)InParameters;
+
 	const CyberTypes::RTC start = CyberTypes::RTC(true);
 	CyberInterposer::interposer.wait_for_ready();
-	CyberLogArgs(InFeatureId, InParameters, OutSizeInBytes, start);
+	CyberLogArgs(InFeatureId, castedInParameters, OutSizeInBytes, start);
 
 	auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_Vulkan.pfn_VULKAN_GetScratchBufferSize;
 
 	if (ptr != nullptr)
 	{
-		auto result = ptr(InFeatureId, InParameters, OutSizeInBytes);
+		auto result = ptr(InFeatureId, castedInParameters->wrapped.param, OutSizeInBytes);
 		CyberLOGvi(result);
 		return result;
 	}
@@ -217,17 +287,19 @@ Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_GetScratchBufferSize(NVSD
 	return NVSDK_NGX_Result_Fail;
 }
 
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_CreateFeature(VkCommandBuffer InCmdBuffer, NVSDK_NGX_Feature InFeatureID, NVSDK_NGX_Parameter* InParameters, NVSDK_NGX_Handle** OutHandle)
+NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_CreateFeature(VkCommandBuffer InCmdBuffer, NVSDK_NGX_Feature InFeatureID, NVSDK_NGX_Parameter* InParameters, NVSDK_NGX_Handle** OutHandle)
 {
+	const auto castedInParameters = (CyberInterposer::CI_Parameter*)InParameters;
+
 	const CyberTypes::RTC start = CyberTypes::RTC(true);
 	CyberInterposer::interposer.wait_for_ready();
-	CyberLogArgs(InCmdBuffer, InFeatureID, InParameters, OutHandle, start);
+	CyberLogArgs(InCmdBuffer, InFeatureID, castedInParameters, OutHandle, start);
 
 	auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_Vulkan.pfn_VULKAN_CreateFeature;
 
 	if (ptr != nullptr)
 	{
-		auto result = ptr(InCmdBuffer, InFeatureID, InParameters, OutHandle);
+		auto result = ptr(InCmdBuffer, InFeatureID, castedInParameters->wrapped.param, OutHandle);
 		CyberLOGvi(result);
 		return result;
 	}
@@ -235,17 +307,19 @@ Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_CreateFeature(VkCommandBu
 	return NVSDK_NGX_Result_Fail;
 }
 
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_CreateFeature1(VkDevice InDevice, VkCommandBuffer InCmdList, NVSDK_NGX_Feature InFeatureID, NVSDK_NGX_Parameter* InParameters, NVSDK_NGX_Handle** OutHandle)
+NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_CreateFeature1(VkDevice InDevice, VkCommandBuffer InCmdList, NVSDK_NGX_Feature InFeatureID, NVSDK_NGX_Parameter* InParameters, NVSDK_NGX_Handle** OutHandle)
 {
+	const auto castedInParameters = (CyberInterposer::CI_Parameter*)InParameters;
+
 	const CyberTypes::RTC start = CyberTypes::RTC(true);
 	CyberInterposer::interposer.wait_for_ready();
-	CyberLogArgs(InDevice, InCmdList, InFeatureID, InParameters, OutHandle, start);
+	CyberLogArgs(InDevice, InCmdList, InFeatureID, castedInParameters, OutHandle, start);
 
 	auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_Vulkan.pfn_VULKAN_CreateFeature1;
 
 	if (ptr != nullptr)
 	{
-		auto result = ptr(InDevice, InCmdList, InFeatureID, InParameters, OutHandle);
+		auto result = ptr(InDevice, InCmdList, InFeatureID, castedInParameters->wrapped.param, OutHandle);
 		CyberLOGvi(result);
 		return result;
 	}
@@ -253,7 +327,7 @@ Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_CreateFeature1(VkDevice I
 	return NVSDK_NGX_Result_Fail;
 }
 
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_ReleaseFeature(NVSDK_NGX_Handle* InHandle)
+NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_ReleaseFeature(NVSDK_NGX_Handle* InHandle)
 {
 	const CyberTypes::RTC start = CyberTypes::RTC(true);
 	CyberInterposer::interposer.wait_for_ready();
@@ -271,17 +345,19 @@ Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_ReleaseFeature(NVSDK_NGX_
 	return NVSDK_NGX_Result_Fail;
 }
 
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_EvaluateFeature(VkCommandBuffer InCmdList, const NVSDK_NGX_Handle* InFeatureHandle, const NVSDK_NGX_Parameter* InParameters, PFN_NVSDK_NGX_ProgressCallback InCallback)
+NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_EvaluateFeature(VkCommandBuffer InCmdList, const NVSDK_NGX_Handle* InFeatureHandle, const NVSDK_NGX_Parameter* InParameters, PFN_NVSDK_NGX_ProgressCallback InCallback)
 {
+	const auto castedInParameters = (CyberInterposer::CI_Parameter*)InParameters;
+
 	const CyberTypes::RTC start = CyberTypes::RTC(true);
 	CyberInterposer::interposer.wait_for_ready();
-	CyberLogArgs(InCmdList, InFeatureHandle, InParameters, InCallback, start);
+	CyberLogArgs(InCmdList, InFeatureHandle, castedInParameters, InCallback, start);
 
 	auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_Vulkan.pfn_VULKAN_EvaluateFeature;
 
 	if (ptr != nullptr)
 	{
-		auto result = ptr(InCmdList, InFeatureHandle, InParameters, InCallback);
+		auto result = ptr(InCmdList, InFeatureHandle, castedInParameters->wrapped.param, InCallback);
 		CyberLOGvi(result);
 		return result;
 	}
@@ -289,8 +365,10 @@ Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_EvaluateFeature(VkCommand
 	return NVSDK_NGX_Result_Fail;
 }
 
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_EvaluateFeature_C(VkCommandBuffer InCmdList, const NVSDK_NGX_Handle* InFeatureHandle, const NVSDK_NGX_Parameter* InParameters, PFN_NVSDK_NGX_ProgressCallback_C InCallback)
+NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_EvaluateFeature_C(VkCommandBuffer InCmdList, const NVSDK_NGX_Handle* InFeatureHandle, const NVSDK_NGX_Parameter* InParameters, PFN_NVSDK_NGX_ProgressCallback_C InCallback)
 {
+	const auto castedInParameters = (CyberInterposer::CI_Parameter*)InParameters;
+	
 	const CyberTypes::RTC start = CyberTypes::RTC(true);
 	CyberInterposer::interposer.wait_for_ready();
 	CyberLogArgs(InCmdList, InFeatureHandle, InParameters, InCallback, start);

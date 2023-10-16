@@ -40,8 +40,8 @@ namespace CyberInterposer
 		virtual NVSDK_NGX_Result Get(const char* InName, void** OutValue) const override;
 		virtual void Reset() override;
 
-		NVSDK_NGX_Result GetOptimalSettingsCallback();
-		NVSDK_NGX_Result GetStatsCallback();
+		static NVSDK_NGX_Result GetOptimalSettingsCallback(CI_Parameter* inParam);
+		static NVSDK_NGX_Result GetStatsCallback(CI_Parameter* inParam);
 
 		CI_Parameter(NVSDK_NGX_Parameter*);
 
@@ -49,15 +49,15 @@ namespace CyberInterposer
 
 	private:
 
-		using GetOptimalSettingsCallbackType = NVSDK_NGX_Result(*)(NVSDK_NGX_Parameter*);
-		using GetStatsCallbackType = NVSDK_NGX_Result(*)(NVSDK_NGX_Parameter*);
+		using GetOptimalSettingsCallbackType = NVSDK_NGX_Result(*)(NVSDK_NGX_Parameter* inParam);
+		using GetStatsCallbackType = NVSDK_NGX_Result(*)(NVSDK_NGX_Parameter* inParam);
 
 	public:
 
 		mutable PFN_Table_NVNGX_Parameter_Union_P wrapped = PFN_Table_NVNGX_Parameter_Union_P(nullptr);
 
-		mutable GetOptimalSettingsCallbackType* wrapped_GetOptimalSettingsCallback = nullptr;
-		mutable GetStatsCallbackType* wrapped_GetStatsCallback = nullptr;
+		mutable GetOptimalSettingsCallbackType wrapped_GetOptimalSettingsCallback = nullptr;
+		mutable GetStatsCallbackType wrapped_GetStatsCallback = nullptr;
 
 	};
 

@@ -146,37 +146,47 @@ bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool
 
     NVSDK_NGX_Result CI_Parameter::Get(const char* InName, unsigned long long* OutValue) const
     {
-        CyberLogArgs(InName, OutValue);
+        const auto result = wrapped.param->Get(InName, OutValue);
 
-        return wrapped.param->Get(InName, OutValue);
+        CyberLogArgs(InName, *OutValue, result);
+
+        return result;
     }
 
     NVSDK_NGX_Result CI_Parameter::Get(const char* InName, float* OutValue) const
     {
-        CyberLogArgs(InName, OutValue);
+        const auto result = wrapped.param->Get(InName, OutValue);
 
-        return wrapped.param->Get(InName, OutValue);
+        CyberLogArgs(InName, *OutValue, result);
+
+        return result;
     }
 
     NVSDK_NGX_Result CI_Parameter::Get(const char* InName, double* OutValue) const
     {
-        CyberLogArgs(InName, OutValue);
+        const auto result = wrapped.param->Get(InName, OutValue);
 
-        return wrapped.param->Get(InName, OutValue);
+        CyberLogArgs(InName, *OutValue, result);
+
+        return result;
     }
 
     NVSDK_NGX_Result CI_Parameter::Get(const char* InName, unsigned int* OutValue) const
     {
-        CyberLogArgs(InName, OutValue);
+        const auto result = wrapped.param->Get(InName, OutValue);
 
-        return wrapped.param->Get(InName, OutValue);
+        CyberLogArgs(InName, *OutValue, result);
+
+        return result;
     }
 
     NVSDK_NGX_Result CI_Parameter::Get(const char* InName, int* OutValue) const
     {
-        CyberLogArgs(InName, OutValue);
+        const auto result = wrapped.param->Get(InName, OutValue);
+        
+        CyberLogArgs(InName, *OutValue, result);
 
-        return wrapped.param->Get(InName, OutValue);
+        return result;
     }
 
     NVSDK_NGX_Result CI_Parameter::Get(const char* InName, ID3D11Resource** OutValue) const
@@ -215,27 +225,28 @@ bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool
     {
         CyberLogArgs(InName, OutValue);
 
-        const char* OptimalCallbaskStr = NGX_Strings::StringsConverter.getContentFromEnum(NGX_Strings::MacroStrings_enum::NVSDK_NGX_Parameter_DLSSOptimalSettingsCallback_enum).data();
+        const auto OptimalCallbaskStr = NGX_Strings::StringsConverter.getContentFromEnum(NGX_Strings::MacroStrings_enum::NVSDK_NGX_Parameter_DLSSOptimalSettingsCallback_enum).data();
 
-        const char* StatsCallbaskStr = NGX_Strings::StringsConverter.getContentFromEnum(NGX_Strings::MacroStrings_enum::NVSDK_NGX_Parameter_DLSSGetStatsCallback_enum).data();
+        const auto StatsCallbaskStr = NGX_Strings::StringsConverter.getContentFromEnum(NGX_Strings::MacroStrings_enum::NVSDK_NGX_Parameter_DLSSGetStatsCallback_enum).data();
 
         const auto isOptimalSettingsCallback = strcmp(InName, OptimalCallbaskStr);
 
+        const auto isStatsCallback = strcmp(InName, StatsCallbaskStr);
+
         if (isOptimalSettingsCallback == 0) {
-            void* interim = nullptr;
-            auto result = wrapped.param->Get(InName, &interim);
-            this->wrapped_GetOptimalSettingsCallback = (GetOptimalSettingsCallbackType*)interim;
-            *OutValue = interim;
+            auto interim = nullptr;
+            auto result = wrapped.param->Get(InName, (void**) & interim);
+            this->wrapped_GetOptimalSettingsCallback = interim;
+            *OutValue = GetOptimalSettingsCallback;
             return result;
         }
 
-        const auto isStatsCallback = strcmp(InName, StatsCallbaskStr);
 
         if (isStatsCallback == 0) {
-            void* interim = nullptr;
-            auto result = wrapped.param->Get(InName, &interim);
-            this->wrapped_GetStatsCallback = (GetStatsCallbackType*)interim;
-            *OutValue = interim;
+            auto interim = nullptr;
+            auto result = wrapped.param->Get(InName, (void**) & interim);
+            this->wrapped_GetStatsCallback = interim;
+            *OutValue = GetStatsCallback;
             return result;
         }
 
@@ -250,13 +261,19 @@ bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool
     }
 
 
-    NVSDK_NGX_Result CyberInterposer::CI_Parameter::GetOptimalSettingsCallback() {
-        const GetOptimalSettingsCallbackType* callback = this->wrapped_GetOptimalSettingsCallback;
-        return (*callback)(this->wrapped.param);
+    NVSDK_NGX_Result CyberInterposer::CI_Parameter::GetOptimalSettingsCallback(CI_Parameter* inParam) {
+        const auto callback = inParam->wrapped_GetOptimalSettingsCallback;
+
+        const auto result = (callback)(inParam->wrapped.param);
+
+        return result;
     }
-    NVSDK_NGX_Result CyberInterposer::CI_Parameter::GetStatsCallback() {
-        const GetStatsCallbackType* callback = this->wrapped_GetStatsCallback;
-        return (*callback)(this->wrapped.param);
+    NVSDK_NGX_Result CyberInterposer::CI_Parameter::GetStatsCallback(CI_Parameter* inParam) {
+        const auto callback = inParam->wrapped_GetStatsCallback;
+
+        const auto result = (callback)(inParam->wrapped.param);
+
+        return result;
     }
 
     CyberInterposer::CI_Parameter::CI_Parameter() {}
@@ -356,12 +373,12 @@ bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool
 }
 
 
-NVSDK_NGX_Result C_Declare NVSDK_NGX_DLSS_GetOptimalSettingsCallback(NVSDK_NGX_Parameter* InParams)
+NVSDK_NGX_Result C_Declare NVSDK_NGX_DLSS_GetOptimalSettingsCallback(CyberInterposer::CI_Parameter* InParams)
 {
-    return ((CyberInterposer::CI_Parameter*)InParams)->GetOptimalSettingsCallback();
+    return InParams->GetOptimalSettingsCallback(InParams);
 }
 
-NVSDK_NGX_Result C_Declare NVSDK_NGX_DLSS_GetStatsCallback(NVSDK_NGX_Parameter* InParams)
+NVSDK_NGX_Result C_Declare NVSDK_NGX_DLSS_GetStatsCallback(CyberInterposer::CI_Parameter* InParams)
 {
-    return ((CyberInterposer::CI_Parameter*)InParams)->GetStatsCallback();
+    return InParams->GetStatsCallback(InParams);
 }

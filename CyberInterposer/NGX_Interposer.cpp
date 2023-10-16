@@ -175,14 +175,14 @@ namespace CyberInterposer {
 
     const std::array<NVNGX_NvDLL, DLLRepo::RepoMaxLoadedDLLs>* DLLRepo::GetLoadedDLLs()
     {
-        CyberLOG();
+        //CyberLOGvi();
 
         return &dlls;
     }
 
     const NVNGX_NvDLL& DLLRepo::GetLoadedDLL()
     {
-        CyberLOG();
+        //CyberLOGvi();
 
         return dlls[0];
     }

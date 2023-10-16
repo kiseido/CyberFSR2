@@ -6,7 +6,7 @@ Config InterposerConfig = Config();
 using AVT = Configurationator::AcceptedValueTypes;
 
 Config::Config() {
-    configData[L"DLSSBackEnd"][L"DLL"] = ini_value(L"nvngx.dll", AVT::String, {}, {});
+    configData[L"DLSSBackEnd"][L"DLL"] = ini_value(L"CyberFSR.dll", AVT::String, {}, {});
 
     // QualityOverrides
     configData[L"QualityOverrides"].Comments = {
