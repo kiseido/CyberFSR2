@@ -73,6 +73,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LibraryPath>$(SolutionDir)$(Platform)\$(Configuration)\;$(VULKAN_SDK)\Lib;$(LibraryPath);$(SolutionDir)CyberLogger\$(Platform)\$(Configuration)\;$(SolutionDir)CyberNGX\$(Platform)\$(Configuration)\</LibraryPath>
     <IncludePath>$(SolutionDir)CyberNGX;$(SolutionDir)CyberUtils;$(SolutionDir)external\simpleini;$(SolutionDir)external\nvngx_dlss_sdk\include;$(SolutionDir)external\unordered_dense\include;$(VULKAN_SDK)\Include;$(IncludePath)</IncludePath>
+    <TargetName>nvngx</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LibraryPath>$(SolutionDir)$(Platform)\$(Configuration)\;$(SolutionDir)external\FidelityFX-FSR2\bin\ffx_fsr2_api;$(VULKAN_SDK)\Lib;$(LibraryPath);$(SolutionDir)CyberLogger\$(Platform)\$(Configuration)\</LibraryPath>
@@ -91,6 +92,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <ModuleDefinitionFile>CyberInterposer.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -110,6 +112,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <ModuleDefinitionFile>CyberInterposer.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -123,12 +126,15 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <AdditionalIncludeDirectories>$(SolutionDir)Logger</AdditionalIncludeDirectories>
+      <PreprocessToFile>false</PreprocessToFile>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <AdditionalDependencies>CyberNGX.lib;CyberUtils.lib;vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>CyberInterposer.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -150,11 +156,20 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <AdditionalDependencies>CyberNGX.lib;CyberLogger.lib;vulkan-1.lib;ffx_fsr2_api_x64d.lib;ffx_fsr2_api_dx12_x64d.lib;ffx_fsr2_api_vk_x64d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>CyberInterposer.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Config.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="imconfig.h" />
+    <ClInclude Include="imgui.h" />
+    <ClInclude Include="imgui_impl_dx11.h" />
+    <ClInclude Include="imgui_impl_win32.h" />
+    <ClInclude Include="imgui_internal.h" />
+    <ClInclude Include="imstb_rectpack.h" />
+    <ClInclude Include="imstb_textedit.h" />
+    <ClInclude Include="imstb_truetype.h" />
     <ClInclude Include="NGX_Interposer.h" />
     <ClInclude Include="CI_Logging.h" />
     <ClInclude Include="NGX_Parameter.h" />
@@ -168,6 +183,13 @@
   <ItemGroup>
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="imgui.cpp" />
+    <ClCompile Include="imgui_demo.cpp" />
+    <ClCompile Include="imgui_draw.cpp" />
+    <ClCompile Include="imgui_impl_dx11.cpp" />
+    <ClCompile Include="imgui_impl_win32.cpp" />
+    <ClCompile Include="imgui_tables.cpp" />
+    <ClCompile Include="imgui_widgets.cpp" />
     <ClCompile Include="NGX_Interposer.cpp" />
     <ClCompile Include="CI_Logging.cpp" />
     <ClCompile Include="Common.cpp" />
@@ -182,6 +204,9 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="CyberInterposer.def" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
