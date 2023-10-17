@@ -2,7 +2,45 @@
 #include "CyberTypes.h"
 
 
+namespace CyberTypes {
 
+    DLSS_Features& DLSS_Features::operator=(const NVSDK_NGX_DLSS_Feature_Flags& other) {
+        this->flags = other;
+        return *this;
+    }
+
+    DLSS_Features::operator NVSDK_NGX_DLSS_Feature_Flags() const {
+        return this->flags;
+    }
+
+    bool DLSS_Features::IsHDR() {
+        return (flags & NVSDK_NGX_DLSS_Feature_Flags_IsHDR) != 0;
+    }
+
+    bool DLSS_Features::IsMVLowRes() {
+        return (flags & NVSDK_NGX_DLSS_Feature_Flags_MVLowRes) != 0;
+    }
+
+    bool DLSS_Features::IsMVJittered() {
+        return (flags & NVSDK_NGX_DLSS_Feature_Flags_MVJittered) != 0;
+    }
+
+    bool DLSS_Features::IsDepthInverted() {
+        return (flags & NVSDK_NGX_DLSS_Feature_Flags_DepthInverted) != 0;
+    }
+
+    bool DLSS_Features::IsReserved0() {
+        return (flags & NVSDK_NGX_DLSS_Feature_Flags_Reserved_0) != 0;
+    }
+
+    bool DLSS_Features::IsDoSharpening() {
+        return (flags & NVSDK_NGX_DLSS_Feature_Flags_DoSharpening) != 0;
+    }
+
+    bool DLSS_Features::IsAutoExposure() {
+        return (flags & NVSDK_NGX_DLSS_Feature_Flags_AutoExposure) != 0;
+    }
+}
 
 std::wstring CyberTypes::stringToWstring(const std::string& str) {
     if (str.empty())

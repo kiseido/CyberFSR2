@@ -132,6 +132,20 @@ namespace CyberTypes {
 
     std::wstring stringToWstring(const std::string& str);
 
+    struct DLSS_Features {
+        NVSDK_NGX_DLSS_Feature_Flags flags;
+
+        bool IsHDR();
+        bool IsMVLowRes();
+        bool IsMVJittered();
+        bool IsDepthInverted();
+        bool IsDoSharpening();
+        bool IsAutoExposure();
+        bool IsReserved0();
+
+        DLSS_Features& operator=(const NVSDK_NGX_DLSS_Feature_Flags& other);
+        operator NVSDK_NGX_DLSS_Feature_Flags() const;
+    };
 
 }
 
