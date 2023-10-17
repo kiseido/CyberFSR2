@@ -40,8 +40,8 @@ namespace CyberInterposer
 		virtual NVSDK_NGX_Result Get(const char* InName, void** OutValue) const override;
 		virtual void Reset() override;
 
-		static NVSDK_NGX_Result GetOptimalSettingsCallback(CI_Parameter* inParam);
-		static NVSDK_NGX_Result GetStatsCallback(CI_Parameter* inParam);
+		static NVSDK_NGX_Result CALLBACK GetOptimalSettingsCallback(CI_Parameter* inParam);
+		static NVSDK_NGX_Result CALLBACK GetStatsCallback(CI_Parameter* inParam);
 
 		CI_Parameter(NVSDK_NGX_Parameter*);
 

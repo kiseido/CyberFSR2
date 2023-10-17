@@ -64,7 +64,7 @@ bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool
 
     void CI_Parameter::Set(const char* InName, unsigned long long InValue)
     {
-        CyberLogArgs(InName, InValue);
+        CyberLogArgs(L"unsigned long long", InName, InValue);
 
         wrapped.param->Set(InName, InValue);
 
@@ -73,7 +73,7 @@ bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool
 
     void CI_Parameter::Set(const char* InName, float InValue)
     {
-        CyberLogArgs(InName, InValue);
+        CyberLogArgs(L"float", InName, InValue);
 
         wrapped.param->Set(InName, InValue);
 
@@ -82,7 +82,7 @@ bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool
 
     void CI_Parameter::Set(const char* InName, double InValue)
     {
-        CyberLogArgs(InName, InValue);
+        CyberLogArgs(L"double", InName, InValue);
 
         wrapped.param->Set(InName, InValue);
 
@@ -91,7 +91,7 @@ bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool
 
     void CI_Parameter::Set(const char* InName, unsigned int InValue)
     {
-        CyberLogArgs(InName, InValue);
+        CyberLogArgs(L"unsigned int", InName, InValue);
 
         wrapped.param->Set(InName, InValue);
 
@@ -100,7 +100,7 @@ bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool
 
     void CI_Parameter::Set(const char* InName, int InValue)
     {
-        CyberLogArgs(InName, InValue);
+        CyberLogArgs(L"int", InName, InValue);
 
         wrapped.param->Set(InName, InValue);
 
@@ -110,7 +110,7 @@ bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool
     void CI_Parameter::Set(const char* InName, ID3D11Resource* InValue)
     {
 #ifdef CyberInterposer_DO_DX11
-        CyberLogArgs(InName, InValue);
+        CyberLogArgs(L"ID3D11Resource*", InName, InValue);
 
         wrapped.param->Set(InName, InValue);
 
@@ -124,7 +124,7 @@ bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool
     void CI_Parameter::Set(const char* InName, ID3D12Resource* InValue)
     {
 #ifdef CyberInterposer_DO_DX12
-        CyberLogArgs(InName, InValue);
+        CyberLogArgs(L"ID3D12Resource*", InName, InValue);
 
         wrapped.param->Set(InName, InValue);
 
@@ -137,7 +137,7 @@ bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool
 
     void CI_Parameter::Set(const char* InName, void* InValue)
     {
-        CyberLogArgs(InName, InValue);
+        CyberLogArgs(L"void*", InName, InValue);
 
         wrapped.param->Set(InName, InValue);
 
@@ -148,7 +148,7 @@ bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool
     {
         const auto result = wrapped.param->Get(InName, OutValue);
 
-        CyberLogArgs(InName, *OutValue, result);
+        CyberLogArgs(L"unsigned long long", InName, *OutValue, result);
 
         return result;
     }
@@ -157,7 +157,7 @@ bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool
     {
         const auto result = wrapped.param->Get(InName, OutValue);
 
-        CyberLogArgs(InName, *OutValue, result);
+        CyberLogArgs(L"float", InName, *OutValue, result);
 
         return result;
     }
@@ -166,7 +166,7 @@ bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool
     {
         const auto result = wrapped.param->Get(InName, OutValue);
 
-        CyberLogArgs(InName, *OutValue, result);
+        CyberLogArgs(L"double", InName, *OutValue, result);
 
         return result;
     }
@@ -175,7 +175,7 @@ bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool
     {
         const auto result = wrapped.param->Get(InName, OutValue);
 
-        CyberLogArgs(InName, *OutValue, result);
+        CyberLogArgs(L"unsigned int", InName, *OutValue, result);
 
         return result;
     }
@@ -184,7 +184,7 @@ bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool
     {
         const auto result = wrapped.param->Get(InName, OutValue);
         
-        CyberLogArgs(InName, *OutValue, result);
+        CyberLogArgs(L"int", InName, *OutValue, result);
 
         return result;
     }
@@ -196,7 +196,7 @@ bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool
 
         auto result = wrapped.param->Get(InName, OutValue);
 
-        CyberLOGvi(InName, OutValue, result);
+        CyberLOGvi(L"ID3D11Resource*", InName, OutValue, result);
 
         return result;
 #endif
@@ -212,7 +212,7 @@ bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool
 
         auto result = wrapped.param->Get(InName, OutValue);
 
-        CyberLOGvi(InName, OutValue, result);
+        CyberLOGvi(L"ID3D12Resource*", InName, OutValue, result);
 
         return result;
 #endif
@@ -238,6 +238,7 @@ bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool
             auto result = wrapped.param->Get(InName, (void**) & interim);
             this->wrapped_GetOptimalSettingsCallback = interim;
             *OutValue = GetOptimalSettingsCallback;
+            CyberLOGvi(L"void*", InName, OutValue, result);
             return result;
         }
 
@@ -247,6 +248,7 @@ bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool
             auto result = wrapped.param->Get(InName, (void**) & interim);
             this->wrapped_GetStatsCallback = interim;
             *OutValue = GetStatsCallback;
+            CyberLOGvi(L"void*", InName, OutValue, result);
             return result;
         }
 
@@ -261,14 +263,14 @@ bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool
     }
 
 
-    NVSDK_NGX_Result CyberInterposer::CI_Parameter::GetOptimalSettingsCallback(CI_Parameter* inParam) {
+    NVSDK_NGX_Result CALLBACK CyberInterposer::CI_Parameter::GetOptimalSettingsCallback(CI_Parameter* inParam) {
         const auto callback = inParam->wrapped_GetOptimalSettingsCallback;
 
         const auto result = (callback)(inParam->wrapped.param);
 
         return result;
     }
-    NVSDK_NGX_Result CyberInterposer::CI_Parameter::GetStatsCallback(CI_Parameter* inParam) {
+    NVSDK_NGX_Result CALLBACK CyberInterposer::CI_Parameter::GetStatsCallback(CI_Parameter* inParam) {
         const auto callback = inParam->wrapped_GetStatsCallback;
 
         const auto result = (callback)(inParam->wrapped.param);
