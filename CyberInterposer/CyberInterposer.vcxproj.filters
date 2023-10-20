@@ -75,6 +75,12 @@
     <ClInclude Include="imgui_impl_dx11.h">
       <Filter>Imgui</Filter>
     </ClInclude>
+    <ClInclude Include="InterposerWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="InterposerOverlay.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -130,6 +136,12 @@
     </ClCompile>
     <ClCompile Include="imgui_impl_dx11.cpp">
       <Filter>Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="InterposerWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="InterposerOverlay.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

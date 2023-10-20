@@ -80,8 +80,6 @@ namespace CyberLogger {
 
         std::thread writingThread;
 
-        std::wofstream logFile;
-
         void WritingThreadFunction();
     };
 

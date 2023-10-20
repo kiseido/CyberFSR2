@@ -170,6 +170,8 @@
     <ClInclude Include="imstb_rectpack.h" />
     <ClInclude Include="imstb_textedit.h" />
     <ClInclude Include="imstb_truetype.h" />
+    <ClInclude Include="InterposerOverlay.h" />
+    <ClInclude Include="InterposerWindow.h" />
     <ClInclude Include="NGX_Interposer.h" />
     <ClInclude Include="CI_Logging.h" />
     <ClInclude Include="NGX_Parameter.h" />
@@ -190,6 +192,8 @@
     <ClCompile Include="imgui_impl_win32.cpp" />
     <ClCompile Include="imgui_tables.cpp" />
     <ClCompile Include="imgui_widgets.cpp" />
+    <ClCompile Include="InterposerOverlay.cpp" />
+    <ClCompile Include="InterposerWindow.cpp" />
     <ClCompile Include="NGX_Interposer.cpp" />
     <ClCompile Include="CI_Logging.cpp" />
     <ClCompile Include="Common.cpp" />

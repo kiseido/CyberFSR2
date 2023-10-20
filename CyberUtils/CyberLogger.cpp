@@ -19,7 +19,7 @@ CyberTypes::CyString_view CyberLogger::getLogTypeName(const LogType& logType) {
 }
 
 CyberLogger::Logger::Logger()
-    : stopWritingThread(false), logQueue(), queueMutex(), queueCondVar(), writingThread(), logFile() {
+    : stopWritingThread(false), logQueue(), queueMutex(), queueCondVar(), writingThread() {
     DoPerformanceInfo = false;
     DoCoreInfo = false;
     DoRTC = false;
@@ -92,6 +92,8 @@ void CyberLogger::Logger::stop() {
 }
 
 void CyberLogger::Logger::WritingThreadFunction() {
+    std::wofstream logFile;
+
     {
         std::lock_guard<std::mutex> lock(queueMutex);
 

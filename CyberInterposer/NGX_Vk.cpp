@@ -37,7 +37,7 @@ namespace CyberInterposer {
 
 
 
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_Init(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath, VkInstance InInstance, VkPhysicalDevice InPD, VkDevice InDevice, PFN_vkGetInstanceProcAddr InGIPA, PFN_vkGetDeviceProcAddr InGDPA, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion)
+NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_Init(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath, VkInstance InInstance, VkPhysicalDevice InPD, VkDevice InDevice, PFN_vkGetInstanceProcAddr InGIPA, PFN_vkGetDeviceProcAddr InGDPA, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion)
 {
 	const CyberTypes::RTC start = CyberTypes::RTC(true);
 	CyberInterposer::interposer.wait_for_ready();
@@ -55,7 +55,7 @@ Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_Init(unsigned long long I
 	return NVSDK_NGX_Result_Fail;
 }
 
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_Init_ProjectID(const char* InProjectId, NVSDK_NGX_EngineType InEngineType, const char* InEngineVersion, const wchar_t* InApplicationDataPath, VkInstance InInstance, VkPhysicalDevice InPD, VkDevice InDevice, PFN_vkGetInstanceProcAddr InGIPA, PFN_vkGetDeviceProcAddr InGDPA, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion)
+NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_Init_ProjectID(const char* InProjectId, NVSDK_NGX_EngineType InEngineType, const char* InEngineVersion, const wchar_t* InApplicationDataPath, VkInstance InInstance, VkPhysicalDevice InPD, VkDevice InDevice, PFN_vkGetInstanceProcAddr InGIPA, PFN_vkGetDeviceProcAddr InGDPA, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion)
 {
 	const CyberTypes::RTC start = CyberTypes::RTC(true);
 	CyberInterposer::interposer.wait_for_ready();
@@ -73,7 +73,7 @@ Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_Init_ProjectID(const char
 	return NVSDK_NGX_Result_Fail;
 }
 
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_Init_with_ProjectID(const char* InProjectId, NVSDK_NGX_EngineType InEngineType, const char* InEngineVersion, const wchar_t* InApplicationDataPath, VkInstance InInstance, VkPhysicalDevice InPD, VkDevice InDevice, PFN_vkGetInstanceProcAddr InGIPA, PFN_vkGetDeviceProcAddr InGDPA, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion)
+NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_Init_with_ProjectID(const char* InProjectId, NVSDK_NGX_EngineType InEngineType, const char* InEngineVersion, const wchar_t* InApplicationDataPath, VkInstance InInstance, VkPhysicalDevice InPD, VkDevice InDevice, PFN_vkGetInstanceProcAddr InGIPA, PFN_vkGetDeviceProcAddr InGDPA, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion)
 {
 	const CyberTypes::RTC start = CyberTypes::RTC(true);
 	CyberInterposer::interposer.wait_for_ready();
@@ -91,7 +91,7 @@ Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_Init_with_ProjectID(const
 	return NVSDK_NGX_Result_Fail;
 }
 
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_Shutdown(void)
+NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_Shutdown(void)
 {
 	const CyberTypes::RTC start = CyberTypes::RTC(true);
 	CyberInterposer::interposer.wait_for_ready();
@@ -109,7 +109,7 @@ Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_Shutdown(void)
 	return NVSDK_NGX_Result_Fail;
 }
 
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_Shutdown1(VkDevice InDevice)
+NVSDK_NGX_Result C_Declare NVSDK_NGX_VULKAN_Shutdown1(VkDevice InDevice)
 {
 	const CyberTypes::RTC start = CyberTypes::RTC(true);
 	CyberInterposer::interposer.wait_for_ready();

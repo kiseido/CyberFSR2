@@ -64,7 +64,7 @@ bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool
 
     void CI_Parameter::Set(const char* InName, unsigned long long InValue)
     {
-        CyberLogArgs(L"unsigned long long", InName, InValue);
+        CyberLogArgs(L"ULL  ", InName, InValue);
 
         wrapped.param->Set(InName, InValue);
 
@@ -73,7 +73,7 @@ bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool
 
     void CI_Parameter::Set(const char* InName, float InValue)
     {
-        CyberLogArgs(L"float", InName, InValue);
+        CyberLogArgs(L"FLOAT", InName, InValue);
 
         wrapped.param->Set(InName, InValue);
 
@@ -82,7 +82,7 @@ bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool
 
     void CI_Parameter::Set(const char* InName, double InValue)
     {
-        CyberLogArgs(L"double", InName, InValue);
+        CyberLogArgs(L"DOUBLE", InName, InValue);
 
         wrapped.param->Set(InName, InValue);
 
@@ -91,7 +91,7 @@ bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool
 
     void CI_Parameter::Set(const char* InName, unsigned int InValue)
     {
-        CyberLogArgs(L"unsigned int", InName, InValue);
+        CyberLogArgs(L"UINT ", InName, InValue);
 
         wrapped.param->Set(InName, InValue);
 
@@ -100,7 +100,7 @@ bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool
 
     void CI_Parameter::Set(const char* InName, int InValue)
     {
-        CyberLogArgs(L"int", InName, InValue);
+        CyberLogArgs(L"INT  ", InName, InValue);
 
         wrapped.param->Set(InName, InValue);
 
@@ -110,7 +110,7 @@ bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool
     void CI_Parameter::Set(const char* InName, ID3D11Resource* InValue)
     {
 #ifdef CyberInterposer_DO_DX11
-        CyberLogArgs(L"ID3D11Resource*", InName, InValue);
+        CyberLogArgs(L"D11RP*", InName, InValue);
 
         wrapped.param->Set(InName, InValue);
 
@@ -124,7 +124,7 @@ bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool
     void CI_Parameter::Set(const char* InName, ID3D12Resource* InValue)
     {
 #ifdef CyberInterposer_DO_DX12
-        CyberLogArgs(L"ID3D12Resource*", InName, InValue);
+        CyberLogArgs(L"D12RP", InName, InValue);
 
         wrapped.param->Set(InName, InValue);
 
@@ -137,7 +137,7 @@ bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool
 
     void CI_Parameter::Set(const char* InName, void* InValue)
     {
-        CyberLogArgs(L"void*", InName, InValue);
+        CyberLogArgs(L"VOIDP", InName, InValue);
 
         wrapped.param->Set(InName, InValue);
 
@@ -148,7 +148,7 @@ bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool
     {
         const auto result = wrapped.param->Get(InName, OutValue);
 
-        CyberLogArgs(L"unsigned long long", InName, *OutValue, result);
+        CyberLogArgs(L"ULL  ", InName, *OutValue, result);
 
         return result;
     }
@@ -157,7 +157,7 @@ bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool
     {
         const auto result = wrapped.param->Get(InName, OutValue);
 
-        CyberLogArgs(L"float", InName, *OutValue, result);
+        CyberLogArgs(L"FLOAT", InName, *OutValue, result);
 
         return result;
     }
@@ -166,7 +166,7 @@ bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool
     {
         const auto result = wrapped.param->Get(InName, OutValue);
 
-        CyberLogArgs(L"double", InName, *OutValue, result);
+        CyberLogArgs(L"DOUBLE", InName, *OutValue, result);
 
         return result;
     }
@@ -175,7 +175,7 @@ bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool
     {
         const auto result = wrapped.param->Get(InName, OutValue);
 
-        CyberLogArgs(L"unsigned int", InName, *OutValue, result);
+        CyberLogArgs(L"UINT ", InName, *OutValue, result);
 
         return result;
     }
@@ -184,7 +184,7 @@ bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool
     {
         const auto result = wrapped.param->Get(InName, OutValue);
         
-        CyberLogArgs(L"int", InName, *OutValue, result);
+        CyberLogArgs(L"INT  ", InName, *OutValue, result);
 
         return result;
     }
@@ -196,7 +196,7 @@ bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool
 
         auto result = wrapped.param->Get(InName, OutValue);
 
-        CyberLOGvi(L"ID3D11Resource*", InName, OutValue, result);
+        CyberLOGvi(L"D11RP", InName, OutValue, result);
 
         return result;
 #endif
@@ -212,7 +212,7 @@ bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool
 
         auto result = wrapped.param->Get(InName, OutValue);
 
-        CyberLOGvi(L"ID3D12Resource*", InName, OutValue, result);
+        CyberLOGvi(L"D12RP", InName, OutValue, result);
 
         return result;
 #endif
@@ -238,7 +238,7 @@ bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool
             auto result = wrapped.param->Get(InName, (void**) & interim);
             this->wrapped_GetOptimalSettingsCallback = interim;
             *OutValue = GetOptimalSettingsCallback;
-            CyberLOGvi(L"void*", InName, OutValue, result);
+            CyberLOGvi(L"VOIDP", InName, OutValue, result);
             return result;
         }
 
@@ -248,7 +248,7 @@ bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool
             auto result = wrapped.param->Get(InName, (void**) & interim);
             this->wrapped_GetStatsCallback = interim;
             *OutValue = GetStatsCallback;
-            CyberLOGvi(L"void*", InName, OutValue, result);
+            CyberLOGvi(L"VOIDP", InName, OutValue, result);
             return result;
         }
 

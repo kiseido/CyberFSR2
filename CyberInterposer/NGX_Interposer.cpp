@@ -11,11 +11,11 @@ namespace CyberInterposer {
     }
 
     int Interposer::init() {
-        if (InterposerInitialized == true) return 0;
+        if (InterposerInitialized.load() == true) return 0;
 
         std::lock_guard<std::mutex> lock(startupMutex);
         
-        if (InterposerInitialized == true) return 0;
+        if (InterposerInitialized.load() == true) return 0;
 
         InterposerConfig.loadFromFile(cyberinterposerdllFileName);
         InterposerConfig.saveToFile(cyberinterposerdllFileName);

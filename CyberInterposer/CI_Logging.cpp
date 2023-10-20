@@ -2,9 +2,8 @@
 #include "NGX_Interposer.h"
 #include "CI_Logging.h"
 
-CyberLogger::Logger CyberInterposer::logger(L"CyberInterposer.log", true, true, true);
+constexpr bool doPerformanceInfo = false;
+constexpr bool doCoreInfo = true;
+constexpr bool doRTC = false;
 
-
-
-//CyberLogger::Logger CyberInterposer::logger = CyberLogger::Logger();
-
+CyberLogger::Logger CyberInterposer::logger(L"CyberInterposer.log", doPerformanceInfo, doCoreInfo, doRTC);
