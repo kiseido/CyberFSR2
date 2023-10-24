@@ -6,32 +6,46 @@ public:
         return instance;
     }
 
-    void Show(int nCmdShow);
+    void Start(HMODULE hModule);
 
-    void StartWindowThread();
-    void UpdateTime();
+
+    static void OnStringUpdated(const std::wstring_view& input, const SIZE_T index, const SIZE_T length);
 
 private:
     InterposerWindow();
-    ~InterposerWindow() = default;
+    ~InterposerWindow();
     InterposerWindow(const InterposerWindow&) = delete;
     InterposerWindow& operator=(const InterposerWindow&) = delete;
 
-    static LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-    LRESULT instanceWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    void InitListView();
 
-    void InitWindow();
+    friend DWORD WINAPI WindowThreadMain(LPVOID lpParam);
+    friend LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    friend void DoUpdateWindow(InterposerWindow&);
+    friend INT_PTR CALLBACK DialogProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
+    std::atomic<bool> showWindow;
+    
+    HANDLE WindowThread;
 
-    std::thread windowThread;
-
-    HWND hwnd;
+    HWND hWindow;
+    HWND hButton;
     HWND hTextBox;
     HINSTANCE hInstance;
 
     static InterposerWindow instance;
 
-    static constexpr UINT WM_UPDATE_TIME = WM_USER + 1;
-    static constexpr UINT IDC_BUTTON_ADDTIME = WM_USER + 2;
-    static constexpr UINT IDC_TEXTBOX = WM_USER + 3;
+    enum WindowsMessaging {
+        Enum_Base = WM_USER,
+        CONTROLS_ID_Offset = 2000,
+        MESSAGES_ID_Offset = 4000,
+
+        WM_USER_StartOfMessages = Enum_Base + MESSAGES_ID_Offset,
+        WM_USER_Update_Window,
+        WM_USER_UPDATE_LISTVIEW,
+
+        IDC_StartofUI = Enum_Base + CONTROLS_ID_Offset,
+        IDC_BUTTON,
+        IDC_TEXTBOX,
+    };
 };

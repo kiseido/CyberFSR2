@@ -57,12 +57,18 @@ CyberTypes::HighPerformanceCounterInfo::HighPerformanceCounterInfo() : frequency
 
 CyberTypes::HighPerformanceCounterInfo::HighPerformanceCounterInfo(const bool& performInitLogic) {
     if (performInitLogic) {
-        QueryPerformanceFrequency(&frequency);
-        QueryPerformanceCounter(&counter);
+        LARGE_INTEGER freq;
+        LARGE_INTEGER count;
+
+        QueryPerformanceFrequency(&freq);
+        QueryPerformanceCounter(&count);
+
+        frequency = freq.QuadPart;
+        counter = count.QuadPart;
     }
     else {
-        frequency = LARGE_INTEGER();
-        counter = LARGE_INTEGER();
+        frequency = 0;
+        counter = 0;
     }
 }
 
@@ -173,7 +179,7 @@ CyberTypes::CyString to_CyString(const std::wstring_view& input) {
 //
 
 std::wostream& operator<<(std::wostream& os, const CyberTypes::HighPerformanceCounterInfo& counterInfo) {
-    os << "HPC: " << counterInfo.counter.QuadPart << " / " << counterInfo.frequency.QuadPart;
+    os << "HPC: " << counterInfo.counter << " / " << counterInfo.frequency;
     return os;
 }
 

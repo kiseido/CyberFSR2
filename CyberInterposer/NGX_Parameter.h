@@ -1,7 +1,4 @@
-#include "pch.h"
-
-#ifndef CyInt_NGX_Parameter
-#define CyInt_NGX_Parameter
+#pragma once
 
 #include "Common.h"
 #include <bitset>
@@ -20,25 +17,26 @@ namespace CyberInterposer
 
 	struct CI_Parameter : public NVSDK_NGX_Parameter
 	{
-		virtual void Set(const char* InName, unsigned long long InValue) override;
-		virtual void Set(const char* InName, float InValue) override;
-		virtual void Set(const char* InName, double InValue) override;
-		virtual void Set(const char* InName, unsigned int InValue) override;
-		virtual void Set(const char* InName, int InValue) override;
+		void Set(const char* InName, unsigned long long InValue) override;
+		void Set(const char* InName, float InValue) override;
+		void Set(const char* InName, double InValue) override;
+		void Set(const char* InName, unsigned int InValue) override;
+		void Set(const char* InName, int InValue) override;
+		void Set(const char* InName, void* InValue) override;
+		void Set(const char* InName, ID3D11Resource* InValue) override;
+		void Set(const char* InName, ID3D12Resource* InValue) override;
 
-		virtual void Set(const char* InName, ID3D11Resource* InValue) override;
-		virtual void Set(const char* InName, ID3D12Resource* InValue) override;
-		virtual NVSDK_NGX_Result Get(const char* InName, ID3D11Resource** OutValue) const override;
-		virtual NVSDK_NGX_Result Get(const char* InName, ID3D12Resource** OutValue) const override;
 
-		virtual void Set(const char* InName, void* InValue) override;
-		virtual NVSDK_NGX_Result Get(const char* InName, unsigned long long* OutValue) const override;
-		virtual NVSDK_NGX_Result Get(const char* InName, float* OutValue) const override;
-		virtual NVSDK_NGX_Result Get(const char* InName, double* OutValue) const override;
-		virtual NVSDK_NGX_Result Get(const char* InName, unsigned int* OutValue) const override;
-		virtual NVSDK_NGX_Result Get(const char* InName, int* OutValue) const override;
-		virtual NVSDK_NGX_Result Get(const char* InName, void** OutValue) const override;
-		virtual void Reset() override;
+		NVSDK_NGX_Result Get(const char* InName, unsigned long long* OutValue) const override;
+		NVSDK_NGX_Result Get(const char* InName, float* OutValue) const override;
+		NVSDK_NGX_Result Get(const char* InName, double* OutValue) const override;
+		NVSDK_NGX_Result Get(const char* InName, unsigned int* OutValue) const override;
+		NVSDK_NGX_Result Get(const char* InName, int* OutValue) const override;
+		NVSDK_NGX_Result Get(const char* InName, void** OutValue) const override;
+		NVSDK_NGX_Result Get(const char* InName, ID3D11Resource** OutValue) const override;
+		NVSDK_NGX_Result Get(const char* InName, ID3D12Resource** OutValue) const override;
+
+		void Reset() override;
 
 		static NVSDK_NGX_Result CALLBACK GetOptimalSettingsCallback(CI_Parameter* inParam);
 		static NVSDK_NGX_Result CALLBACK GetStatsCallback(CI_Parameter* inParam);
@@ -48,6 +46,13 @@ namespace CyberInterposer
 		CI_Parameter();
 
 	private:
+
+		template<typename T>
+		NVSDK_NGX_Result GetHelper(const char* InName, T* OutValue) const;
+
+		template<typename T>
+		void SetHelper(const char* InName, T InValue);
+
 
 		using GetOptimalSettingsCallbackType = NVSDK_NGX_Result(*)(NVSDK_NGX_Parameter* inParam);
 		using GetStatsCallbackType = NVSDK_NGX_Result(*)(NVSDK_NGX_Parameter* inParam);
@@ -81,5 +86,3 @@ namespace CyberInterposer
 		std::mutex allocatorMutex;
 	};
 }
-
-#endif

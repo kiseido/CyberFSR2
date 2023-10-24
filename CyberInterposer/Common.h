@@ -1,7 +1,4 @@
-#include "pch.h"
-
-#ifndef CyInt_NVCOMMON
-#define CyInt_NVCOMMON
+#pragma once
 
 #include "NGX_PFN_Definitions.h"
 
@@ -33,4 +30,3 @@ namespace CyberInterposer
 
     typedef size_t File_Details;
 }
-#endif

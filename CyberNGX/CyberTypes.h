@@ -1,7 +1,4 @@
-#include "pch.h"
-
-#ifndef CyberTypes_H
-#define CyberTypes_H
+#pragma once
 
 #include <map>
 #include <string_view>
@@ -22,44 +19,44 @@ namespace CyberTypes {
 
 // #define WrapIt(BaseType) typedef Wrapper<BaseType> CT_##BaseType##_t; typedef union {BaseType base; CT_##BaseType##_t wrapped;} CT_##BaseType##_u; std::wostream& CyberTypes::CT_##BaseType##_u::operator<<(std::wostream& wos)
 
-#define WrapIt(BaseType) typedef CyberUtils::UnionWrapper<BaseType> CT_##BaseType##_u; std::wostream& operator<<(std::wostream& wos, const CT_##BaseType##_u&)
+#define WrapThisTypeAndOperator(BaseType) typedef CyberUtils::UnionWrapper<BaseType> CT_##BaseType##_u; std::wostream& operator<<(std::wostream& wos, const CT_##BaseType##_u&)
 
     struct NVSDK_NGX_FeatureCommonInfo_Internal  {};
 
     // Define wrapper classes for specific types
-    WrapIt(AppId);
+    WrapThisTypeAndOperator(AppId);
 
-    WrapIt(NVSDK_NGX_GPU_Arch);
-    WrapIt(NVSDK_NGX_DLSS_Hint_Render_Preset);
-    WrapIt(NVSDK_NGX_FeatureCommonInfo_Internal);
-    WrapIt(NVSDK_NGX_Version);
-    WrapIt(NVSDK_NGX_Result);
-    WrapIt(NVSDK_NGX_Feature);
-    WrapIt(NVSDK_NGX_Buffer_Format);
-    WrapIt(NVSDK_NGX_PerfQuality_Value);
-    WrapIt(NVSDK_NGX_RTX_Value);
-    WrapIt(NVSDK_NGX_DLSS_Mode);
-    WrapIt(NVSDK_NGX_DeepDVC_Mode);
-    WrapIt(NVSDK_NGX_Handle);
-    WrapIt(NVSDK_NGX_DLSS_Feature_Flags);
-    WrapIt(NVSDK_NGX_ToneMapperType);
-    WrapIt(NVSDK_NGX_GBufferType);
-    WrapIt(NVSDK_NGX_Coordinates);
-    WrapIt(NVSDK_NGX_Dimensions);
-    WrapIt(NVSDK_NGX_PathListInfo);
-    WrapIt(NVSDK_NGX_Logging_Level);
-    WrapIt(NVSDK_NGX_FeatureCommonInfo);
-    WrapIt(NVSDK_NGX_Resource_VK_Type);
-    WrapIt(NVSDK_NGX_Opt_Level);
-    WrapIt(NVSDK_NGX_EngineType);
-    WrapIt(NVSDK_NGX_Feature_Support_Result);
-    WrapIt(NVSDK_NGX_Application_Identifier_Type);
-    WrapIt(NVSDK_NGX_ProjectIdDescription);
-    WrapIt(NVSDK_NGX_Application_Identifier);
-    WrapIt(NVSDK_NGX_FeatureDiscoveryInfo);
-    WrapIt(NVSDK_NGX_FeatureRequirement);
+    WrapThisTypeAndOperator(NVSDK_NGX_GPU_Arch);
+    WrapThisTypeAndOperator(NVSDK_NGX_DLSS_Hint_Render_Preset);
+    WrapThisTypeAndOperator(NVSDK_NGX_FeatureCommonInfo_Internal);
+    WrapThisTypeAndOperator(NVSDK_NGX_Version);
+    WrapThisTypeAndOperator(NVSDK_NGX_Result);
+    WrapThisTypeAndOperator(NVSDK_NGX_Feature);
+    WrapThisTypeAndOperator(NVSDK_NGX_Buffer_Format);
+    WrapThisTypeAndOperator(NVSDK_NGX_PerfQuality_Value);
+    WrapThisTypeAndOperator(NVSDK_NGX_RTX_Value);
+    WrapThisTypeAndOperator(NVSDK_NGX_DLSS_Mode);
+    WrapThisTypeAndOperator(NVSDK_NGX_DeepDVC_Mode);
+    WrapThisTypeAndOperator(NVSDK_NGX_Handle);
+    WrapThisTypeAndOperator(NVSDK_NGX_DLSS_Feature_Flags);
+    WrapThisTypeAndOperator(NVSDK_NGX_ToneMapperType);
+    WrapThisTypeAndOperator(NVSDK_NGX_GBufferType);
+    WrapThisTypeAndOperator(NVSDK_NGX_Coordinates);
+    WrapThisTypeAndOperator(NVSDK_NGX_Dimensions);
+    WrapThisTypeAndOperator(NVSDK_NGX_PathListInfo);
+    WrapThisTypeAndOperator(NVSDK_NGX_Logging_Level);
+    WrapThisTypeAndOperator(NVSDK_NGX_FeatureCommonInfo);
+    WrapThisTypeAndOperator(NVSDK_NGX_Resource_VK_Type);
+    WrapThisTypeAndOperator(NVSDK_NGX_Opt_Level);
+    WrapThisTypeAndOperator(NVSDK_NGX_EngineType);
+    WrapThisTypeAndOperator(NVSDK_NGX_Feature_Support_Result);
+    WrapThisTypeAndOperator(NVSDK_NGX_Application_Identifier_Type);
+    WrapThisTypeAndOperator(NVSDK_NGX_ProjectIdDescription);
+    WrapThisTypeAndOperator(NVSDK_NGX_Application_Identifier);
+    WrapThisTypeAndOperator(NVSDK_NGX_FeatureDiscoveryInfo);
+    WrapThisTypeAndOperator(NVSDK_NGX_FeatureRequirement);
 
-#undef WrapIt
+#undef WrapThisTypeAndOperator
 
     class CyString : public std::wstring {
     public:
@@ -71,10 +68,6 @@ namespace CyberTypes {
         CyString(const CyString& other);
         CyString(const char* cstr);
         CyString(const wchar_t* wcstr);
-
-        friend CyString operator"" _CyStrView(const char* str, size_t len) {
-            return CyString(std::string_view(str, len));
-        }
     };
 
     class CyString_view : public std::wstring_view {
@@ -84,15 +77,11 @@ namespace CyberTypes {
         CyString_view(const std::wstring_view& wview);
         CyString_view(const wchar_t* wcstr);
         CyString_view(const CyString_view& other);
-
-        friend CyString_view operator"" _CyWStrView(const wchar_t* str, size_t len) {
-            return std::wstring_view(str, len);
-        }
     };
 
     struct HighPerformanceCounterInfo {
-        LARGE_INTEGER frequency;
-        LARGE_INTEGER counter;
+        long long frequency;
+        long long counter;
 
         HighPerformanceCounterInfo();
         HighPerformanceCounterInfo(const bool& performInitLogic);
@@ -175,5 +164,3 @@ std::wstring stringify_args(const Args&... args) {
     (stringify_args_helper(ss, args), ...);
     return ss.str();
 }
-
-#endif

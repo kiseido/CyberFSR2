@@ -1,7 +1,4 @@
-#include "pch.h"
-
-#ifndef CyberNGX_Utils
-#define CyberNGX_Utils
+#pragma once
 
 #include <string_view>
 
@@ -68,5 +65,3 @@ namespace CyberUtils {
     case name: { \
         return CyberUtils::TRY_REMOVE_PREFIX(L#prefix, L#name); \
     }
-
-#endif

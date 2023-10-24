@@ -45,12 +45,55 @@ namespace CyberLogger {
     CyberTypes::CyString_view getLogTypeName(const LogType& logType);
 
 
+    class TextRecallWindow {
+    public:
+        
+        typedef void (*StringUpdateCallback)(const std::wstring_view& input, const SIZE_T index, const SIZE_T length);
+
+        TextRecallWindow();
+
+        void InsertLine(const std::wstring& line);
+
+        std::vector<std::wstring> GetLinesChonological() const;
+        std::wstring GetLineChonological() const;
+
+        std::vector<std::wstring> GetLines() const;
+        std::wstring GetLine(SIZE_T index) const;
+
+        bool addListener(StringUpdateCallback callback);
+        bool removeListener(StringUpdateCallback callback);
+
+    private:
+
+        enum CharAllocationSize : UINT8 {
+            Base_Multiplier = 50,
+            Ultra_Small = 1,
+            Small = 2,
+            Medium = 4,
+            Large = 6,
+            Epic = 20,
+        };
+        static constexpr SIZE_T MAX_CHAR_PER_LINE = Epic * Base_Multiplier;
+        static constexpr SIZE_T MAX_LINE_COUNT = Epic * Base_Multiplier;
+
+        static constexpr SIZE_T BUFFER_SIZE = MAX_CHAR_PER_LINE * MAX_LINE_COUNT;
+
+        static constexpr SIZE_T MAX_CALLBACKS = Ultra_Small * Base_Multiplier;
+
+        mutable std::mutex accessMutex;
+
+        wchar_t buffer[BUFFER_SIZE];
+        std::wstring_view lines[MAX_LINE_COUNT];
+        StringUpdateCallback callbacks[MAX_CALLBACKS];
+        int LastLineOverwriteIndex;
+        int NextLineOverwriteIndex;
+    };
 
     class Logger {
     public:
         ~Logger();
         Logger();
-        Logger(const LPCWSTR& fileName, const bool& doPerformanceInfo, const bool& doCoreInfo, const bool& doRTC);
+        Logger(const LPCWSTR& fileName, const bool doPerformanceInfo, const bool doCoreInfo, const bool doRTC);
         void start();
         void stop();
 
@@ -67,6 +110,8 @@ namespace CyberLogger {
         bool DoRTC = true;
 
         bool doVerbose = true;
+
+        TextRecallWindow recallWindow;
 
     private:
 

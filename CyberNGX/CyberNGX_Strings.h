@@ -1,4 +1,4 @@
-#include "pch.h"
+#pragma once
 
 #include <array>
 #include <string_view>
@@ -7,9 +7,6 @@
 #include <unordered_set>
 #include <vector>
 #include <unordered_map>
-
-#ifndef CyberNGX_Strings_H
-#define CyberNGX_Strings_H
 
 #define CyberNGX_Strings_Macros(wrapper_macro) \
         wrapper_macro(NVSDK_NGX_EParameter_Reserved00), \
@@ -282,7 +279,7 @@
 #define CyberNGX_Strings_ContentEnumPair(name) ValuePair({MacroStrings_macrocontent[CyberNGX_Strings_ENUM_NAME(##name)], CyberNGX_Strings_ENUM_NAME(##name)})
 
 
-namespace NGX_StringsHelper {
+namespace CyberNGX::NGX_StringsHelper {
 
     enum MacroStrings_enum { CyberNGX_Strings_Macros(CyberNGX_Strings_ENUM_NAME), COUNT_enum };
 
@@ -316,7 +313,7 @@ namespace NGX_StringsHelper {
     
 }
 
-namespace NGX_Strings {
+namespace CyberNGX::NGX_Strings {
 
     using MacroStrings_enum = NGX_StringsHelper::MacroStrings_enum;
 
@@ -336,7 +333,7 @@ namespace NGX_Strings {
     inline static StringConverter StringsConverter;
 }
 
-namespace NGX_StringsHelper {
+namespace CyberNGX::NGX_StringsHelper {
 
     // Node for Huffman tree
     struct Node {
@@ -360,5 +357,3 @@ namespace NGX_StringsHelper {
     // Decompress a string using Huffman codes
     constexpr std::string decompress(Node* huffmanTree, std::string_view compressed);
 }
-
-#endif

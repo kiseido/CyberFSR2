@@ -79,7 +79,7 @@ namespace Hyper_NGX_Parameter {
 	};
 
 
-	enum HandlerStatus_enum : int8_t { error_uninited = 0, consumed = 0b11110000, unconsumed = 0b00001111 };
+	enum HandlerStatus_enum : UINT8 { error_uninited = 0, consumed = 0b11110000, unconsumed = 0b00001111 };
 
 
 	struct HandlerHelper_t {

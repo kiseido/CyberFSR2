@@ -1,4 +1,5 @@
 #include "pch.h"
+#include <format>
 #include "NGX_Interposer.h"
 
 namespace CyberInterposer {
@@ -59,200 +60,181 @@ bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool
     return foundFunctions;
 }
 */
-
-
-
-    void CI_Parameter::Set(const char* InName, unsigned long long InValue)
-    {
-        CyberLogArgs(L"ULL  ", InName, InValue);
-
-        wrapped.param->Set(InName, InValue);
-
-        return;
-    }
-
-    void CI_Parameter::Set(const char* InName, float InValue)
-    {
-        CyberLogArgs(L"FLOAT", InName, InValue);
-
-        wrapped.param->Set(InName, InValue);
-
-        return;
-    }
-
-    void CI_Parameter::Set(const char* InName, double InValue)
-    {
-        CyberLogArgs(L"DOUBLE", InName, InValue);
-
-        wrapped.param->Set(InName, InValue);
-
-        return;
-    }
-
-    void CI_Parameter::Set(const char* InName, unsigned int InValue)
-    {
-        CyberLogArgs(L"UINT ", InName, InValue);
-
-        wrapped.param->Set(InName, InValue);
-
-        return;
-    }
-
-    void CI_Parameter::Set(const char* InName, int InValue)
-    {
-        CyberLogArgs(L"INT  ", InName, InValue);
-
-        wrapped.param->Set(InName, InValue);
-
-        return;
-    }
-
-    void CI_Parameter::Set(const char* InName, ID3D11Resource* InValue)
-    {
-#ifdef CyberInterposer_DO_DX11
-        CyberLogArgs(L"D11RP*", InName, InValue);
-
-        wrapped.param->Set(InName, InValue);
-
-        return;
-#endif
-#ifndef CyberInterposer_DO_DX11
-        return;
-#endif
-    }
-
-    void CI_Parameter::Set(const char* InName, ID3D12Resource* InValue)
-    {
-#ifdef CyberInterposer_DO_DX12
-        CyberLogArgs(L"D12RP", InName, InValue);
-
-        wrapped.param->Set(InName, InValue);
-
-        return;
-#endif
-#ifndef CyberInterposer_DO_DX12
-        return;
-#endif
+    template<typename T>
+    consteval std::wstring_view TypeString() {
+        constexpr SIZE_T strLengthMax = 5;
+        if constexpr (std::is_same_v<T, unsigned long long> ||
+            std::is_same_v<T, unsigned long long*>) {
+            return L"ULL  ";
+        }
+        else if constexpr (std::is_same_v<T, float> ||
+            std::is_same_v<T, float*>) {
+            return L"FLOAT";
+        }
+        else if constexpr (std::is_same_v<T, double> ||
+            std::is_same_v<T, double*>) {
+            return L"DOUBLE";
+        }
+        else if constexpr (std::is_same_v<T, unsigned int> ||
+            std::is_same_v<T, unsigned int*>) {
+            return L"UINT  ";
+        }
+        else if constexpr (std::is_same_v<T, int> ||
+            std::is_same_v<T, int*>) {
+            return L"INT  ";
+        }
+        else if constexpr (std::is_same_v<T, void*> ||
+            std::is_same_v<T, void**>) {
+            return L"VOIDP";
+        }
+        else if constexpr (std::is_same_v<T, ID3D11Resource*> ||
+            std::is_same_v<T, ID3D11Resource**>) {
+            return L"D11RP";
+        }
+        else if constexpr (std::is_same_v<T, ID3D12Resource*> ||
+            std::is_same_v<T, ID3D12Resource**>) {
+            return L"D12RP";
+        }
+        else {
+            return L"UNKN ";
+        }
     }
 
     void CI_Parameter::Set(const char* InName, void* InValue)
     {
-        CyberLogArgs(L"VOIDP", InName, InValue);
+        const std::wstring_view typeString = TypeString<void*>();
+
+        CyberLogArgs(InName, InValue, typeString);
 
         wrapped.param->Set(InName, InValue);
 
         return;
     }
 
-    NVSDK_NGX_Result CI_Parameter::Get(const char* InName, unsigned long long* OutValue) const
+    template<typename T>
+    void CI_Parameter::SetHelper(const char* InName, T InValue)
     {
-        const auto result = wrapped.param->Get(InName, OutValue);
+        const std::wstring_view typeString = TypeString<T>();
 
-        CyberLogArgs(L"ULL  ", InName, *OutValue, result);
+        CyberLogArgs(InName, InValue, typeString);
 
-        return result;
+        wrapped.param->Set(InName, InValue);
+
+        return;
     }
 
-    NVSDK_NGX_Result CI_Parameter::Get(const char* InName, float* OutValue) const
+    void CI_Parameter::Set(const char* InName, unsigned long long InValue)
     {
-        const auto result = wrapped.param->Get(InName, OutValue);
-
-        CyberLogArgs(L"FLOAT", InName, *OutValue, result);
-
-        return result;
+        SetHelper(InName, InValue);
     }
 
-    NVSDK_NGX_Result CI_Parameter::Get(const char* InName, double* OutValue) const
+    void CI_Parameter::Set(const char* InName, float InValue)
     {
-        const auto result = wrapped.param->Get(InName, OutValue);
-
-        CyberLogArgs(L"DOUBLE", InName, *OutValue, result);
-
-        return result;
+        SetHelper(InName, InValue);
     }
 
-    NVSDK_NGX_Result CI_Parameter::Get(const char* InName, unsigned int* OutValue) const
+    void CI_Parameter::Set(const char* InName, double InValue)
     {
-        const auto result = wrapped.param->Get(InName, OutValue);
-
-        CyberLogArgs(L"UINT ", InName, *OutValue, result);
-
-        return result;
+        SetHelper(InName, InValue);
     }
 
-    NVSDK_NGX_Result CI_Parameter::Get(const char* InName, int* OutValue) const
+    void CI_Parameter::Set(const char* InName, unsigned int InValue)
     {
-        const auto result = wrapped.param->Get(InName, OutValue);
-        
-        CyberLogArgs(L"INT  ", InName, *OutValue, result);
-
-        return result;
+        SetHelper(InName, InValue);
     }
 
-    NVSDK_NGX_Result CI_Parameter::Get(const char* InName, ID3D11Resource** OutValue) const
+    void CI_Parameter::Set(const char* InName, int InValue)
     {
-#ifdef CyberInterposer_DO_DX11
-        //CyberLogArgs(InName, OutValue);
-
-        auto result = wrapped.param->Get(InName, OutValue);
-
-        CyberLOGvi(L"D11RP", InName, OutValue, result);
-
-        return result;
-#endif
-#ifndef CyberInterposer_DO_DX11
-        return NVSDK_NGX_Result_Fail;
-#endif
+        SetHelper(InName, InValue);
     }
 
-    NVSDK_NGX_Result CI_Parameter::Get(const char* InName, ID3D12Resource** OutValue) const
+    void CI_Parameter::Set(const char* InName, ID3D11Resource* InValue)
     {
-#ifdef CyberInterposer_DO_DX12
-        //CyberLogArgs(InName, OutValue);
+        SetHelper(InName, InValue);
+    }
 
-        auto result = wrapped.param->Get(InName, OutValue);
-
-        CyberLOGvi(L"D12RP", InName, OutValue, result);
-
-        return result;
-#endif
-#ifndef CyberInterposer_DO_DX12
-        return NVSDK_NGX_Result_Fail;
-#endif
+    void CI_Parameter::Set(const char* InName, ID3D12Resource* InValue)
+    {
+        SetHelper(InName, InValue);
     }
 
     NVSDK_NGX_Result CI_Parameter::Get(const char* InName, void** OutValue) const
     {
-        CyberLogArgs(InName, OutValue);
+        const auto& converter = CyberNGX::NGX_Strings::StringsConverter;
+        using enumSpace = CyberNGX::NGX_Strings::MacroStrings_enum;
 
-        const auto OptimalCallbaskStr = NGX_Strings::StringsConverter.getContentFromEnum(NGX_Strings::MacroStrings_enum::NVSDK_NGX_Parameter_DLSSOptimalSettingsCallback_enum).data();
+        const auto OptimalCallbackStr = converter.getContentFromEnum(enumSpace::NVSDK_NGX_Parameter_DLSSOptimalSettingsCallback_enum).data();
+        const auto StatsCallbackStr = converter.getContentFromEnum(enumSpace::NVSDK_NGX_Parameter_DLSSGetStatsCallback_enum).data();
 
-        const auto StatsCallbaskStr = NGX_Strings::StringsConverter.getContentFromEnum(NGX_Strings::MacroStrings_enum::NVSDK_NGX_Parameter_DLSSGetStatsCallback_enum).data();
+        NVSDK_NGX_Result result = NVSDK_NGX_Result(0b0);
 
-        const auto isOptimalSettingsCallback = strcmp(InName, OptimalCallbaskStr);
-
-        const auto isStatsCallback = strcmp(InName, StatsCallbaskStr);
-
-        if (isOptimalSettingsCallback == 0) {
+        if (strcmp(InName, OptimalCallbackStr) == 0) {
             auto interim = nullptr;
-            auto result = wrapped.param->Get(InName, (void**) & interim);
+            result = wrapped.param->Get(InName, (void**)&interim);
             this->wrapped_GetOptimalSettingsCallback = interim;
             *OutValue = GetOptimalSettingsCallback;
-            CyberLOGvi(L"VOIDP", InName, OutValue, result);
-            return result;
         }
-
-
-        if (isStatsCallback == 0) {
+        else if (strcmp(InName, StatsCallbackStr) == 0) {
             auto interim = nullptr;
-            auto result = wrapped.param->Get(InName, (void**) & interim);
+            result = wrapped.param->Get(InName, (void**)&interim);
             this->wrapped_GetStatsCallback = interim;
             *OutValue = GetStatsCallback;
+        }
+        else {
+            result = wrapped.param->Get(InName, OutValue);
             CyberLOGvi(L"VOIDP", InName, OutValue, result);
-            return result;
         }
 
-        return wrapped.param->Get(InName, OutValue);
+        return result;
+    }
+
+
+    template<typename T>
+    NVSDK_NGX_Result CI_Parameter::GetHelper(const char* InName, T* OutValue) const
+    {
+        const auto result = wrapped.param->Get(InName, OutValue);
+
+        const std::wstring_view typeString = TypeString<T>();
+
+        CyberLogArgs(InName, *OutValue, typeString, result);
+
+        return result;
+    }
+
+
+    NVSDK_NGX_Result CI_Parameter::Get(const char* InName, unsigned long long* OutValue) const
+    {
+        return GetHelper(InName, OutValue);
+    }
+
+    NVSDK_NGX_Result CI_Parameter::Get(const char* InName, float* OutValue) const
+    {
+        return GetHelper(InName, OutValue);
+    }
+
+    NVSDK_NGX_Result CI_Parameter::Get(const char* InName, double* OutValue) const
+    {
+        return GetHelper(InName, OutValue);
+    }
+
+    NVSDK_NGX_Result CI_Parameter::Get(const char* InName, unsigned int* OutValue) const
+    {
+        return GetHelper(InName, OutValue);
+    }
+
+    NVSDK_NGX_Result CI_Parameter::Get(const char* InName, int* OutValue) const
+    {
+        return GetHelper(InName, OutValue);
+    }
+
+    NVSDK_NGX_Result CI_Parameter::Get(const char* InName, ID3D11Resource** OutValue) const
+    {
+        return GetHelper(InName, OutValue);
+    }
+
+    NVSDK_NGX_Result CI_Parameter::Get(const char* InName, ID3D12Resource** OutValue) const
+    {
+        return GetHelper(InName, OutValue);
     }
 
     void CI_Parameter::Reset()
@@ -264,16 +246,22 @@ bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool
 
 
     NVSDK_NGX_Result CALLBACK CyberInterposer::CI_Parameter::GetOptimalSettingsCallback(CI_Parameter* inParam) {
-        const auto callback = inParam->wrapped_GetOptimalSettingsCallback;
+        const auto& callback = inParam->wrapped_GetOptimalSettingsCallback;
 
-        const auto result = (callback)(inParam->wrapped.param);
+        NVSDK_NGX_Result result = NVSDK_NGX_Result_Fail;
+
+        if(callback)
+            result = (callback)(inParam->wrapped.param);
 
         return result;
     }
     NVSDK_NGX_Result CALLBACK CyberInterposer::CI_Parameter::GetStatsCallback(CI_Parameter* inParam) {
-        const auto callback = inParam->wrapped_GetStatsCallback;
+        const auto& callback = inParam->wrapped_GetStatsCallback;
 
-        const auto result = (callback)(inParam->wrapped.param);
+        NVSDK_NGX_Result result = NVSDK_NGX_Result_Fail;
+
+        if (callback)
+            result = (callback)(inParam->wrapped.param);
 
         return result;
     }

@@ -1,156 +1,170 @@
 #include "pch.h"
 #include "InterposerWindow.h"
+#include "CI_Logging.h"
+
+#include "resource.h"
+
+#include <CommCtrl.h>
+#pragma comment(lib, "ComCtl32.lib")
+
 
 inline InterposerWindow InterposerWindow::instance;
 
-
-InterposerWindow::InterposerWindow() {
-
+InterposerWindow::InterposerWindow() : hWindow(NULL), hButton(NULL), hTextBox(NULL), hInstance(NULL), showWindow(false), WindowThread() {
 }
 
-void InterposerWindow::InitWindow() {
-    const LPCSTR CLASS_NAME = "Sample Window Class";
-
-    WNDCLASS wc = {};
-
-    wc.lpfnWndProc = WindowProc;
-    wc.hInstance = hInstance;
-    wc.lpszClassName = CLASS_NAME;
-
-    RegisterClass(&wc);
-
-    hwnd = CreateWindowEx(
-        0,
-        CLASS_NAME,
-        "Sample Window",
-        WS_OVERLAPPEDWINDOW,
-        CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-        NULL,
-        NULL,
-        hInstance,
-        NULL
-    );
+InterposerWindow::~InterposerWindow() {
+  // end thread and window?
 }
 
-void InterposerWindow::Show(int nCmdShow) {
-    if (hwnd == 0) InitWindow();
+void InterposerWindow::OnStringUpdated(const std::wstring_view& input, const SIZE_T index, const SIZE_T length) {
+    // Post the custom message to update the ListView in the main thread.
+    // The LPARAM will be the index of the updated string and WPARAM will be the length.
+    PostMessage(instance.hWindow, WM_USER_UPDATE_LISTVIEW, (WPARAM)length, (LPARAM)index);
+}
 
-    ShowWindow(hwnd, nCmdShow);
+void InterposerWindow::InitListView() {
+    HWND hListView = GetDlgItem(hWindow, IDC_LIST1);
 
-    MSG msg = {};
-    while (GetMessage(&msg, NULL, 0, 0)) {
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
+    // Initialize columns for ListView. Assuming you just want one column for the strings.
+    LVCOLUMNW lvColumn;
+    memset(&lvColumn, 0, sizeof(lvColumn));
+    lvColumn.mask = LVCF_TEXT | LVCF_WIDTH;
+    lvColumn.cx = 500; // Assuming a fixed width for simplicity. Adjust accordingly.
+    lvColumn.pszText = const_cast<LPWSTR>(L"Logs");
+    ListView_InsertColumn(hListView, 0, &lvColumn);
+
+    // Populate initial data from recallWindow
+    auto& recallWindow = CyberInterposer::logger.recallWindow;
+    auto lines = recallWindow.GetLines();
+
+    LVITEMW lvItem;
+    memset(&lvItem, 0, sizeof(lvItem));
+    lvItem.mask = LVIF_TEXT;
+
+    int i = 0;
+    for (const auto& line : lines) {
+        lvItem.iItem = i++;
+        lvItem.pszText = const_cast<LPWSTR>(line.c_str());
+        ListView_InsertItem(hListView, &lvItem);
+    }
+
+    recallWindow.addListener(InterposerWindow::OnStringUpdated);
+}
+
+
+void KillGame(auto input, bool askFirst = true) {
+    if (askFirst) {
+        int msgboxID = MessageBox(
+            input,
+            "Are you sure you want to terminate the game and Interposer?",
+            "Confirmation",
+            MB_ICONWARNING | MB_YESNO | MB_DEFBUTTON2
+        );
+
+        if (msgboxID == IDNO) {
+            // If the user says no, we simply return without terminating
+            return;
+        }
+    }
+
+    DWORD dwParentProcessId = GetCurrentProcessId();
+    HANDLE hParentProcess = OpenProcess(PROCESS_TERMINATE, FALSE, dwParentProcessId);
+    if (hParentProcess) {
+        TerminateProcess(hParentProcess, 0);
+        CloseHandle(hParentProcess);
+    }
+    else {
+        // Error handling, to understand if OpenProcess fails
+        DWORD error = GetLastError();
+        std::string errorMsg = "OpenProcess failed with error: " + std::to_string(error);
+        MessageBox(input, errorMsg.c_str(), "Error", MB_ICONERROR);
     }
 }
 
-LRESULT CALLBACK InterposerWindow::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    return instance.instanceWindowProc(hwnd, uMsg, wParam, lParam);
-}
+INT_PTR CALLBACK DialogProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    auto& instance = InterposerWindow::GetInstance();
 
-LRESULT InterposerWindow::instanceWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    switch (uMsg)
-    {
-    case WM_CREATE: {
-        CreateWindow(
-            "BUTTON",
-            "Add Time",
-            WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
-            10, 10, 100, 30,
-            hwnd,
-            (HMENU)IDC_BUTTON_ADDTIME,
-            hInstance,
-            NULL);
-
-        hTextBox = CreateWindow(
-            "EDIT",
-            "",
-            WS_CHILD | WS_VISIBLE | WS_VSCROLL | ES_LEFT | ES_MULTILINE | ES_AUTOVSCROLL,
-            10, 50, 280, 160,
-            hwnd,
-            (HMENU)IDC_TEXTBOX,
-            hInstance,
-            NULL);
-        return 0;
-    }
-    case WM_COMMAND: {
-        if (LOWORD(wParam) == IDC_BUTTON_ADDTIME)
-        {
-            std::time_t t = std::time(nullptr);
-            std::tm tm;
-            localtime_s(&tm, &t);
-            char mbstr[100];
-            std::strftime(mbstr, sizeof(mbstr), "%H:%M:%S", &tm);
-
-            std::string timeStr = std::string("[") + mbstr + "] ";
-
-            char buffer[1024];
-            GetWindowText(hTextBox, buffer, 1024);
-            std::string currentText = buffer;
-
-            if (!currentText.empty()) {
-                timeStr += "\r\n";
-            }
-
-            currentText.insert(0, timeStr); // Use insert to prepend the timeStr
-
-            int lines = 0;
-            size_t pos = currentText.size();
-            while (lines < 10 && pos != std::string::npos) {
-                pos = currentText.rfind("\r\n", pos);
-                if (pos != std::string::npos) {
-                    lines++;
-                    if (lines < 10) {
-                        pos--;
-                    }
+    switch (message) {
+        case WM_INITDIALOG: {
+            SetTimer(hwnd, InterposerWindow::WM_USER_Update_Window, 10000, nullptr);
+            instance.InitListView();
+            return 0;  // Let the system set the keyboard focus
+        }
+        case WM_COMMAND: {
+            switch (LOWORD(wParam)) {
+                case IDCLOSE: {
+                    KillGame(hwnd);
+                    return TRUE;
                 }
             }
-            if (lines == 10 && pos != std::string::npos) {
-                currentText = currentText.substr(pos + 2);
+            break;
+        }
+        case WM_TIMER: {
+            if (wParam == InterposerWindow::WM_USER_Update_Window) {
+                //DoUpdateWindow(*window);
+                return 0;
             }
-
-            SetWindowText(hTextBox, currentText.c_str());
+            break;
         }
-        return 0;
-    }
-    case WM_DESTROY: {
-        PostQuitMessage(0);
-        return 0;
-    }
-    case WM_UPDATE_TIME: {
-        std::time_t t = std::time(nullptr);
-        std::tm tm;
-        localtime_s(&tm, &t);
-        char mbstr[100];
-        std::strftime(mbstr, sizeof(mbstr), "%H:%M:%S", &tm);
-        std::string timeStr = std::string("[") + mbstr + "]";
-
-        SetWindowText(hTextBox, timeStr.c_str());
-        return 0;
-    }
-    }
-
-
-    return DefWindowProc(hwnd, uMsg, wParam, lParam);
-}
-
-
-void InterposerWindow::StartWindowThread() {
-    windowThread = std::thread([this]() {
-        // Wait for 1 second
-        std::this_thread::sleep_for(std::chrono::seconds(12));
-
-        // Show the window
-        Show(SW_SHOW);
-
-        // Update the time every second
-        while (true) {
-            UpdateTime();
-            std::this_thread::sleep_for(std::chrono::seconds(1));
+        case WM_CLOSE: {
+            EndDialog(hwnd, 0);
+            return TRUE;
         }
-        });
+        case InterposerWindow::WM_USER_UPDATE_LISTVIEW: {
+            SIZE_T length = (SIZE_T)wParam;
+            SIZE_T index = (SIZE_T)lParam;
+
+            HWND hListView = GetDlgItem(hwnd, IDC_LIST1);
+            auto& recallWindow = CyberInterposer::logger.recallWindow;
+            std::wstring updatedStr = recallWindow.GetLines()[index];
+
+            LVITEMW lvItem;
+            memset(&lvItem, 0, sizeof(lvItem));
+            lvItem.iSubItem = 0;
+            lvItem.pszText = const_cast<LPWSTR>(updatedStr.c_str());
+
+            SendMessage(hListView, LVM_SETITEMTEXT, index, (LPARAM)&lvItem);
+
+            return TRUE;
+        }
+
+    };
+    return FALSE;
 }
 
-void InterposerWindow::UpdateTime() {
-    PostMessage(hwnd, WM_UPDATE_TIME, 0, 0);
+
+DWORD WINAPI WindowThreadMain(LPVOID lpParam) {
+    auto& instance = InterposerWindow::GetInstance();
+
+    DialogBox(instance.hInstance, MAKEINTRESOURCE(IDD_DIALOG1), NULL, DialogProc);
+
+    //SetTimer(hwnd, InterposerWindow::WM_Update_Window, 10000, nullptr);
+
+    MSG msg = {};
+    while (true) {
+        if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+        }
+        else {
+            constexpr SIZE_T msInSecond = 1000;
+            constexpr SIZE_T millisecondsToSleep = msInSecond / 200;
+
+            const auto didSwitch = SwitchToThread();
+            if(didSwitch == false)
+                Sleep(millisecondsToSleep);
+        }
+    }
+    return 0;
 }
+
+void InterposerWindow::Start(HMODULE hModule)
+{
+    hInstance = hModule;
+
+    WindowThread = CreateThread(NULL, 0, WindowThreadMain, hModule, 0, NULL);
+}
+
+

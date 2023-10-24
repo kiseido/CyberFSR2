@@ -1,4 +1,11 @@
+#include "pch.h"
+
 #include "CyberLogger.h"
+
+#include <string_view>
+#include <iostream>
+#include <sstream>
+#include <string>
 
 using namespace CyberTypes;
 
@@ -25,7 +32,7 @@ CyberLogger::Logger::Logger()
     DoRTC = false;
 }
 
-CyberLogger::Logger::Logger(const LPCWSTR& fileName, const bool& doPerformanceInfo, const bool& doCoreInfo, const bool& doRTC)
+CyberLogger::Logger::Logger(const LPCWSTR& fileName, const bool doPerformanceInfo, const bool doCoreInfo, const bool doRTC)
 {
     DoPerformanceInfo = doPerformanceInfo;
     DoCoreInfo = doCoreInfo;
@@ -62,7 +69,7 @@ void CyberLogger::Logger::start()
     if (!writingThread.joinable()) {
         stopWritingThread = false;
         writingThread = std::thread(&Logger::WritingThreadFunction, this);
-        //writingThread.detach();
+        writingThread.detach();
     }
 }
 
@@ -111,6 +118,12 @@ void CyberLogger::Logger::WritingThreadFunction() {
             LogEntry entry = logQueue.front();
             logQueue.pop();
             lock.unlock();
+
+            {
+                std::wstringstream stream;
+                stream << entry;
+                recallWindow.InsertLine(stream.str());
+            }
 
             logFile << entry << "\n";
 
@@ -191,3 +204,115 @@ std::wostream& operator<<(std::wostream& os, const CyberLogger::LogEntry& entry)
     return os;
 }
 
+CyberLogger::TextRecallWindow::TextRecallWindow() : LastLineOverwriteIndex(0), NextLineOverwriteIndex(0) {
+    std::memset(buffer, 0, sizeof(buffer));
+    std::memset(callbacks, 0, sizeof(callbacks));
+
+    for (auto& line : lines) {
+        line = std::wstring_view();
+    }
+}
+
+void CyberLogger::TextRecallWindow::InsertLine(const std::wstring& line) {
+    std::lock_guard<std::mutex> lock(accessMutex);
+
+    const SIZE_T length = std::min(MAX_CHAR_PER_LINE - 1, line.length());
+
+    const SIZE_T lengthLeft = MAX_CHAR_PER_LINE - length;
+
+    const SIZE_T lastbufferIndex = LastLineOverwriteIndex * MAX_CHAR_PER_LINE;
+    const SIZE_T currentbufferIndex = NextLineOverwriteIndex * MAX_CHAR_PER_LINE;
+
+    const auto CurrentBufferPointer = &buffer[currentbufferIndex];
+
+    const auto oldUsedSize = lines[NextLineOverwriteIndex].length();
+
+    if (oldUsedSize > length) {
+        const auto remnantCount = oldUsedSize - length;
+        const auto remnantPointer = CurrentBufferPointer + length;
+        std::wmemset(remnantPointer, 0, remnantCount);
+    }
+
+    // Copy the new line into the buffer
+    std::wmemcpy(CurrentBufferPointer, line.c_str(), length);
+
+    CurrentBufferPointer[length] = L'\n';
+
+    // Update the string_view to point to the new line in the buffer
+    lines[NextLineOverwriteIndex] = std::wstring_view(CurrentBufferPointer, length);
+
+    // Update the indices for the next insert
+    LastLineOverwriteIndex = NextLineOverwriteIndex;
+    NextLineOverwriteIndex = (NextLineOverwriteIndex + 1) % MAX_LINE_COUNT;
+
+    for (int i = 0; i < MAX_CALLBACKS; i++) {
+        auto& callback = callbacks[i];
+        if (callback != nullptr) {
+            callback(lines[NextLineOverwriteIndex], LastLineOverwriteIndex, length);
+        }
+        else
+            break;
+    }
+}
+
+
+std::vector<std::wstring> CyberLogger::TextRecallWindow::GetLines() const {
+    std::lock_guard<std::mutex> lock(accessMutex);
+
+    std::vector<std::wstring> result(MAX_LINE_COUNT);
+    for (int i = 0; i < MAX_LINE_COUNT; i++) {
+        if (!lines[i].empty()) {
+            result[i] = lines[i];
+        }
+    }
+    return result;
+}
+
+bool CyberLogger::TextRecallWindow::addListener(StringUpdateCallback newCallback) {
+    if (newCallback == 0)
+        return false;
+
+    std::lock_guard<std::mutex> lock(accessMutex);
+
+    for (int i = 0; i < MAX_CALLBACKS; i++) {
+        if (callbacks[i] == nullptr) {
+            callbacks[i] = newCallback;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CyberLogger::TextRecallWindow::removeListener(StringUpdateCallback callbackToRemove) {
+    if (!callbackToRemove)
+        return false;  // Invalid callback provided
+
+    std::lock_guard<std::mutex> lock(accessMutex);
+
+    bool removed = false;
+
+    // Iterate through the callback array
+    for (int removalIndex = 0; removalIndex < MAX_CALLBACKS; removalIndex++) {
+        if (callbacks[removalIndex] == callbackToRemove) {
+            // Found the callback to remove
+            callbacks[removalIndex] = 0;
+            removed = true;
+
+            // Bubble the empty slot down by swapping with the next non-empty slot
+            for (int bubbleIndex = removalIndex + 1; bubbleIndex < MAX_CALLBACKS; bubbleIndex++) {
+
+                auto*& current = callbacks[bubbleIndex-1];
+                auto*& next = callbacks[bubbleIndex];
+                if (next) {
+                    current = next;
+
+                }
+                else {
+                    current = 0;
+                }
+            }
+        }
+    }
+
+    return removed;
+}

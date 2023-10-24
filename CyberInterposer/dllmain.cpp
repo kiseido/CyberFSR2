@@ -12,12 +12,11 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
     case DLL_PROCESS_ATTACH: {
         CyberLOGvi("Interposer_DLL_PROCESS_ATTACH");
         DisableThreadLibraryCalls(hModule);
-        InterposerWindow::GetInstance().StartWindowThread();
+        InterposerWindow::GetInstance().Start(hModule);
         //ProcessID pid = GetCurrentProcessId(); // needs some sort of casting
         //ConnectionManager::GetInstance().getConnectionForProcess(pid)->Initialize();
         break;
     }
-
     case DLL_PROCESS_DETACH: {
         CyberLOGvi("Interposer_DLL_PROCESS_DETACH");
         //ProcessID pid = GetCurrentProcessId();// needs some sort of casting

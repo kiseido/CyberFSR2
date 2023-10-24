@@ -1,3 +1,5 @@
+#include "pch.h"
+
 #include "CyberConfigurationator.h"
 
 #include <fstream>
