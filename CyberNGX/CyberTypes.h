@@ -78,7 +78,15 @@ namespace CyberTypes::Utils {
 
 namespace CyberTypes {
 
-    typedef std::int32_t ResolutionAxis_i32;
+    using ResolutionAxis_i32 = std::int32_t;
+
+    template <typename T>
+    struct ScaleRatio {
+        T numerator;
+        T divisor;
+    };
+
+    using ScaleRatio_i32 = ScaleRatio<ResolutionAxis_i32>;
 
     template <typename T>
     struct Resolution {
@@ -111,8 +119,11 @@ namespace CyberTypes {
             return widthAligned && heightAligned;
         }
 
-        T GetPixelCount() const {
-            return width * height;
+        template <typename CalcType>
+        CalcType GetPixelCount() const {
+            CalcType count = width;
+            count *= height;
+            return count;
         }
 
         T GetLowestAxis() const {
@@ -136,6 +147,10 @@ namespace CyberTypes {
         Resolution<T> GetSimplified() const {
             T gcd = std::gcd(width, height);
             return { width / gcd, height / gcd };
+        }
+
+        Resolution<T> operator*(const ScaleRatio<T>& scalar) const {
+            return { (width * scalar.numerator) / scalar.divisor, (height * scalar.numerator) / scalar.divisor };
         }
 
         Resolution<T> operator*(const T scalar) const {
@@ -170,17 +185,9 @@ namespace CyberTypes {
         }
     };
 
-    template <typename T>
-    struct ScaleRatio {
-        T numerator;
-        T divisor;
-    };
+    using Resolution_i32 = Resolution<ResolutionAxis_i32>;
 
-    typedef ScaleRatio<ResolutionAxis_i32> ScaleRatio_i32;
-
-    typedef Resolution<ResolutionAxis_i32> Resolution_i32;
-
-    typedef std::vector<Resolution_i32> ResolutionList_i32;
+    using ResolutionList_i32 = std::vector<Resolution_i32>;
 
 // #define WrapIt(BaseType) typedef Wrapper<BaseType> CT_##BaseType##_t; typedef union {BaseType base; CT_##BaseType##_t wrapped;} CT_##BaseType##_u; std::wostream& CyberTypes::CT_##BaseType##_u::operator<<(std::wostream& wos)
 

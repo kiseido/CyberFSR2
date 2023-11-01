@@ -3,8 +3,8 @@
 
 #include <vector>
 
-#include <algorithm> // For std::max
-#include <cstdlib> // For std::div
+#include <algorithm>
+#include <cstdlib>
 #include <numeric>
 #include <initializer_list>
 
@@ -15,12 +15,12 @@ using ScaleRatio = CyberTypes::ScaleRatio_i32;
 
 namespace CyberUtils {
 
-    CyberTypes::ResolutionList_i32 AlignedResolutionList::MakeList(
-        const CyberTypes::Resolution_i32& aspect_ratio,
-        const CyberTypes::Resolution_i32& align_to,
-        const CyberTypes::Resolution_i32& minValues,
-        const CyberTypes::Resolution_i32& maxValues
-    ) {
+    CyberTypes::ResolutionList_i32 AlignedResolutionList::make_list( const InitParams& params) {
+
+        const auto& maxValues = params.maximumAxisValues;
+        const auto& minValues = params.minimumAxisValues;
+        const auto& aspect_ratio = params.aspect_ratio;
+        const auto& align_to = params.align_to;
 
         CyberTypes::ResolutionList_i32 output;
 
@@ -65,16 +65,55 @@ namespace CyberUtils {
         return output;
     }
 
-    AlignedResolutionList::AlignedResolutionList(
-        const CyberTypes::Resolution_i32& aspect_ratio,
-        const CyberTypes::Resolution_i32& align_to,
-        const CyberTypes::Resolution_i32& minmum_axis_values,
-        const CyberTypes::Resolution_i32& maximum_axis_values
-    ) : init_params(aspect_ratio, align_to, minmum_axis_values, maximum_axis_values), resolutions(MakeList(aspect_ratio, align_to, minmum_axis_values, maximum_axis_values)) {
-
+    AlignedResolutionList::AlignedResolutionList(const InitParams& params)
+        : init_params(params), resolutions(make_list(params)) {
+        // Constructor body (if needed)
     }
 
-    AlignedResolutionList::Init_Params::Init_Params(
+    std::optional<CyberTypes::Resolution_i32> AlignedResolutionList::get_closest_resolution(const CyberTypes::Resolution_i32& target_resolution) const {
+
+        std::optional<CyberTypes::Resolution_i32> output = std::nullopt;
+
+        if (resolutions.empty()) {
+            return output;
+        }
+
+        using CalcT = int64_t;
+
+        const CalcT targetPixCount = target_resolution.GetPixelCount<CalcT>();
+
+        const auto it = std::lower_bound(resolutions.begin(), resolutions.end(), targetPixCount,
+            [](const CyberTypes::Resolution_i32& res, CalcT val) {
+                return res.GetPixelCount<CalcT>() < val;
+            });
+
+        // Three cases to consider:
+        // 1. Found exact match, or it is the smallest resolution that is greater than the target.
+        // 2. It is the end iterator, meaning all resolutions in the list are smaller than the target.
+        // 3. It is somewhere in the middle of the list.
+
+        if (it == resolutions.begin()) {
+            output = *it;
+        }
+        else if (it == resolutions.end()) {
+            output = *std::prev(it);
+        }
+        else {
+            const auto prev_it = std::prev(it);
+            const CalcT diff_curr = std::abs(it->GetPixelCount<CalcT>() - targetPixCount);
+            const CalcT diff_prev = std::abs(prev_it->GetPixelCount<CalcT>() - targetPixCount);
+
+
+            if (diff_curr > diff_prev)
+                output = *prev_it;
+            else
+                output = *it;
+        }
+        return output;
+    }
+
+
+    AlignedResolutionList::InitParams::InitParams(
         const CyberTypes::Resolution_i32& aspect_ratio,
         const CyberTypes::Resolution_i32& align_to,
         const CyberTypes::Resolution_i32& minmum_axis_values,
@@ -90,53 +129,81 @@ namespace CyberUtils {
             init_params.maximumAxisValues == other.init_params.maximumAxisValues;
     }
 
-    CyberUtils::ResolutionDatabase::ListPtr ResolutionDatabase::getResolutions(const Resolution& aspect_ratio, const Resolution& align_to, const Resolution& minimumAxisValues, const Resolution& maximumAxisValues) {
-
-        const auto begin = lists.begin();
-        const auto end = lists.end();
-
-
-        constexpr size_t ResCount = 2 * 4;
-        constexpr size_t ResSize = sizeof(int32_t);
-        constexpr size_t ResArraySize = ResSize * ResCount;
-        constexpr size_t NativeSize = sizeof(char);
-        constexpr size_t NativeCount = (ResArraySize / NativeSize) + ((ResArraySize % NativeSize == 0) ? 0 : 1);
-
-        std::array<char, NativeCount> key;;
-
-        // pack the resolutions int32 bits into the char array
-
-        auto packResolution = [&key](const Resolution& res, size_t offset) {
-            uint32_t width = static_cast<uint32_t>(res.width);
-            uint32_t height = static_cast<uint32_t>(res.height);
-
-            key[offset] = width & 0xFF;
-            key[offset + 1] = (width >> 8) & 0xFF;
-            key[offset + 2] = (width >> 16) & 0xFF;
-            key[offset + 3] = (width >> 24) & 0xFF;
-
-            key[offset + 4] = height & 0xFF;
-            key[offset + 5] = (height >> 8) & 0xFF;
-            key[offset + 6] = (height >> 16) & 0xFF;
-            key[offset + 7] = (height >> 24) & 0xFF;
-            };
-
-        packResolution(aspect_ratio, 0);
-        packResolution(align_to, ResSize * 2);
-        packResolution(minimumAxisValues, ResSize * 4);
-        packResolution(maximumAxisValues, ResSize * 6);
-
-        const std::string_view keyString(key.data(),key.size());
-
-        auto ptr = lists[keyString];
-
-        if (ptr == nullptr) {
-            const AlignedResolutionList result(aspect_ratio, align_to, minimumAxisValues, maximumAxisValues);
-            ptr = std::make_shared<AlignedResolutionList>(result);
-            lists[keyString] = ptr;
+    ResolutionDatabase::ListPtr ResolutionDatabase::find_first_list_with_params(const AlignedResolutionList::InitParams& params) {
+        for (auto it = lru_lists.begin(); it != lru_lists.end(); it++) {
+            const auto listPtr = *it;
+            if (listPtr->init_params == params) {
+                move_to_front(it);
+                return listPtr;
+            }
         }
-
-        return ptr;
+        return nullptr;
     }
 
+    ResolutionDatabase::ListPtr ResolutionDatabase::find_first_list_with_aspect_ratio(const CyberTypes::Resolution_i32& aspect_ratio) {
+        for (auto it = lru_lists.begin(); it != lru_lists.end(); it++) {
+            const auto& listPtr = *it;
+            if (listPtr->init_params.aspect_ratio == aspect_ratio) {
+                move_to_front(it);
+                return *it;
+            }
+        }
+        return nullptr;  // Return null if not found
+    }
+
+    ResolutionDatabase::ListPtr ResolutionDatabase::find_first_list_with_align_to(const CyberTypes::Resolution_i32& align_to) {
+        for (auto it = lru_lists.begin(); it != lru_lists.end(); it++) {
+            const auto& listPtr = *it;
+            if (listPtr->init_params.align_to == align_to) {
+                move_to_front(it);
+                return *it;
+            }
+        }
+        return nullptr;  // Return null if not found
+    }
+
+    CyberUtils::ResolutionDatabase::ListPtr ResolutionDatabase::generate_resolutions(const Resolution& aspect_ratio, const Resolution& align_to, const Resolution& minimumAxisValues, const Resolution& maximumAxisValues) {
+
+        const AlignedResolutionList::InitParams param(aspect_ratio, align_to, minimumAxisValues, maximumAxisValues);
+
+        const auto foundPtr = find_first_list_with_params(param);
+
+        if (foundPtr != nullptr)
+            return foundPtr;
+
+        const auto newPtr = std::make_shared<AlignedResolutionList>(param);
+
+        lru_lists.emplace_front(newPtr);
+
+        prune();
+
+        return newPtr;
+    }
+
+    void ResolutionDatabase::prune() {
+        while (lru_lists.size() > MAX_SIZE) {
+            auto last = lru_lists.end();
+            last--;
+            lru_lists.pop_back();
+        }
+    }
+    void ResolutionDatabase::move_to_front(std::list<ListPtr>::iterator& it) {
+        if (it != lru_lists.begin()) { // Check if it is not already at the front
+            lru_lists.splice(lru_lists.begin(), lru_lists, it);
+        }
+    }
+
+    std::optional<CyberTypes::Resolution_i32> ResolutionDatabase::find_first_resolution_near(const CyberTypes::Resolution_i32& target_resolution) {
+
+        const CyberTypes::Resolution_i32 target_aspect_ratio = target_resolution.GetSimplified();
+
+        const auto foundListPtr = find_first_list_with_aspect_ratio(target_aspect_ratio);
+
+        if (foundListPtr == nullptr)
+            return std::nullopt;
+
+        auto nearest_resolution = foundListPtr->get_closest_resolution(target_resolution);
+
+        return nearest_resolution;
+    }
 }
