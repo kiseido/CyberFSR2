@@ -2,6 +2,9 @@
 
 #include "CyberLogger.h"
 
+#include <map>
+#include <format>
+
 #include <string_view>
 #include <iostream>
 #include <sstream>

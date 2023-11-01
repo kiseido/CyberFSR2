@@ -1,44 +1,46 @@
 #include "pch.h"
+
 #include "CyberTypes.h"
 
+#include "CyberMacro.h"
 
 namespace CyberTypes {
 
-    DLSS_Features& DLSS_Features::operator=(const NVSDK_NGX_DLSS_Feature_Flags& other) {
-        this->flags = other;
+    DLSS_Feature_Flags_Wrapper& DLSS_Feature_Flags_Wrapper::operator=(const NVSDK_NGX_DLSS_Feature_Flags& other) {
+        this->inner = other;
         return *this;
     }
 
-    DLSS_Features::operator NVSDK_NGX_DLSS_Feature_Flags() const {
-        return this->flags;
+    DLSS_Feature_Flags_Wrapper::operator NVSDK_NGX_DLSS_Feature_Flags() const {
+        return this->inner;
     }
 
-    bool DLSS_Features::IsHDR() {
-        return (flags & NVSDK_NGX_DLSS_Feature_Flags_IsHDR) != 0;
+    bool DLSS_Feature_Flags_Wrapper::IsHDR() {
+        return (inner & NVSDK_NGX_DLSS_Feature_Flags_IsHDR) != 0;
     }
 
-    bool DLSS_Features::IsMVLowRes() {
-        return (flags & NVSDK_NGX_DLSS_Feature_Flags_MVLowRes) != 0;
+    bool DLSS_Feature_Flags_Wrapper::IsMVLowRes() {
+        return (inner & NVSDK_NGX_DLSS_Feature_Flags_MVLowRes) != 0;
     }
 
-    bool DLSS_Features::IsMVJittered() {
-        return (flags & NVSDK_NGX_DLSS_Feature_Flags_MVJittered) != 0;
+    bool DLSS_Feature_Flags_Wrapper::IsMVJittered() {
+        return (inner & NVSDK_NGX_DLSS_Feature_Flags_MVJittered) != 0;
     }
 
-    bool DLSS_Features::IsDepthInverted() {
-        return (flags & NVSDK_NGX_DLSS_Feature_Flags_DepthInverted) != 0;
+    bool DLSS_Feature_Flags_Wrapper::IsDepthInverted() {
+        return (inner & NVSDK_NGX_DLSS_Feature_Flags_DepthInverted) != 0;
     }
 
-    bool DLSS_Features::IsReserved0() {
-        return (flags & NVSDK_NGX_DLSS_Feature_Flags_Reserved_0) != 0;
+    bool DLSS_Feature_Flags_Wrapper::IsReserved0() {
+        return (inner & NVSDK_NGX_DLSS_Feature_Flags_Reserved_0) != 0;
     }
 
-    bool DLSS_Features::IsDoSharpening() {
-        return (flags & NVSDK_NGX_DLSS_Feature_Flags_DoSharpening) != 0;
+    bool DLSS_Feature_Flags_Wrapper::IsDoSharpening() {
+        return (inner & NVSDK_NGX_DLSS_Feature_Flags_DoSharpening) != 0;
     }
 
-    bool DLSS_Features::IsAutoExposure() {
-        return (flags & NVSDK_NGX_DLSS_Feature_Flags_AutoExposure) != 0;
+    bool DLSS_Feature_Flags_Wrapper::IsAutoExposure() {
+        return (inner & NVSDK_NGX_DLSS_Feature_Flags_AutoExposure) != 0;
     }
 }
 
@@ -506,23 +508,6 @@ std::wostream& CyberTypes::operator<<(std::wostream& os, const CyberTypes::CT_NV
 
 std::wostream& CyberTypes::operator<<(std::wostream& os, const CyberTypes::CT_NVSDK_NGX_FeatureCommonInfo_Internal_u& featureCommonInfo) {
     os << L"FeatureCommonInfo_Internal";
-    return os;
-}
-
-std::wostream& CyberTypes::operator<<(std::wostream& os, const CyberTypes::CT_NVSDK_NGX_DLSS_Feature_Flags_u& dlssFeatureFlags) {
-    switch (dlssFeatureFlags.inner) {
-        CyberEnumSwitchHelperOStream(os, NVSDK_NGX_DLSS_DeepDVC_Mode_, NVSDK_NGX_DLSS_Feature_Flags_IsInvalid);
-        CyberEnumSwitchHelperOStream(os, NVSDK_NGX_DLSS_DeepDVC_Mode_, NVSDK_NGX_DLSS_Feature_Flags_None);
-        CyberEnumSwitchHelperOStream(os, NVSDK_NGX_DLSS_DeepDVC_Mode_, NVSDK_NGX_DLSS_Feature_Flags_IsHDR);
-        CyberEnumSwitchHelperOStream(os, NVSDK_NGX_DLSS_DeepDVC_Mode_, NVSDK_NGX_DLSS_Feature_Flags_MVLowRes);
-        CyberEnumSwitchHelperOStream(os, NVSDK_NGX_DLSS_DeepDVC_Mode_, NVSDK_NGX_DLSS_Feature_Flags_MVJittered);
-        CyberEnumSwitchHelperOStream(os, NVSDK_NGX_DLSS_DeepDVC_Mode_, NVSDK_NGX_DLSS_Feature_Flags_DepthInverted);
-        CyberEnumSwitchHelperOStream(os, NVSDK_NGX_DLSS_DeepDVC_Mode_, NVSDK_NGX_DLSS_Feature_Flags_Reserved_0);
-        CyberEnumSwitchHelperOStream(os, NVSDK_NGX_DLSS_DeepDVC_Mode_, NVSDK_NGX_DLSS_Feature_Flags_DoSharpening);
-        CyberEnumSwitchHelperOStream(os, NVSDK_NGX_DLSS_DeepDVC_Mode_, NVSDK_NGX_DLSS_Feature_Flags_AutoExposure);
-    default:
-        os << L"CI_Unknown";
-    }
     return os;
 }
 

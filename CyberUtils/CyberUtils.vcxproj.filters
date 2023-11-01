@@ -27,11 +27,11 @@
     <ClInclude Include="CyberLogger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CyberResolution.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CyberUtils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -39,6 +39,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CyberLogger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CyberResolution.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

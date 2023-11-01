@@ -6,16 +6,21 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CyberFSR", "CyberFSR\CyberFSR.vcxproj", "{8D2B73FB-EECD-45CE-B8E5-335610462F58}"
 	ProjectSection(ProjectDependencies) = postProject
 		{45EB66A8-E3BB-4D69-AE35-DFB0D4DB79BC} = {45EB66A8-E3BB-4D69-AE35-DFB0D4DB79BC}
+		{942BFAD0-51BE-4C6C-A6E6-2EF3D54ED22B} = {942BFAD0-51BE-4C6C-A6E6-2EF3D54ED22B}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CyberInterposer", "CyberInterposer\CyberInterposer.vcxproj", "{66688C84-ECBD-4E74-8EB0-1A9CA7EC2D47}"
 	ProjectSection(ProjectDependencies) = postProject
 		{45EB66A8-E3BB-4D69-AE35-DFB0D4DB79BC} = {45EB66A8-E3BB-4D69-AE35-DFB0D4DB79BC}
+		{942BFAD0-51BE-4C6C-A6E6-2EF3D54ED22B} = {942BFAD0-51BE-4C6C-A6E6-2EF3D54ED22B}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CyberNGX", "CyberNGX\CyberNGX.vcxproj", "{45EB66A8-E3BB-4D69-AE35-DFB0D4DB79BC}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CyberUtils", "CyberUtils\CyberUtils.vcxproj", "{942BFAD0-51BE-4C6C-A6E6-2EF3D54ED22B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{45EB66A8-E3BB-4D69-AE35-DFB0D4DB79BC} = {45EB66A8-E3BB-4D69-AE35-DFB0D4DB79BC}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

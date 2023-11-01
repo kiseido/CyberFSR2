@@ -69,6 +69,8 @@ namespace CyberInterposer
 	struct CI_MGX_Parameter_StaticAlloc {
 		static constexpr std::size_t PoolSize = 10000;
 
+		bool isMine(NVSDK_NGX_Parameter* p) const;
+
 		CI_Parameter* claim() noexcept(false);
 		CI_Parameter* claim(std::size_t number) noexcept(false);
 		bool release(CI_Parameter* p) noexcept(false);
