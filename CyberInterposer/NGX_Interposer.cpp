@@ -143,14 +143,14 @@ namespace CyberInterposer {
     }
 }
 
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_GetVersion(NVSDK_NGX_Version* version)
+NVSDK_NGX_Result C_Declare NVSDK_NGX_GetVersion(NVSDK_NGX_Version* version)
 {
     CyberLogArgs(version);
 
     return NVSDK_NGX_Result_Fail;
 }
 
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_UpdateFeature(const NVSDK_NGX_Application_Identifier* ApplicationId, const NVSDK_NGX_Feature FeatureID)
+NVSDK_NGX_Result C_Declare NVSDK_NGX_UpdateFeature(const NVSDK_NGX_Application_Identifier* ApplicationId, const NVSDK_NGX_Feature FeatureID)
 {
     CyberLogArgs(ApplicationId, FeatureID);
 

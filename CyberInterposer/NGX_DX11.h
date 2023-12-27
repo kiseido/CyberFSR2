@@ -51,12 +51,7 @@ Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_Parameter_GetD3d11Resource(NVSDK
 
 Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D11_Init(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath, ID3D11Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion);
 
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D11_Init_Ext(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath, ID3D11Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion, unsigned long long InFlags);
-
 Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D11_Init_Ext(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath, ID3D11Device* InDevice, NVSDK_NGX_Version InSDKVersion, const char* Apointer1, const char* Apointer2);
-
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D11_Init_ProjectID(const char* InProjectId, NVSDK_NGX_EngineType InEngineType, const char* InEngineVersion, const wchar_t* InApplicationDataPath, ID3D11Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion);
-
 
 Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D11_Shutdown(void);
 Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D11_Shutdown1(ID3D11Device* InDevice);

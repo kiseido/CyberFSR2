@@ -35,28 +35,6 @@ namespace CyberInterposer {
     }
 }
 
-
-
-NVSDK_NGX_Result NVSDK_NGX_D3D12_Init_Ext(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath,
-    ID3D12Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion,
-    unsigned long long unknown0)
-{
-    const CyberTypes::RTC start = CyberTypes::RTC(true);
-    WaitForLoading();
-    CyberLogArgs(InApplicationId, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion, unknown0, start);
-
-    auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_DX12.pfn_D3D12_Init_Ext;
-
-    if (ptr != nullptr)
-    {
-        auto result = ptr(InApplicationId, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion, unknown0);
-        CyberLOGvi(result);
-        return result;
-    }
-
-    return NVSDK_NGX_Result_Fail;
-}
-
 NVSDK_NGX_Result NVSDK_NGX_D3D12_Init(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath, ID3D12Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion)
 {
     const CyberTypes::RTC start = CyberTypes::RTC(true);
@@ -68,24 +46,6 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_Init(unsigned long long InApplicationId, const 
     if (ptr != nullptr)
     {
         auto result = ptr(InApplicationId, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion);
-        CyberLOGvi(result);
-        return result;
-    }
-
-    return NVSDK_NGX_Result_Fail;
-}
-
-NVSDK_NGX_Result NVSDK_NGX_D3D12_Init_ProjectID(const char* InProjectId, NVSDK_NGX_EngineType InEngineType, const char* InEngineVersion, const wchar_t* InApplicationDataPath, ID3D12Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion)
-{
-    const CyberTypes::RTC start = CyberTypes::RTC(true);
-    WaitForLoading();
-    CyberLogArgs(InProjectId, InEngineType, InEngineVersion, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion, start);
-
-    auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_DX12.pfn_D3D12_Init_ProjectID;
-
-    if (ptr != nullptr)
-    {
-        auto result = ptr(InProjectId, InEngineType, InEngineVersion, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion);
         CyberLOGvi(result);
         return result;
     }
@@ -176,24 +136,6 @@ NVSDK_NGX_Result NVSDK_NGX_D3D12_AllocateParameters(NVSDK_NGX_Parameter** OutPar
     if (ptr != nullptr)
     {
         auto result = ptr(OutParameters);
-        CyberLOGvi(result);
-        return result;
-    }
-
-    return NVSDK_NGX_Result_Fail;
-}
-
-NVSDK_NGX_Result NVSDK_NGX_D3D12_DestroyParameters(NVSDK_NGX_Parameter* InParameters)
-{
-    const CyberTypes::RTC start = CyberTypes::RTC(true);
-    WaitForLoading();
-    CyberLogArgs(InParameters, start);
-
-    auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_DX12.pfn_D3D12_DestroyParameters;
-
-    if (ptr != nullptr)
-    {
-        auto result = ptr(InParameters);
         CyberLOGvi(result);
         return result;
     }

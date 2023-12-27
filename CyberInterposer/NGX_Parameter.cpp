@@ -356,12 +356,12 @@ bool CyberInterposer::PFN_Table_NVNGX_Parameter::LoadDLL(HMODULE inputFile, bool
 }
 
 
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_DLSS_GetOptimalSettingsCallback(NVSDK_NGX_Parameter* InParams)
+NVSDK_NGX_Result C_Declare NVSDK_NGX_DLSS_GetOptimalSettingsCallback(NVSDK_NGX_Parameter* InParams)
 {
     return ((CyberInterposer::CI_Parameter*)InParams)->GetOptimalSettingsCallback();
 }
 
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_DLSS_GetStatsCallback(NVSDK_NGX_Parameter* InParams)
+NVSDK_NGX_Result C_Declare NVSDK_NGX_DLSS_GetStatsCallback(NVSDK_NGX_Parameter* InParams)
 {
     return ((CyberInterposer::CI_Parameter*)InParams)->GetStatsCallback();
 }

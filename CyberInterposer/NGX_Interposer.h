@@ -14,7 +14,9 @@
 #include "NGX_Vk.h"
 #include "NGX_Parameter.h"
 
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_GetVersion(NVSDK_NGX_Version* version);
+NVSDK_NGX_Result C_Declare NVSDK_NGX_GetVersion(NVSDK_NGX_Version* version);
+
+Expose_API NVSDK_NGX_Result C_Declare NGX_SNIPPETS_GetRequiredDriverSupport(NVSDK_NGX_Version* version);
 
 namespace CyberInterposer
 {

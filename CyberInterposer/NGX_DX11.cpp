@@ -58,27 +58,6 @@ Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D11_Init(unsigned long long In
 	return NVSDK_NGX_Result_Fail;
 }
 
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D11_Init_Ext(unsigned long long InApplicationId, const wchar_t* InApplicationDataPath,
-	ID3D11Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion,
-	unsigned long long unknown0)
-{
-	const CyberTypes::RTC start = CyberTypes::RTC(true);
-	WaitForLoading();
-	CyberLogArgs(InApplicationId, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion, unknown0, start);
-
-	auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_DX11.pfn_D3D11_Init_Ext;
-
-	if (ptr != nullptr)
-	{
-		auto result = ptr(InApplicationId, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion, unknown0);
-		CyberLOGvi(result);
-		return result;
-	}
-
-	return NVSDK_NGX_Result_Fail;
-}
-
-
 
 Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D11_Shutdown(void)
 {
@@ -208,25 +187,6 @@ Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D11_EvaluateFeature_C(ID3D11De
 	return NVSDK_NGX_Result_Fail;
 }
 
-
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D11_Init_ProjectID(const char* InProjectId, NVSDK_NGX_EngineType InEngineType, const char* InEngineVersion, const wchar_t* InApplicationDataPath, ID3D11Device* InDevice, const NVSDK_NGX_FeatureCommonInfo* InFeatureInfo, NVSDK_NGX_Version InSDKVersion)
-{
-	const CyberTypes::RTC start = CyberTypes::RTC(true);
-	WaitForLoading();
-	CyberLogArgs(InProjectId, InEngineType, InEngineVersion, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion, start);
-
-	auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_DX11.pfn_D3D11_Init_ProjectID;
-
-	if (ptr != nullptr)
-	{
-		auto result = ptr(InProjectId, InEngineType, InEngineVersion, InApplicationDataPath, InDevice, InFeatureInfo, InSDKVersion);
-		CyberLOGvi(result);
-		return result;
-	}
-
-	return NVSDK_NGX_Result_Fail;
-}
-
 Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D11_Shutdown1(ID3D11Device* InDevice)
 {
 	const CyberTypes::RTC start = CyberTypes::RTC(true);
@@ -284,30 +244,6 @@ Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D11_AllocateParameters(NVSDK_N
 		NVSDK_NGX_Result result = ptr(OutParameters);
 		internalParam->wrapped.param = *OutParameters;
 		*OutParameters = internalParam;
-		CyberLOGvi(result);
-		return result;
-	}
-
-	return NVSDK_NGX_Result_Fail;
-}
-
-Expose_API NVSDK_NGX_Result C_Declare NVSDK_NGX_D3D11_DestroyParameters(NVSDK_NGX_Parameter* InParameters)
-{
-	const CyberTypes::RTC start = CyberTypes::RTC(true);
-	WaitForLoading();
-	CyberLogArgs(InParameters, start);
-
-	auto ptr = CyberInterposer::DLLs.GetLoadedDLL().pointer_tables.PFN_DX11.pfn_D3D11_DestroyParameters;
-
-	if (ptr != nullptr)
-	{
-		CyberInterposer::CI_Parameter* internalParam = static_cast<CyberInterposer::CI_Parameter*>(InParameters);
-
-		NVSDK_NGX_Result result = ptr(internalParam->wrapped.param);
-
-		// Release the parameter from custom allocator.
-		CyberInterposer::CI_MGX_Parameter_StaticAlloc::AllocateParameters.release(internalParam);
-
 		CyberLOGvi(result);
 		return result;
 	}
